@@ -1,4 +1,6 @@
+// Max number of possible rounds
 #define MAX_RNDS 14
+// Turn on state outputs
 #define AES_DEBUG 0
 
 struct aes_key_struct {

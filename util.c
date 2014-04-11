@@ -12,5 +12,41 @@ void printbuf(const unsigned char* const buf, const int size) {
 	printf("\n");
 }
 
+/**
+ * NOTE: Buffers obtained from this MUST be freed
+ */
+unsigned char* fromHex(const char* const hex) {
+	int len = 0;
+	int i = 0;
+	while(hex[i]) {
+		char c = hex[i];
+		if((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			len++;
+		}
+		i++;
+	}
+	
+	if(len % 2 == 1) {
+		return NULL;
+	}
+	
+	unsigned char* buf = (unsigned char*) malloc(len / 2 * sizeof(unsigned char));
+	i = 0;
+	int bufi = 0;
+	while(hex[i]) {
+		char c = hex[i];
+		if(c >= '0' && c <= '9') {
+			buf[bufi/2] |= (c - '0') << (bufi % 2 == 0 ? 4 : 0);
+			bufi++;
+		} else if((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			c |= 0x20; // convert to lower case by flipping bit 5
+			           // (e.g. 'A':0100 0001->'a':0110 0001)
+			buf[bufi/2] |= (c - '0') << (bufi % 2 == 0 ? 4 : 0);
+			bufi++;
+		}
+		i++;
+	}
+	return buf;
+}
 
 #endif

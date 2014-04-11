@@ -10,9 +10,12 @@
 void assert_equals(const unsigned char* const a, const unsigned char* const b, int len, const char* const errString) {
 	for(int i = 0; i < len; i++) {
 		if(a[i] != b[i]) {
-			printf(errString);
+			printf("%s", errString);
 			printf("\n");
+			printbuf(a, len);
+			printbuf(b, len);
 			exit(-1);
 		}
 	}
+	printf("Test ok\n");
 }

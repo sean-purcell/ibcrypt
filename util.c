@@ -1,6 +1,6 @@
-#ifndef IBUR_CRYPTO_UTIL
-#define IBUR_CRYPTO_UTIL
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void printbuf(const unsigned char* const buf, const int size) {
 	for(int i = 0; i < size; i++) {
@@ -48,5 +48,3 @@ unsigned char* fromHex(const char* const hex) {
 	}
 	return buf;
 }
-
-#endif

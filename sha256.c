@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "sha256.h"
-#include "util.c"
+#include "util.h"
 
 #define BK_SIZE 64
 

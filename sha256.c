@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "sha256.h"
 #include "util.h"
@@ -9,7 +10,7 @@
 /**
  * sha256 constants
  */
-const unsigned int K[64] = {
+const uint32_t K[64] = {
 	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
 	0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
 	0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
@@ -23,7 +24,7 @@ const unsigned int K[64] = {
 /**
  * Initial sha256 state
  */
-const unsigned int H0[8] = {
+const uint32_t H0[8] = {
 	0x6a09e667,
 	0xbb67ae85,
 	0x3c6ef372,
@@ -34,38 +35,38 @@ const unsigned int H0[8] = {
 	0x5be0cd19
 };
 
-static inline unsigned int rotr(const unsigned int x, const unsigned int n) {
-	return (x >> n) | (x << ((sizeof(unsigned int) * 8) - n));
+static inline uint32_t rotr(const uint32_t x, const uint32_t n) {
+	return (x >> n) | (x << ((sizeof(uint32_t) * 8) - n));
 }
 
-static inline unsigned int ch(const unsigned int x, const unsigned int y, const unsigned int z) {
+static inline uint32_t ch(const uint32_t x, const uint32_t y, const uint32_t z) {
 	return (x & y) ^ ((~x) & z);
 }
 
-static inline unsigned int maj(const unsigned int x, const unsigned int y, const unsigned int z) {
+static inline uint32_t maj(const uint32_t x, const uint32_t y, const uint32_t z) {
 	return (x & y) ^ (x & z) ^ (y & z);
 }
 
-static inline unsigned int SIG0(const unsigned int x) {
+static inline uint32_t SIG0(const uint32_t x) {
 	return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
 }
 
-static inline unsigned int SIG1(const unsigned int x) {
+static inline uint32_t SIG1(const uint32_t x) {
 	return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
 }
 
-static inline unsigned sig0(const unsigned int x) {
+static inline unsigned sig0(const uint32_t x) {
 	return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
 }
 
-static inline unsigned sig1(const unsigned int x) {
+static inline unsigned sig1(const uint32_t x) {
 	return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10);
 }
 
 /**
  * Out should be a buffer of size (message_size / BK_SIZE + 1) * BK_SIZE
  */
-void pad_sha256(const unsigned char* const message, const unsigned long size, unsigned char* const out) {
+void pad_sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
 	/*if(size % BK_SIZE == 0) {
 		memcpy(out, message, size);
 		return;
@@ -86,9 +87,9 @@ void pad_sha256(const unsigned char* const message, const unsigned long size, un
 }
 
 /**
- *  Schedule needs to be a buffer of size at least sizeof(unsigned int) * 64
+ *  Schedule needs to be a buffer of size at least sizeof(uint32_t) * 64
  */
-void create_message_schedule_sha256(const unsigned int* const message, unsigned int* const schedule) {
+void create_message_schedule_sha256(const uint32_t* const message, uint32_t* const schedule) {
 	for(int j = 0; j < 64; j++) {
 		if(j < 16) {
 			schedule[j] = message[j];
@@ -98,13 +99,13 @@ void create_message_schedule_sha256(const unsigned int* const message, unsigned 
 	}
 }
 
-void process_block_sha256(const unsigned char* const message, unsigned int* const state) {
+void process_block_sha256(const uint8_t* const message, uint32_t* const state) {
 	if(SHA_256_DEBUG > 1) {
 		printbuf(message, 64);
 	}
 	// copy the message into the block
-	unsigned int block[16];
-	memset(block, 0, 16 * sizeof(unsigned int));
+	uint32_t block[16];
+	memset(block, 0, 16 * sizeof(uint32_t));
 	for(int i = 0; i < 64; i++) {
 		block[i/4] |= message[i] << ((3 - i % 4) * 8);
 	}
@@ -116,7 +117,7 @@ void process_block_sha256(const unsigned char* const message, unsigned int* cons
 		printf("\n");
 	}
 	
-	unsigned int W[64]; 
+	uint32_t W[64]; 
 	create_message_schedule_sha256(block, W);
 	
 	int a = state[0],
@@ -133,7 +134,7 @@ void process_block_sha256(const unsigned char* const message, unsigned int* cons
 	}
 	
 	for(int j = 0; j < 64; j++) {
-		unsigned int T1 = h + SIG1(e) + ch(e, f, g) + K[j] + W[j],
+		uint32_t T1 = h + SIG1(e) + ch(e, f, g) + K[j] + W[j],
 					 T2 = SIG0(a) + maj(a, b, c);
 		if(SHA_256_DEBUG > 1) {
 			printf("T1: %x; T2: %x;\n", T1, T2);
@@ -171,10 +172,10 @@ void process_block_sha256(const unsigned char* const message, unsigned int* cons
 /**
  * Out should be a buffer of size 32
  */
-void hash_sha256(const unsigned char* const message, const unsigned long size, unsigned char* const out) {
+void hash_sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
 	// pad the message
 	const unsigned long padded_size = (size / BK_SIZE + 1) * BK_SIZE;
-	unsigned char* const padded_message = (unsigned char*) malloc(padded_size);
+	uint8_t* const padded_message = (uint8_t*) malloc(padded_size);
 	pad_sha256(message, size, padded_message);
 	
 	if(SHA_256_DEBUG) {
@@ -182,8 +183,8 @@ void hash_sha256(const unsigned char* const message, const unsigned long size, u
 	}
 	
 	// initialize the state
-	unsigned int state[8];
-	memcpy(state, H0, sizeof(unsigned int) * 8);
+	uint32_t state[8];
+	memcpy(state, H0, sizeof(uint32_t) * 8);
 	
 	// iterate the hash
 	for(int i = 0; i < padded_size / BK_SIZE; i++) {

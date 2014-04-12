@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <stdint.h>
+
 #include "aes.c"
 #include "util.c"
 
 void size128Test() {
-	unsigned char key_bytes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint8_t key_bytes[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	AES_KEY aes_key;
 	memset(&aes_key, 0, (16 * (MAX_RNDS + 1)));
 	if(create_key_AES(key_bytes, 128, &aes_key)) {
@@ -22,7 +24,7 @@ void size128Test() {
 }
 
 void size192Test() {
-	unsigned char key_bytes[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint8_t key_bytes[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	AES_KEY aes_key;
 	memset(&aes_key, 0, (16 * (MAX_RNDS + 1)));
 	if(create_key_AES(key_bytes, 192, &aes_key)) {
@@ -41,7 +43,7 @@ void size192Test() {
 }
 
 void size256Test() {
-	unsigned char key_bytes[32] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
+	uint8_t key_bytes[32] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 	AES_KEY aes_key;
 	memset(&aes_key, 0, (16 * (MAX_RNDS + 1)));
 	if(create_key_AES(key_bytes, 256, &aes_key)) {
@@ -60,16 +62,16 @@ void size256Test() {
 }
 
 void mix_columns_test() {
-	unsigned char a[4] = {0xdb, 0x13, 0x53, 0x45};
+	uint8_t a[4] = {0xdb, 0x13, 0x53, 0x45};
 	mix_single_column(a);
 	printf("%x %x %x %x\n", a[0], a[1], a[2], a[3]);
 }
 
 void aes_test() {
-	unsigned char in[16] = {0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34};
-	unsigned char key[16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
-	unsigned char out[16];
-	unsigned char ori[16];
+	uint8_t in[16] = {0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34};
+	uint8_t key[16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+	uint8_t out[16];
+	uint8_t ori[16];
 	AES_KEY aes_key;
 	memset(&aes_key, 0, (16 * (MAX_RNDS + 1)));
 	create_key_AES(key, 128, &aes_key);

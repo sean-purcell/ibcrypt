@@ -3,4 +3,6 @@
  * Header for test.c
  */
 
-void assert_equals(const unsigned char* const a, const unsigned char* const b, int len, const char* const errString);
+#include <stdint.h>
+
+void assert_equals(const uint8_t* const a, const uint8_t* const b, int len, const char* const errString);

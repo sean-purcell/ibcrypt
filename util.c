@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 void printbuf(const unsigned char* const buf, const int size) {
 	for(int i = 0; i < size; i++) {
@@ -48,4 +49,10 @@ unsigned char* from_hex(const char* const hex) {
 		i++;
 	}
 	return buf;
+}
+
+void xor_bytes(const uint8_t* const a, const uint8_t* const b, const uint32_t len, uint8_t* const o) {
+	for(uint32_t i = 0; i < len; i++) {
+		o[i] = a[i] ^ b[i];
+	}
 }

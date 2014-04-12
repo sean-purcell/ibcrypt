@@ -4,10 +4,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "util.h"
 
-void assert_equals(const unsigned char* const a, const unsigned char* const b, int len, const char* const errString) {
+void assert_equals(const uint8_t* const a, const uint8_t* const b, int len, const char* const errString) {
 	for(int i = 0; i < len; i++) {
 		if(a[i] != b[i]) {
 			printf("%s", errString);

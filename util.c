@@ -13,10 +13,7 @@ void printbuf(const unsigned char* const buf, const int size) {
 	printf("\n");
 }
 
-/**
- * NOTE: Buffers obtained from this MUST be freed
- */
-unsigned char* from_hex(const char* const hex) {
+void from_hex(const char* const hex, uint8_t* const buf) {
 	int len = 0;
 	int i = 0;
 	while(hex[i]) {
@@ -26,13 +23,8 @@ unsigned char* from_hex(const char* const hex) {
 		}
 		i++;
 	}
-	
-	if(len % 2 == 1) {
-		return NULL;
-	}
-	
-	unsigned char* buf = (unsigned char*) malloc(len / 2 * sizeof(unsigned char));
-	memset(buf, 0, len / 2 * sizeof(unsigned char));
+	// add 1 to len in case an extra nibble is needed
+	memset(buf, 0, (len + 1) / 2 * sizeof(unsigned char));
 	i = 0;
 	int bufi = 0;
 	while(hex[i]) {
@@ -48,7 +40,6 @@ unsigned char* from_hex(const char* const hex) {
 		}
 		i++;
 	}
-	return buf;
 }
 
 void xor_bytes(const uint8_t* const a, const uint8_t* const b, const uint32_t len, uint8_t* const o) {

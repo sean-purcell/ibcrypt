@@ -40,3 +40,38 @@ int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const u
 	
 	return 0;
 }
+
+// adds 1, iterating through to carry if necessary
+static void add_one(uint8_t* const nonce) {
+	for(int i = 15; i >= 0; i--) {
+		nonce[i]++;
+		if(nonce[i] != 0) {
+			return;
+		}
+	}
+}
+
+int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out) {
+	uint8_t encrypt_block[16];
+	// copy nonce into encrypt_block
+	memcpy(encrypt_block, nonce, 16);
+	
+	uint8_t keystream[16];
+	
+	for(int i = 0; i < length; i++) {
+		
+		uint8_t mod = i % 16;
+		if(mod == 0) { // generate more keystream bytes
+			add_one(encrypt_block);
+			encrypt_block_AES(encrypt_block, keystream, key);
+		}
+		
+		out[i] = message[i] ^ keystream[mod];
+	}
+	
+	return 0;
+}
+
+int decrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out) {
+	return encrypt_ctr_AES(message, length, nonce, key, out);
+}

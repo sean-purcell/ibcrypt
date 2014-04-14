@@ -203,3 +203,58 @@ void hash_sha256(const uint8_t* const message, const unsigned long size, uint8_t
 	
 	free(padded_message);
 }
+
+// HMAC_SHA256
+
+const uint8_t ipad[64] = {0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36};
+const uint8_t opad[64] = {0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c};
+
+static void adjust_key(const uint8_t* const key, const uint32_t keylen, uint8_t* const out) {
+	memset(out, 0, 64);
+	if(keylen <= 64) {
+		memcpy(out, key, keylen);
+	} else {
+		hash_sha256(key, keylen, out);
+	}
+}
+
+void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t* const message, uint32_t len, uint8_t* const out) {
+	uint8_t adjkey[64];
+	adjust_key(key, keylen, adjkey);
+	
+	uint8_t* inner_hash_buf = (uint8_t*) malloc(len + 64); // this could be any size
+	xor_bytes(adjkey, ipad, 64, inner_hash_buf);
+	memcpy(inner_hash_buf + 64, message, len);
+	
+	uint8_t outer_hash_buf[96]; // this is just a 64 byte key plus a 32 byte hash
+	xor_bytes(adjkey, opad, 64, outer_hash_buf);
+	hash_sha256(inner_hash_buf, len + 64, outer_hash_buf + 64);
+	
+	hash_sha256(outer_hash_buf, 96, out);
+}
+
+// PBKDF2_HMAC_SHA256
+
+#define max(a, b) (a > b ? a : b)
+
+// dkLen and hlen are in bytes
+void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, const uint32_t dkLen, uint8_t* const out) {
+	
+	memset(out, 0, dkLen);
+	
+	const uint32_t sections = (dkLen + 31)/32; // in case dkLen is not a multiple of 32
+	
+	for(uint32_t i = 1; i <= sections; i++) {
+		uint8_t prev[max(32, saltLen + 4)];
+		memcpy(prev, salt, saltLen);
+		
+		for(int x = 0; x < 4; x++) {
+			prev[saltLen + x] = (i >> (24 - x * 8)) & 0xff;
+		}
+		
+		for(int u = 0; u < c; u++) {
+			hmac_sha256(pass, plen, prev, (u == 0 ? saltLen + 4 : 32), prev);
+			xor_bytes(out + ((i-1) * 32), prev, 32, out + ((i-1) * 32));
+		}
+	}
+}

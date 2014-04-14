@@ -99,7 +99,7 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 	uint32_t W[64]; 
 	create_message_schedule_sha256(block, W);
 	
-	/*uint32_t a = state[0],
+	uint32_t a = state[0],
 		b = state[1],
 		c = state[2],
 		d = state[3],
@@ -107,61 +107,45 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 		f = state[5],
 		g = state[6],
 		h = state[7];
-	*/
-	uint32_t S[8];
-	memcpy(S, state, 32);
 	
-	uint32_t T1, T2;
-	uint8_t a, b, c, d, e, f, g, h;
+	if(SHA_256_DEBUG) {
+		printf("init: %x %x %x %x %x %x %x %x\n", a, b, c, d, e, f, g, h);
+	}
 	
 	for(int j = 0; j < 64; j++) {
-		/*uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
+		uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
 					 T2 = S0(a) + maj(a, b, c);
-		
 		if(SHA_256_DEBUG > 1) {
-					printf("T1: %x; T2: %x;\n", T1, T2);
-					printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, S1(e), ch(e, f, g), K[j], W[j]);
-				}
-							 
-				// sha256 compression function
-				{
-					h = g;
-					g = f;
-					f = e;
-					e = d + T1;
-					d = c;
-					c = b;
-					b = a;
-					a = T1 + T2;
-				}
-				
-				if(SHA_256_DEBUG) {
-					printf("t = %d %x %x %x %x %x %x %x %x\n", j, a, b, c, d, e, f, g, h);
-				}*/
-		a = (64-j) & 0x7;
-		b = (65-j) & 0x7;
-		c = (66-j) & 0x7;
-		d = (67-j) & 0x7;
-		e = (68-j) & 0x7;
-		f = (69-j) & 0x7;
-		g = (70-j) & 0x7;
-		h = (71-j) & 0x7;
+			printf("T1: %x; T2: %x;\n", T1, T2);
+			printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, S1(e), ch(e, f, g), K[j], W[j]);
+		}
+					 
+		// sha256 compression function
+		{
+			h = g;
+			g = f;
+			f = e;
+			e = d + T1;
+			d = c;
+			c = b;
+			b = a;
+			a = T1 + T2;
+		}
 		
-		T1 = S[h] + S1(S[e]) + ch(S[e], S[f], S[g]) + W[j] + K[j];
-		T2 = S0(S[a]) + maj(S[a], S[b], S[c]);
-		S[d] += T1;
-		S[h] = T1 + T2;
+		if(SHA_256_DEBUG) {
+			printf("t = %d %x %x %x %x %x %x %x %x\n", j, a, b, c, d, e, f, g, h);
+		}
 	}
 	
 	// update state
-	state[0] += S[0];
-	state[1] += S[1];
-	state[2] += S[2];
-	state[3] += S[3];
-	state[4] += S[4];
-	state[5] += S[5];
-	state[6] += S[6];
-	state[7] += S[7];
+	state[0] += a;
+	state[1] += b;
+	state[2] += c;
+	state[3] += d;
+	state[4] += e;
+	state[5] += f;
+	state[6] += g;
+	state[7] += h;
 }
 
 /**

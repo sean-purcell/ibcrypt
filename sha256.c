@@ -142,7 +142,7 @@ void process_block_sha256(const uint8_t* const message, uint32_t* const state) {
 			printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, SIG1(e), ch(e, f, g), K[j], W[j]);
 		}
 					 
-		// sha256 ompression function
+		// sha256 compression function
 		{
 			h = g;
 			g = f;
@@ -173,7 +173,7 @@ void process_block_sha256(const uint8_t* const message, uint32_t* const state) {
 /**
  * Out should be a buffer of size 32
  */
-void hash_sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
+void sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
 	// pad the message
 	const unsigned long padded_size = (size / BK_SIZE + 1) * BK_SIZE;
 	uint8_t* const padded_message = (uint8_t*) malloc(padded_size);
@@ -214,7 +214,7 @@ static void adjust_key(const uint8_t* const key, const uint32_t keylen, uint8_t*
 	if(keylen <= 64) {
 		memcpy(out, key, keylen);
 	} else {
-		hash_sha256(key, keylen, out);
+		sha256(key, keylen, out);
 	}
 }
 
@@ -228,14 +228,14 @@ void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t*
 	
 	uint8_t outer_hash_buf[96]; // this is just a 64 byte key plus a 32 byte hash
 	xor_bytes(adjkey, opad, 64, outer_hash_buf);
-	hash_sha256(inner_hash_buf, len + 64, outer_hash_buf + 64);
+	sha256(inner_hash_buf, len + 64, outer_hash_buf + 64);
 	
-	hash_sha256(outer_hash_buf, 96, out);
+	sha256(outer_hash_buf, 96, out);
 }
 
 // PBKDF2_HMAC_SHA256
 
-#define max(a, b) (a > b ? a : b)
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 // dkLen and hlen are in bytes
 void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, const uint32_t dkLen, uint8_t* const out) {

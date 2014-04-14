@@ -36,42 +36,20 @@ static const uint32_t H0[8] = {
 	0x5be0cd19
 };
 
-static inline uint32_t rotr(const uint32_t x, const uint32_t n) {
-	return (x >> n) | (x << ((sizeof(uint32_t) * 8) - n));
-}
 
-static inline uint32_t ch(const uint32_t x, const uint32_t y, const uint32_t z) {
-	return (x & y) ^ ((~x) & z);
-}
-
-static inline uint32_t maj(const uint32_t x, const uint32_t y, const uint32_t z) {
-	return (x & y) ^ (x & z) ^ (y & z);
-}
-
-static inline uint32_t SIG0(const uint32_t x) {
-	return rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22);
-}
-
-static inline uint32_t SIG1(const uint32_t x) {
-	return rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25);
-}
-
-static inline unsigned sig0(const uint32_t x) {
-	return rotr(x, 7) ^ rotr(x, 18) ^ (x >> 3);
-}
-
-static inline unsigned sig1(const uint32_t x) {
-	return rotr(x, 17) ^ rotr(x, 19) ^ (x >> 10);
-}
+#define ch(x, y, z)	((x & (y ^ z)) ^ z)
+#define maj(x, y, z)	((x & (y | z)) | (y & z))
+#define shr(x, n)	(x >> n)
+#define rotr(x, n)	((x >> n) | (x << (32 - n)))
+#define S0(x)		(rotr(x, 2) ^ rotr(x, 13) ^ rotr(x, 22))
+#define S1(x)		(rotr(x, 6) ^ rotr(x, 11) ^ rotr(x, 25))
+#define s0(x)		(rotr(x, 7) ^ rotr(x, 18) ^ shr(x, 3))
+#define s1(x)		(rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10))
 
 /**
  * Out should be a buffer of size (message_size / BK_SIZE + 1) * BK_SIZE
  */
 static void pad_sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
-	/*if(size % BK_SIZE == 0) {
-		memcpy(out, message, size);
-		return;
-	}*/
 	memset(out, 0, (size/BK_SIZE + 1) * BK_SIZE);
 	memcpy(out, message, size);
 	out[size] |= 1 << 7;
@@ -95,7 +73,7 @@ static void create_message_schedule_sha256(const uint32_t* const message, uint32
 		if(j < 16) {
 			schedule[j] = message[j];
 		} else {
-			schedule[j] = sig1(schedule[j-2]) + schedule[j-7] + sig0(schedule[j-15]) + schedule[j-16];
+			schedule[j] = s1(schedule[j-2]) + schedule[j-7] + s0(schedule[j-15]) + schedule[j-16];
 		}
 	}
 }
@@ -135,11 +113,11 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 	}
 	
 	for(int j = 0; j < 64; j++) {
-		uint32_t T1 = h + SIG1(e) + ch(e, f, g) + K[j] + W[j],
-					 T2 = SIG0(a) + maj(a, b, c);
+		uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
+					 T2 = S0(a) + maj(a, b, c);
 		if(SHA_256_DEBUG > 1) {
 			printf("T1: %x; T2: %x;\n", T1, T2);
-			printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, SIG1(e), ch(e, f, g), K[j], W[j]);
+			printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, S1(e), ch(e, f, g), K[j], W[j]);
 		}
 					 
 		// sha256 compression function

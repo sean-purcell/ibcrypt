@@ -5,7 +5,7 @@
 
 #define SHA_256_DEBUG 0
 
-void sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out);
+void sha256(const uint8_t* const message, const uint32_t size, uint8_t* const out);
 
 void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t* const message, uint32_t len, uint8_t* const out);
 

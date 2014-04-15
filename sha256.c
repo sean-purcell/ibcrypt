@@ -67,7 +67,7 @@ static inline unsigned sig1(const uint32_t x) {
 /**
  * Out should be a buffer of size (message_size / BK_SIZE + 1) * BK_SIZE
  */
-static void pad_sha256(const uint8_t* const message, const unsigned long size, uint8_t* const out) {
+static void pad_sha256(const uint8_t* const message, const uint64_t size, uint8_t* const out) {
 	/*if(size % BK_SIZE == 0) {
 		memcpy(out, message, size);
 		return;
@@ -76,14 +76,15 @@ static void pad_sha256(const uint8_t* const message, const unsigned long size, u
 	memcpy(out, message, size);
 	out[size] |= 1 << 7;
 	
-	const int k = 448 - ((size*8) % (BK_SIZE * 8)); // bits of pad
-	const int kb = k/8; // bytes of pad
+	const uint64_t kb = 56 - (size %64);
 	
+	printf("%llu, %llu\n", kb, size);
 	// copy size
 	const unsigned long size_bits = size * 8;
 	for(int i = 0; i < 8; i++) {
 		// copy 1 byte at a time, can't memcpy due to big-endian vs little-endian
 		out[i + size + kb] = (size_bits >> (56 - 8 * i)) & (0xff);
+		printf("%llu\n", i + size + kb);
 	}
 }
 

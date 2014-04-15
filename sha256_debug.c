@@ -4,8 +4,8 @@
 #include "util.h"
 
 int main() {
-	char* m = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+\n";
+	char* m = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456\n";
 	uint8_t out[32];
-	sha256((uint8_t*) m, 64, out);
+	sha256((uint8_t*) m, 60, out);
 	printbuf(out, 32);
 }

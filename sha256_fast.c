@@ -148,30 +148,43 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 /**
  * Out should be a buffer of size 32
  */
-void sha256(const uint8_t* message, uint32_t size, uint8_t* const out) {
-	uint64_t padded_size = ((size + 8) / 64 + 1) * 64; // add 8 due to size bits
+void sha256(const uint8_t* message, const uint64_t osize, uint8_t* const out) {
+	uint64_t size = osize;
 	uint8_t buf[64];
-	printbuf(buf, 64);
 	
 	// initialize the state
 	uint32_t state[8];
 	memcpy(state, H0, sizeof(uint32_t) * 8);
-	printbuf(buf, 64);
 	// iterate the hash
-	while(size) {
-		memcpy(buf, message, min(size, 64));
-		printbuf(buf, 64);
-		if(padded_size == 64) {
-			printbuf(buf, 64);
-			pad_sha256(buf, size);
-			printbuf(buf, 64);
+	while(1) {
+		if(size >= 64) {
+			memcpy(buf, message, 64);
+			process_block_sha256(buf, state);
+			message += 64;
+			size -= 64;
+		} else {
+			memcpy(buf, message, size);
+			// pad
+			buf[size] = 0x80;
+			if(size < 56) {				
+				uint64_t bp = 56 - 1 - size; // bytes of pad
+				memset(buf + size + 1, 0, bp);
+			} else {
+				memset(buf + size + 1, 0, 64 - size - 1);
+				process_block_sha256(buf, state);
+				memset(buf, 0, 56);
+			}
+			const uint64_t size_bits = osize * 8;
+			for(int i = 0; i < 8; i++) {
+				// copy 1 byte at a time, can't memcpy due to big-endian vs little-endian
+				buf[56 + i] = (size_bits >> (56 - 8 * i)) & (0xff);
+			}
+			process_block_sha256(buf, state);
+			goto out;
 		}
-		process_block_sha256(buf, state);
-		message += 64;
-		padded_size -= 64;
-		size -= 64;
 	}
 	
+	out:;
 	// copy the state to the output
 	// can't memcpy because of little-endian vs big-endian
 	for(int i = 0; i < 8; i++) {

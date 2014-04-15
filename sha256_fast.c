@@ -6,8 +6,6 @@
 #include "sha256.h"
 #include "util.h"
 
-#define BK_SIZE 64
-
 /**
  * sha256 constants
  */
@@ -36,7 +34,8 @@ static const uint32_t H0[8] = {
 	0x5be0cd19
 };
 
-
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 #define ch(x, y, z)	((x & (y ^ z)) ^ z)
 #define maj(x, y, z)	((x & (y | z)) | (y & z))
 #define shr(x, n)	(x >> n)
@@ -49,19 +48,17 @@ static const uint32_t H0[8] = {
 /**
  * Out should be a buffer of size (message_size / BK_SIZE + 1) * BK_SIZE
  */
-static void pad_sha256(const uint8_t* const message, const uint64_t size, uint8_t* const out) {
-	memset(out, 0, (size/BK_SIZE + 1) * BK_SIZE);
-	memcpy(out, message, size);
-	out[size] |= 1 << 7;
+static void pad_sha256(uint8_t* const buf, uint64_t size) {
+	uint64_t msize = size % 64;
+	buf[size] = 0x80;
 	
-	const uint64_t kb = 56 - (size %64);
-	printf("%llu, %llu\n", kb, size);
-	
+	const uint32_t kb = 56 - size;
+	memset(buf + size + 1, 0, kb);
 	// copy size
 	const uint64_t size_bits = size * 8;
 	for(int i = 0; i < 8; i++) {
 		// copy 1 byte at a time, can't memcpy due to big-endian vs little-endian
-		out[i + size + kb] = (size_bits >> (56 - 8 * i)) & (0xff);
+		buf[i + size + kb] = (size_bits >> (56 - 8 * i)) & (0xff);
 	}
 }
 
@@ -151,23 +148,28 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 /**
  * Out should be a buffer of size 32
  */
-void sha256(const uint8_t* const message, const uint32_t size, uint8_t* const out) {
-	// pad the message
-	const unsigned long padded_size = ((size + 8) / BK_SIZE + 1) * BK_SIZE;
-	uint8_t* const padded_message = (uint8_t*) malloc(padded_size);
-	pad_sha256(message, size, padded_message);
-	
-	if(SHA_256_DEBUG) {
-		printbuf(padded_message, padded_size);
-	}
+void sha256(const uint8_t* message, uint32_t size, uint8_t* const out) {
+	uint64_t padded_size = ((size + 8) / 64 + 1) * 64; // add 8 due to size bits
+	uint8_t buf[64];
+	printbuf(buf, 64);
 	
 	// initialize the state
 	uint32_t state[8];
 	memcpy(state, H0, sizeof(uint32_t) * 8);
-	
+	printbuf(buf, 64);
 	// iterate the hash
-	for(int i = 0; i < padded_size / BK_SIZE; i++) {
-		process_block_sha256(padded_message + BK_SIZE * i, state);
+	while(size) {
+		memcpy(buf, message, min(size, 64));
+		printbuf(buf, 64);
+		if(padded_size == 64) {
+			printbuf(buf, 64);
+			pad_sha256(buf, size);
+			printbuf(buf, 64);
+		}
+		process_block_sha256(buf, state);
+		message += 64;
+		padded_size -= 64;
+		size -= 64;
 	}
 	
 	// copy the state to the output
@@ -178,8 +180,6 @@ void sha256(const uint8_t* const message, const uint32_t size, uint8_t* const ou
 		out[i * 4 + 2] = (state[i] >>  8) & 0xff;
 		out[i * 4 + 3] = (state[i] >>  0) & 0xff;
 	}
-	
-	free(padded_message);
 }
 
 // HMAC_SHA256
@@ -212,8 +212,6 @@ void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t*
 }
 
 // PBKDF2_HMAC_SHA256
-
-#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 // dkLen and hlen are in bytes
 void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, const uint32_t dkLen, uint8_t* const out) {

@@ -35,13 +35,13 @@ int main() {
 		uint8_t* p = (uint8_t*) "passwordPASSWORDpassword";
 		uint8_t* s = (uint8_t*) "saltSALTsaltSALTsaltSALTsaltSALTsalt";
 		uint32_t c = iters;
-		uint8_t out[32];
+		uint8_t out[64];
 		clock_t start = clock();
-		pbkdf2_hmac_sha256(p, 32, s, 32, c, 32, out);
+		pbkdf2_hmac_sha256(p, 24, s, 36, c, 64, out);
 		clock_t end = clock();
 		float seconds = (float)(end-start) / CLOCKS_PER_SEC;
 		printf("%u iterations of pbkdf2 hmac sha256 took %f seconds.\n", iters, seconds);
-		printbuf(out, 32);
+		printbuf(out, 64);
 	}
 }
 

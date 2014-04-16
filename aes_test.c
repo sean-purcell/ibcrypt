@@ -194,7 +194,7 @@ void KeySbox192Test() {
 	}
 }
 
-int main() {
+void aes_tests() {
 	GFSBox128Test();
 	GFSBox192Test();
 	GFSBox256Test();

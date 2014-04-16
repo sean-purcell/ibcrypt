@@ -21,4 +21,12 @@ void encrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KE
 
 void decrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KEY* const key);
 
+int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
+
+int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
+
+int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out);
+
+int decrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out);
+
 #endif

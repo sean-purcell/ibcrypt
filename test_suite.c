@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "sha256_test.h"
-#include "aes_test.h"
+#include "test_suite.h"
 #include "test.h"
 
 extern void aes_tests();

@@ -46,23 +46,6 @@ static const uint32_t H0[8] = {
 #define s1(x)		(rotr(x, 17) ^ rotr(x, 19) ^ shr(x, 10))
 
 /**
- * Out should be a buffer of size (message_size / BK_SIZE + 1) * BK_SIZE
- */
-static void pad_sha256(uint8_t* const buf, uint64_t size) {
-	uint64_t msize = size % 64;
-	buf[size] = 0x80;
-	
-	const uint32_t kb = 56 - size;
-	memset(buf + size + 1, 0, kb);
-	// copy size
-	const uint64_t size_bits = size * 8;
-	for(int i = 0; i < 8; i++) {
-		// copy 1 byte at a time, can't memcpy due to big-endian vs little-endian
-		buf[i + size + kb] = (size_bits >> (56 - 8 * i)) & (0xff);
-	}
-}
-
-/**
  *  Schedule needs to be a buffer of size at least sizeof(uint32_t) * 64
  */
 static void create_message_schedule_sha256(const uint32_t* const message, uint32_t* const schedule) {
@@ -158,8 +141,7 @@ void sha256(const uint8_t* message, const uint64_t osize, uint8_t* const out) {
 	// iterate the hash
 	while(1) {
 		if(size >= 64) {
-			memcpy(buf, message, 64);
-			process_block_sha256(buf, state);
+			process_block_sha256(message, state);
 			message += 64;
 			size -= 64;
 		} else {
@@ -227,7 +209,7 @@ void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t*
 // PBKDF2_HMAC_SHA256
 
 // dkLen and hlen are in bytes
-void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, const uint32_t dkLen, uint8_t* const out) {
+void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, uint32_t dkLen, uint8_t* out) {
 	
 	memset(out, 0, dkLen);
 	
@@ -243,7 +225,9 @@ void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const ui
 		
 		for(int u = 0; u < c; u++) {
 			hmac_sha256(pass, plen, prev, (u == 0 ? saltLen + 4 : 32), prev);
-			xor_bytes(out + ((i-1) * 32), prev, 32, out + ((i-1) * 32));
+			xor_bytes(out, prev, min(32, dkLen), out);
 		}
+		out += 32;
+		dkLen -= 32;
 	}
 }

@@ -25,7 +25,8 @@ int main() {
 		(*suite[i])();
 		clock_t end = clock();
 		float seconds = (float)(end-start) / CLOCKS_PER_SEC;
-		printf("%s done.  %u tests completed.  %f seconds elapsed.\n", names[i], count_tests(), seconds);
+		printf("%s done.  %u tests completed.  %f seconds elapsed.\n", 
+			names[i], count_tests(), seconds);
 		reset_tests();
 	}
 }

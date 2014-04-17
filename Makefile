@@ -32,3 +32,7 @@ cleanall: clean
 remake: clean lib
 
 remaketest: clean test
+
+install:
+	cp bin/libibcrypt.a /usr/local/bin/
+	cp -r bin/ibcrypt /usr/local/include/

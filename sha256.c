@@ -59,21 +59,11 @@ static void create_message_schedule_sha256(const uint32_t* const message, uint32
 }
 
 static void process_block_sha256(const uint8_t* const message, uint32_t* const state) {
-	if(SHA_256_DEBUG > 1) {
-		printbuf(message, 64);
-	}
 	// copy the message into the block
 	uint32_t block[16];
 	memset(block, 0, 16 * sizeof(uint32_t));
 	for(int i = 0; i < 64; i++) {
 		block[i/4] |= message[i] << ((3 - i % 4) * 8);
-	}
-	
-	if(SHA_256_DEBUG > 1) {
-		for(int i = 0; i < 16; i++) {
-			printf("%x ", block[i]);
-		}
-		printf("\n");
 	}
 	
 	uint32_t W[64]; 
@@ -88,33 +78,20 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 		g = state[6],
 		h = state[7];
 	
-	if(SHA_256_DEBUG) {
-		printf("init: %x %x %x %x %x %x %x %x\n", a, b, c, d, e, f, g, h);
-	}
-	
 	for(int j = 0; j < 64; j++) {
+		// sha256 compression function
 		uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
 					 T2 = S0(a) + maj(a, b, c);
-		if(SHA_256_DEBUG > 1) {
-			printf("T1: %x; T2: %x;\n", T1, T2);
-			printf("h: %x; SIG1(e): %x; ch(e, f, g): %x; K[j]: %x; W[j]: %x;\n", h, S1(e), ch(e, f, g), K[j], W[j]);
-		}
-					 
-		// sha256 compression function
-		{
-			h = g;
-			g = f;
-			f = e;
-			e = d + T1;
-			d = c;
-			c = b;
-			b = a;
-			a = T1 + T2;
-		}
-		
-		if(SHA_256_DEBUG) {
-			printf("t = %d %x %x %x %x %x %x %x %x\n", j, a, b, c, d, e, f, g, h);
-		}
+					 		 
+	
+		h = g;
+		g = f;
+		f = e;
+		e = d + T1;
+		d = c;
+		c = b;
+		b = a;
+		a = T1 + T2;
 	}
 	
 	// update state

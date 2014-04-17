@@ -3,5 +3,6 @@
 
 void aes_tests();
 void sha256_tests();
+void aes_mode_tests();
 
 #endif

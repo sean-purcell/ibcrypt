@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "aes_modes.h"
 #include "aes.h"
 #include "util.h"
 
@@ -62,8 +61,8 @@ int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const u
 		
 		uint8_t mod = i % 16;
 		if(mod == 0) { // generate more keystream bytes
-			add_one(encrypt_block);
 			encrypt_block_AES(encrypt_block, keystream, key);
+			add_one(encrypt_block);
 		}
 		
 		out[i] = message[i] ^ keystream[mod];

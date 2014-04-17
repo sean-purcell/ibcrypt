@@ -1,5 +1,5 @@
-#ifndef IBUR_AES_H
-#define IBUR_AES_H
+#ifndef IBCRYPT_AES_H
+#define IBCRYPT_AES_H
 
 #include <stdint.h>
 

@@ -1,5 +1,5 @@
-#ifndef IBUR_RAND_H
-#define IBUR_RAND_H
+#ifndef IBCRYPT_RAND_H
+#define IBCRYPT_RAND_H
 
 #define URANDOM_FAIL 1
 

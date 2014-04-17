@@ -1,5 +1,5 @@
-#ifndef IBUR_TEST_H
-#define IBUR_TEST_H
+#ifndef IBCRYPT_TEST_H
+#define IBCRYPT_TEST_H
 
 /**
  * A set of functions to facilitate testing

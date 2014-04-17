@@ -1,5 +1,5 @@
-#ifndef IBUR_SHA256_H
-#define IBUR_SHA256_H
+#ifndef IBCRYPT_SHA256_H
+#define IBCRYPT_SHA256_H
 
 #include <stdint.h>
 

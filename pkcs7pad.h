@@ -1,5 +1,5 @@
-#ifndef IBUR_PKCS7PAD_H
-#define IBUR_PKCS7PAD_H
+#ifndef IBCRYPT_PKCS7PAD_H
+#define IBCRYPT_PKCS7PAD_H
 
 #include <stdint.h>
 

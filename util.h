@@ -1,5 +1,5 @@
-#ifndef IBUR_UTIL_H
-#define IBUR_UTIL_H
+#ifndef IBCRYPT_UTIL_H
+#define IBCRYPT_UTIL_H
 
 #include <stdint.h>
 

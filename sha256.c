@@ -176,55 +176,6 @@ void sha256(uint8_t* message, uint64_t osize, uint8_t* out) {
 	memset(&ctx, 0, sizeof(SHA256_CTX));
 }
 
-/**
- * Out should be a buffer of size 32
- 
-void sha256(const uint8_t* message, const uint64_t osize, uint8_t* const out) {
-	uint64_t size = osize;
-	uint8_t buf[64];
-	
-	// initialize the state
-	uint32_t state[8];
-	memcpy(state, H0, sizeof(uint32_t) * 8);
-	// iterate the hash
-	while(1) {
-		if(size >= 64) {
-			process_block_sha256(message, state);
-			message += 64;
-			size -= 64;
-		} else {
-			memcpy(buf, message, size);
-			// pad
-			buf[size] = 0x80;
-			if(size < 56) {				
-				uint64_t bp = 56 - 1 - size; // bytes of pad
-				memset(buf + size + 1, 0, bp);
-			} else {
-				memset(buf + size + 1, 0, 64 - size - 1);
-				process_block_sha256(buf, state);
-				memset(buf, 0, 56);
-			}
-			const uint64_t size_bits = osize * 8;
-			for(int i = 0; i < 8; i++) {
-				// copy 1 byte at a time, can't memcpy due to big-endian vs little-endian
-				buf[56 + i] = (size_bits >> (56 - 8 * i)) & (0xff);
-			}
-			process_block_sha256(buf, state);
-			goto out;
-		}
-	}
-	
-	out:;
-	// copy the state to the output
-	// can't memcpy because of little-endian vs big-endian
-	for(int i = 0; i < 8; i++) {
-		out[i * 4 + 0] = (state[i] >> 24) & 0xff;
-		out[i * 4 + 1] = (state[i] >> 16) & 0xff;
-		out[i * 4 + 2] = (state[i] >>  8) & 0xff;
-		out[i * 4 + 3] = (state[i] >>  0) & 0xff;
-	}
-}*/
-
 // HMAC_SHA256
 
 const uint8_t ipad[64] = {0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36};

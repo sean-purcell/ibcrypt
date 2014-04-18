@@ -244,23 +244,56 @@ void hmac_sha256(uint8_t* key, uint32_t keylen, uint8_t* message, uint32_t len, 
 
 // dkLen and hlen are in bytes
 void pbkdf2_hmac_sha256(uint8_t* pass, uint32_t plen, uint8_t* salt, uint32_t saltLen, uint32_t c, uint32_t dkLen, uint8_t* out) {
+	/* in case dkLen is not a multiple of 32 */
+	const uint32_t sections = (dkLen + 31)/32;
+	/* 32 bit buffer to store integer counter */
+	uint8_t count_buf[4];
+	/* previous hash */
+	uint8_t prev[32];
+	/* partial key */
+	uint8_t pkey[32];
 	
-	memset(out, 0, dkLen);
+	/* context with pass as key before processing anything 
+	   not actually used for computation, just as holder so
+	   we don't have to recompute init every iteration */
+	HMAC_SHA256_CTX Pctx;
+	/* context for computation use */
+	HMAC_SHA256_CTX ctx;
 	
-	const uint32_t sections = (dkLen + 31)/32; // in case dkLen is not a multiple of 32
+	hmac_sha256_init(&Pctx, pass, plen);
 	
 	for(uint32_t i = 1; i <= sections; i++) {
-		uint8_t prev[max(32, saltLen + 4)];
-		memcpy(prev, salt, saltLen);
+		/* init ctx with password */
+		memcpy(&ctx, &Pctx, sizeof(HMAC_SHA256_CTX));
 		
 		for(int x = 0; x < 4; x++) {
-			prev[saltLen + x] = (i >> (24 - x * 8)) & 0xff;
+			count_buf[x] = (i >> (24 - x * 8)) & 0xff;
 		}
 		
-		for(int u = 0; u < c; u++) {
-			hmac_sha256(pass, plen, prev, (u == 0 ? saltLen + 4 : 32), prev);
-			xor_bytes(out, prev, min(32, dkLen), out);
+		/* update hmac with salt and count */
+		hmac_sha256_update(&ctx, salt, saltLen);
+		hmac_sha256_update(&ctx, count_buf, 4);
+		
+		hmac_sha256_final(&ctx, prev);
+		
+		memcpy(pkey, prev, 32);
+		
+		/* begin iterations */
+		for(int u = 0; u < c - 1; u++) {
+			/* init ctx with password */
+			memcpy(&ctx, &Pctx, sizeof(HMAC_SHA256_CTX));
+			
+			/* compute next iteration */
+			hmac_sha256_update(&ctx, prev, 32);
+			hmac_sha256_final(&ctx, prev);
+			
+			/* xor result into partial key */
+			xor_bytes(prev, pkey, 32, pkey);
 		}
+		
+		/* copy derived key to output */
+		int clen = min(32, dkLen);
+		memcpy(out, pkey, clen);
 		out += 32;
 		dkLen -= 32;
 	}

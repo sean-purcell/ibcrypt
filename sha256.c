@@ -191,18 +191,31 @@ static void adjust_key(uint8_t* key, uint32_t keylen, uint8_t* out) {
 }
 
 void hmac_sha256(uint8_t* key, uint32_t keylen, uint8_t* message, uint32_t len, uint8_t* out) {
+	SHA256_CTX ictx, octx;
+	
 	uint8_t adjkey[64];
+	
+	uint8_t ikey[64];
+	uint8_t okey[64];
+	
+	uint8_t ihash[32];
+	
+	sha256_init(&ictx);
+	sha256_init(&octx);
+	
 	adjust_key(key, keylen, adjkey);
+	xor_bytes(adjkey, ipad, 64, ikey);
+	xor_bytes(adjkey, opad, 64, okey);
 	
-	uint8_t* inner_hash_buf = (uint8_t*) malloc(len + 64); // this could be any size
-	xor_bytes(adjkey, ipad, 64, inner_hash_buf);
-	memcpy(inner_hash_buf + 64, message, len);
+	sha256_update(&ictx, ikey, 64);
+	sha256_update(&ictx, message, len);
 	
-	uint8_t outer_hash_buf[96]; // this is just a 64 byte key plus a 32 byte hash
-	xor_bytes(adjkey, opad, 64, outer_hash_buf);
-	sha256(inner_hash_buf, len + 64, outer_hash_buf + 64);
+	sha256_final(&ictx, ihash);
 	
-	sha256(outer_hash_buf, 96, out);
+	sha256_update(&octx, okey, 64);
+	sha256_update(&octx, ihash, 32);
+	
+	sha256_final(&octx, out);
 }
 
 // PBKDF2_HMAC_SHA256

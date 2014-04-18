@@ -20,20 +20,6 @@ static const uint32_t K[64] = {
 	0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 };
 
-/**
- * Initial sha256 state
- */
-static const uint32_t H0[8] = {
-	0x6a09e667,
-	0xbb67ae85,
-	0x3c6ef372,
-	0xa54ff53a,
-	0x510e527f,
-	0x9b05688c,
-	0x1f83d9ab,
-	0x5be0cd19
-};
-
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define ch(x, y, z)	((x & (y ^ z)) ^ z)
@@ -58,30 +44,30 @@ static void create_message_schedule_sha256(const uint32_t* const message, uint32
 	}
 }
 
-static void process_block_sha256(const uint8_t* const message, uint32_t* const state) {
+static void process_block_sha256(SHA256_CTX* ctx) {
 	// copy the message into the block
 	uint32_t block[16];
 	memset(block, 0, 16 * sizeof(uint32_t));
 	for(int i = 0; i < 64; i++) {
-		block[i/4] |= message[i] << ((3 - i % 4) * 8);
+		block[i/4] |= ctx->buf[i] << ((3 - i % 4) * 8);
 	}
 	
 	uint32_t W[64]; 
 	create_message_schedule_sha256(block, W);
 	
-	uint32_t a = state[0],
-		b = state[1],
-		c = state[2],
-		d = state[3],
-		e = state[4],
-		f = state[5],
-		g = state[6],
-		h = state[7];
+	uint32_t a = ctx->state[0],
+		 b = ctx->state[1],
+		 c = ctx->state[2],
+		 d = ctx->state[3],
+		 e = ctx->state[4],
+		 f = ctx->state[5],
+		 g = ctx->state[6],
+		 h = ctx->state[7];
 	
 	for(int j = 0; j < 64; j++) {
 		// sha256 compression function
 		uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
-					 T2 = S0(a) + maj(a, b, c);
+		         T2 = S0(a) + maj(a, b, c);
 					 		 
 	
 		h = g;
@@ -95,19 +81,105 @@ static void process_block_sha256(const uint8_t* const message, uint32_t* const s
 	}
 	
 	// update state
-	state[0] += a;
-	state[1] += b;
-	state[2] += c;
-	state[3] += d;
-	state[4] += e;
-	state[5] += f;
-	state[6] += g;
-	state[7] += h;
+	ctx->state[0] += a;
+	ctx->state[1] += b;
+	ctx->state[2] += c;
+	ctx->state[3] += d;
+	ctx->state[4] += e;
+	ctx->state[5] += f;
+	ctx->state[6] += g;
+	ctx->state[7] += h;
+}
+
+/**
+ * Initial sha256 state
+ */
+static const uint32_t H0[8] = {
+	0x6a09e667,
+	0xbb67ae85,
+	0x3c6ef372,
+	0xa54ff53a,
+	0x510e527f,
+	0x9b05688c,
+	0x1f83d9ab,
+	0x5be0cd19
+};
+
+void sha256_init(SHA256_CTX* ctx) {
+	/* initialize sha256 state */
+	memcpy(&(ctx->state), H0, sizeof(uint32_t) * 8);
+	memset(&(ctx->buf), 0, 64);
+	ctx->count = 0;
+}
+
+void sha256_update(SHA256_CTX* ctx, uint8_t* message, uint64_t msize) {
+	while(msize > 0) {
+		const int bufoff = ctx->count % 64;
+		if(bufoff + msize <= 64) {
+			memcpy(ctx->buf + bufoff, message, msize);
+			
+			/* increment counters by amount read into buf */
+			ctx->count += msize;
+			message += msize;
+			msize = 0;
+		} else {
+			const int space = 64 - bufoff;
+			memcpy(ctx->buf + bufoff, message, space);
+			
+			ctx->count += space;
+			msize -= space;
+			message += space;
+		}
+		
+		/* test if the buffer has been filled, if so process block */
+		if(ctx->count % 64 == 0) {
+			process_block_sha256(ctx);
+		}
+	}
+}
+
+void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
+	int bufoff = ctx->count % 64;
+	ctx->buf[bufoff] = 0x80;
+	if(bufoff >= 56) { /* not enough space to write pad and length */
+		/* finish this block, process, then do another pad block */
+		memset(ctx->buf + bufoff + 1, 0, 64 - bufoff - 1);
+		process_block_sha256(ctx);
+		bufoff = 0;
+	}
+	
+	/* bytes of pad */
+	int pad = 55 - bufoff;
+	memset(ctx->buf + bufoff + 1, 0, pad);
+	
+	/* copy length of message into last 8 bytes, big endian */
+	for(int i = 0; i < 8; i++) {
+		ctx->buf[56 + i] = (ctx->count >> (56 - i * 8)) & 0xff;
+	}
+	process_block_sha256(ctx);
+	printbuf(ctx->buf, 64);
+	printbuf(ctx->state, 32);
+	
+	/* copy the state out into the sum buffer */
+	for(int i = 0; i < 8; i++) {
+		sum[i * 4 + 0] = (ctx->state[i] >> 24) & 0xff;
+		sum[i * 4 + 1] = (ctx->state[i] >> 16) & 0xff;
+		sum[i * 4 + 2] = (ctx->state[i] >>  8) & 0xff;
+		sum[i * 4 + 3] = (ctx->state[i] >>  0) & 0xff;
+	}
+}
+
+void sha256(uint8_t* message, uint64_t osize, uint8_t* out) {
+	SHA256_CTX ctx;
+	sha256_init(&ctx);
+	sha256_update(&ctx, message, osize);
+	sha256_final(&ctx, out);
+	memset(&ctx, 0, sizeof(SHA256_CTX));
 }
 
 /**
  * Out should be a buffer of size 32
- */
+ 
 void sha256(const uint8_t* message, const uint64_t osize, uint8_t* const out) {
 	uint64_t size = osize;
 	uint8_t buf[64];
@@ -152,14 +224,14 @@ void sha256(const uint8_t* message, const uint64_t osize, uint8_t* const out) {
 		out[i * 4 + 2] = (state[i] >>  8) & 0xff;
 		out[i * 4 + 3] = (state[i] >>  0) & 0xff;
 	}
-}
+}*/
 
 // HMAC_SHA256
 
 const uint8_t ipad[64] = {0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36};
 const uint8_t opad[64] = {0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c};
 
-static void adjust_key(const uint8_t* const key, const uint32_t keylen, uint8_t* const out) {
+static void adjust_key(uint8_t* key, uint32_t keylen, uint8_t* out) {
 	memset(out, 0, 64);
 	if(keylen <= 64) {
 		memcpy(out, key, keylen);
@@ -168,7 +240,7 @@ static void adjust_key(const uint8_t* const key, const uint32_t keylen, uint8_t*
 	}
 }
 
-void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t* const message, uint32_t len, uint8_t* const out) {
+void hmac_sha256(uint8_t* key, uint32_t keylen, uint8_t* message, uint32_t len, uint8_t* out) {
 	uint8_t adjkey[64];
 	adjust_key(key, keylen, adjkey);
 	
@@ -186,7 +258,7 @@ void hmac_sha256(const uint8_t* const key, const uint32_t keylen, const uint8_t*
 // PBKDF2_HMAC_SHA256
 
 // dkLen and hlen are in bytes
-void pbkdf2_hmac_sha256(const uint8_t* const pass, const uint32_t plen, const uint8_t* salt, const uint32_t saltLen, const uint32_t c, uint32_t dkLen, uint8_t* out) {
+void pbkdf2_hmac_sha256(uint8_t* pass, uint32_t plen, uint8_t* salt, uint32_t saltLen, uint32_t c, uint32_t dkLen, uint8_t* out) {
 	
 	memset(out, 0, dkLen);
 	

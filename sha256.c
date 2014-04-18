@@ -109,11 +109,10 @@ static const uint32_t H0[8] = {
 void sha256_init(SHA256_CTX* ctx) {
 	/* initialize sha256 state */
 	memcpy(&(ctx->state), H0, sizeof(uint32_t) * 8);
-	memset(&(ctx->buf), 0, 64);
 	ctx->count = 0;
 }
 
-void sha256_update(SHA256_CTX* ctx, uint8_t* message, uint64_t msize) {
+void sha256_update(SHA256_CTX* ctx, const uint8_t* message, uint32_t msize) {
 	while(msize > 0) {
 		const int bufoff = ctx->count % 64;
 		if(bufoff + msize <= 64) {
@@ -169,56 +168,76 @@ void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
 		sum[i * 4 + 2] = (ctx->state[i] >>  8) & 0xff;
 		sum[i * 4 + 3] = (ctx->state[i] >>  0) & 0xff;
 	}
+	
+	/* clean the context */
+	memset(ctx, 0, sizeof(SHA256_CTX));
 }
 
-void sha256(uint8_t* message, uint64_t osize, uint8_t* out) {
+void sha256(const uint8_t* message, uint64_t osize, uint8_t* out) {
 	SHA256_CTX ctx;
 	sha256_init(&ctx);
 	sha256_update(&ctx, message, osize);
 	sha256_final(&ctx, out);
-	memset(&ctx, 0, sizeof(SHA256_CTX));
+	
+	/* no need to zero ctx as final does it */
 }
 
-// HMAC_SHA256
-
-const uint8_t ipad[64] = {0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36, 0x36};
-const uint8_t opad[64] = {0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c, 0x5c};
-
-static void adjust_key(uint8_t* key, uint32_t keylen, uint8_t* out) {
-	memset(out, 0, 64);
-	if(keylen <= 64) {
-		memcpy(out, key, keylen);
-	} else {
-		sha256(key, keylen, out);
+void hmac_sha256_init(HMAC_SHA256_CTX* ctx, const uint8_t* _key, uint32_t keylen) {
+	const uint8_t* key = _key;
+	uint8_t khash[32];
+	uint8_t pad[64];
+	
+	/* if the key is longer than 64 bytes, the used key is sha256(key) */
+	if(keylen > 64) {
+		sha256(key, keylen, khash);
+		key = khash;
+		keylen = 32;
 	}
+	
+	sha256_init(&(ctx->octx));
+	sha256_init(&(ctx->ictx));
+	
+	/* update the inner and outer contexts with the padded keys */
+	memset(pad, 0x36, 64);
+	xor_bytes(pad, key, keylen, pad);
+	
+	sha256_update(&(ctx->ictx), pad, 64);
+	
+	memset(pad, 0x5c, 64);
+	xor_bytes(pad, key, keylen, pad);
+	
+	sha256_update(&(ctx->octx), pad, 64);
+	
+	/* clean stack */
+	memset(khash, 0, 32);
+	memset(pad, 0, 64);
+}
+
+void hmac_sha256_update(HMAC_SHA256_CTX* ctx, uint8_t* message, uint32_t mlen) {
+	/* feed the data into the inner context */
+	sha256_update(&(ctx->ictx), message, mlen);
+}
+
+void hmac_sha256_final(HMAC_SHA256_CTX* ctx, uint8_t mac[32]) {
+	/* compute the inner hash */
+	uint8_t ihash[32];
+	sha256_final(&(ctx->ictx), ihash);
+	
+	/* update outer hash */
+	sha256_update(&(ctx->octx), ihash, 32);
+	
+	/* compute final value */
+	sha256_final(&(ctx->octx), mac);
+	
+	/* clean context */
+	memset(ctx, 0, sizeof(HMAC_SHA256_CTX));
 }
 
 void hmac_sha256(uint8_t* key, uint32_t keylen, uint8_t* message, uint32_t len, uint8_t* out) {
-	SHA256_CTX ictx, octx;
-	
-	uint8_t adjkey[64];
-	
-	uint8_t ikey[64];
-	uint8_t okey[64];
-	
-	uint8_t ihash[32];
-	
-	sha256_init(&ictx);
-	sha256_init(&octx);
-	
-	adjust_key(key, keylen, adjkey);
-	xor_bytes(adjkey, ipad, 64, ikey);
-	xor_bytes(adjkey, opad, 64, okey);
-	
-	sha256_update(&ictx, ikey, 64);
-	sha256_update(&ictx, message, len);
-	
-	sha256_final(&ictx, ihash);
-	
-	sha256_update(&octx, okey, 64);
-	sha256_update(&octx, ihash, 32);
-	
-	sha256_final(&octx, out);
+	HMAC_SHA256_CTX ctx;
+	hmac_sha256_init(&ctx, key, keylen);
+	hmac_sha256_update(&ctx, message, len);
+	hmac_sha256_final(&ctx, out);
 }
 
 // PBKDF2_HMAC_SHA256

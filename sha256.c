@@ -22,7 +22,9 @@ static const uint32_t K[64] = {
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #define min(a, b) (((a) < (b)) ? (a) : (b))
-#define ch(x, y, z)	((x & (y ^ z)) ^ z)
+
+/* sha256 operations */
+#define ch(x, y, z)	((x & (y ^ z)) ^ z)                          
 #define maj(x, y, z)	((x & (y | z)) | (y & z))
 #define shr(x, n)	(x >> n)
 #define rotr(x, n)	((x >> n) | (x << (32 - n)))
@@ -45,7 +47,7 @@ static void create_message_schedule_sha256(const uint32_t* const message, uint32
 }
 
 static void process_block_sha256(SHA256_CTX* ctx) {
-	// copy the message into the block
+	/* copy the message into the block */
 	uint32_t block[16];
 	memset(block, 0, 16 * sizeof(uint32_t));
 	for(int i = 0; i < 64; i++) {
@@ -68,8 +70,7 @@ static void process_block_sha256(SHA256_CTX* ctx) {
 		// sha256 compression function
 		uint32_t T1 = h + S1(e) + ch(e, f, g) + K[j] + W[j],
 		         T2 = S0(a) + maj(a, b, c);
-					 		 
-	
+
 		h = g;
 		g = f;
 		f = e;
@@ -79,7 +80,7 @@ static void process_block_sha256(SHA256_CTX* ctx) {
 		b = a;
 		a = T1 + T2;
 	}
-	
+
 	// update state
 	ctx->state[0] += a;
 	ctx->state[1] += b;
@@ -126,6 +127,7 @@ void sha256_update(SHA256_CTX* ctx, uint8_t* message, uint64_t msize) {
 			const int space = 64 - bufoff;
 			memcpy(ctx->buf + bufoff, message, space);
 			
+			/* increment counters by amount read into buf */
 			ctx->count += space;
 			msize -= space;
 			message += space;
@@ -153,6 +155,7 @@ void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
 	memset(ctx->buf + bufoff + 1, 0, pad);
 	
 	const uint64_t lbits = ctx->count * 8; /* length of message in bits */
+	
 	/* copy length of message into last 8 bytes, big endian */
 	for(int i = 0; i < 8; i++) {
 		ctx->buf[56 + i] = (lbits >> (56 - i * 8)) & 0xff;

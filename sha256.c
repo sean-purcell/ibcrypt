@@ -152,13 +152,12 @@ void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
 	int pad = 55 - bufoff;
 	memset(ctx->buf + bufoff + 1, 0, pad);
 	
+	const uint64_t lbits = ctx->count * 8; /* length of message in bits */
 	/* copy length of message into last 8 bytes, big endian */
 	for(int i = 0; i < 8; i++) {
-		ctx->buf[56 + i] = (ctx->count >> (56 - i * 8)) & 0xff;
+		ctx->buf[56 + i] = (lbits >> (56 - i * 8)) & 0xff;
 	}
 	process_block_sha256(ctx);
-	printbuf(ctx->buf, 64);
-	printbuf(ctx->state, 32);
 	
 	/* copy the state out into the sum buffer */
 	for(int i = 0; i < 8; i++) {

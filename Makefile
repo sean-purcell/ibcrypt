@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -g -c -O3 -Wall
+CFLAGS= -g -c -O3 -Wall -std=c99
 TEST_OBJECTS=aes.o aes_modes.o sha256.o util.o test.o aes_test.o sha256_test.o aes_modes_test.o test_suite.o
 
 LIB_HEADERS=aes.h sha256.h rand.h
@@ -34,5 +34,5 @@ remake: clean lib
 remaketest: clean test
 
 install:
-	cp bin/libibcrypt.a /usr/local/bin/
+	cp bin/libibcrypt.a /usr/local/lib/
 	cp -r bin/ibcrypt /usr/local/include/

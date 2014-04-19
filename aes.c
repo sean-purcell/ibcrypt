@@ -234,7 +234,6 @@ int create_key_AES(const uint8_t* const source, const int bits, AES_KEY* const k
 	
 	int c = n;
 	int i = 1;
-	
 	uint8_t t[4];
 	while(c < b) { /* iterate key schedule until b bytes have been created */
 		memcpy(t, rd+c - 4, 4);

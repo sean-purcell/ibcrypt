@@ -229,8 +229,7 @@ void hmac_sha256_final(HMAC_SHA256_CTX* ctx, uint8_t mac[32]) {
 	/* compute final value */
 	sha256_final(&(ctx->octx), mac);
 	
-	/* clean context */
-	memset(ctx, 0, sizeof(HMAC_SHA256_CTX));
+	/* clean context unecessary as final was called on ictx and octx */
 }
 
 void hmac_sha256(uint8_t* key, uint32_t keylen, uint8_t* message, uint32_t len, uint8_t* out) {
@@ -297,4 +296,7 @@ void pbkdf2_hmac_sha256(uint8_t* pass, uint32_t plen, uint8_t* salt, uint32_t sa
 		out += 32;
 		dkLen -= 32;
 	}
+	
+	/* final was never called on Pctx */
+	memset(&Pctx, 0, sizeof(HMAC_SHA256_CTX));
 }

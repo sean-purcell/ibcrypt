@@ -1,9 +1,10 @@
 CC=gcc
 CFLAGS= -g -c -O3 -Wall -std=c99
-TEST_OBJECTS=aes.o aes_modes.o sha256.o util.o test.o aes_test.o sha256_test.o aes_modes_test.o test_suite.o
 
 LIB_HEADERS=aes.h sha256.h rand.h
-LIB_OBJECTS=aes.o sha256.o util.o aes_modes.o util.o rand.o
+LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o util.o
+
+TEST_OBJECTS=$(LIB_OBJECTS) test.o aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o
 
 .PHONY: clean cleanall remake remaketest test all lib
 

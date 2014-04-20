@@ -93,7 +93,6 @@ static void salsa20_8(uint8_t B[64]) {
 static void blockmix(uint8_t* B, uint32_t r, uint8_t* Bout) {
 	uint8_t X[64];
 	uint8_t* out = malloc(128 * r);
-	//printbuf(B, r * 128);
 	uint64_t i = 0;
 	
 	/* 1: X <- B_{2r-1} */
@@ -102,11 +101,8 @@ static void blockmix(uint8_t* B, uint32_t r, uint8_t* Bout) {
 	/* 2: for i = 0 to 2r - 1 do */
 	for(i = 0; i < 2*r; i++) {
 		/* 3: X <- H(X xor Bi) */
-		//printbuf(B + i * 64, 64);
 		xor_bytes(X, B + i * 64, 64, X);
-		//printbuf(X, 64);
 		salsa20_8(X);
-		//printbuf(X, 64);
 
 		/* 4: Yi <- X */
 		/* 6: B' <- (Y0, Y2, ..., Y2r-2, Y1, Y3, ..., Y2r-1) */
@@ -142,10 +138,8 @@ static int smix(uint8_t* Bi, uint64_t N, uint32_t r) {
 		/* 3: Vi <- X */
 		memcpy(V + i * 128 * r, X, 128 * r);
 		
-		//printbuf(X, 128 * r);
 		/* 4: X <- BlockMix_salsa20_8(X) */
 		blockmix(X, r, X);
-		//printbuf(X, 128 * r);
 		
 	/* 5: end for */
 	}
@@ -204,7 +198,6 @@ int scrypt(uint8_t* pass, uint32_t plen, uint8_t* salt, uint32_t slen,
 #else
 	if((B = malloc(pMFlen)) == NULL) {
 		/* could not allocate the memory */
-		// TODO: find err code for this
 		errno = ENOMEM;
 		goto err0;
 	}
@@ -217,11 +210,7 @@ int scrypt(uint8_t* pass, uint32_t plen, uint8_t* salt, uint32_t slen,
 	/* 2: for i = 0 to p - 1 do */
 	for(uint32_t i = 0; i < p; i++) {
 		/* 3: Bi = MF(Bi, N) */
-		//printf("before%d\n", i);
-		//printbuf(B + i * r * 128, 128 * r);
 		smix(B + i * r * 128, N, r);
-		//printf("after %d\n", i);
-		//printbuf(B + i * r * 128, 128 * r);
 	/* 4: end for */
 	}
 	

@@ -10,13 +10,15 @@ extern void sha256_tests();
 void (*suite[])() = {
 	aes_tests,
 	sha256_tests,
-	aes_mode_tests
+	aes_mode_tests,
+	scrypt_tests
 };
 
 const char* names[] = {
 	"AES",
 	"SHA256",
-	"AES modes"
+	"AES modes",
+	"SCRYPT"
 };
 
 int main() {

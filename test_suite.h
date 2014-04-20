@@ -4,5 +4,6 @@
 void aes_tests();
 void sha256_tests();
 void aes_mode_tests();
+void scrypt_tests();
 
 #endif

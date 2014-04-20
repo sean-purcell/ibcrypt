@@ -3,7 +3,8 @@
 #include <string.h>
 #include <stdint.h>
 
-void printbuf(const unsigned char* const buf, const int size) {
+void printbuf(const void* const _buf, const int size) {
+	const uint8_t* const buf = (uint8_t*) _buf;
 	for(int i = 0; i < size; i++) {
 		if(buf[i] < 16) {
 			printf("0");
@@ -42,7 +43,10 @@ void from_hex(const char* const hex, uint8_t* const buf) {
 	}
 }
 
-void xor_bytes(const uint8_t* const a, const uint8_t* const b, const uint32_t len, uint8_t* const o) {
+void xor_bytes(const void* const _a, const void* const _b, const uint32_t len, void* const _o) {
+	const uint8_t* const a = (uint8_t*) _a;
+	const uint8_t* const b = (uint8_t*) _b;
+	uint8_t* const o = (uint8_t*) _o;
 	for(uint32_t i = 0; i < len; i++) {
 		o[i] = a[i] ^ b[i];
 	}

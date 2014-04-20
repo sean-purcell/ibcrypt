@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-void printbuf(const uint8_t* const buf, const int size);
+void printbuf(const void* const buf, const int size);
 
 void from_hex(const char* const hex, uint8_t* const buf);
 
-void xor_bytes(const uint8_t* const a, const uint8_t* const b, const uint32_t len, uint8_t* const o);
+void xor_bytes(const void* const a, const void* const b, const uint32_t len, void* const o);
 
 #endif

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -g -c -O3 -Wall -std=c99
+CFLAGS= -g -c -O4 -Wall -std=c99
 
 LIB_HEADERS=aes.h sha256.h rand.h
 LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o util.o

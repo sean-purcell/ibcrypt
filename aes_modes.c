@@ -50,7 +50,7 @@ static void add_one(uint8_t* const nonce) {
 	}
 }
 
-int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out) {
+int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {
 	uint8_t encrypt_block[16];
 	// copy nonce into encrypt_block
 	memcpy(encrypt_block, nonce, 16);
@@ -71,6 +71,6 @@ int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const u
 	return 0;
 }
 
-int decrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const nonce, const AES_KEY* const key, uint8_t* const out) {
+int decrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {
 	return encrypt_ctr_AES(message, length, nonce, key, out);
 }

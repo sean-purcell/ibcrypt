@@ -393,3 +393,7 @@ void decrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KE
 	sub_bytes_inv(out);
 	add_round_key(out, key, 0);
 }
+
+void zero_key_AES(AES_KEY* const key) {
+	memset(key, 0, sizeof(AES_KEY));
+}

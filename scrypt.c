@@ -76,21 +76,25 @@ static void salsa20_8(uint32_t B[16]) {
 }
 
 static void blockmix(uint32_t* B, uint32_t r, uint32_t* Bout) {
-	uint32_t X[16];
 	uint64_t i = 0;
 	
+	uint32_t* X;
+	uint32_t* Y;
+	
 	/* 1: X <- B_{2r-1} */
-	memcpy(X, B + (2 * r - 1) * 16, 64);
+	X = B + (2 * r-1) * 16;
 	
 	/* 2: for i = 0 to 2r - 1 do */
 	for(i = 0; i < 2*r; i++) {
+		Y = Bout + ((i/2) * 16 + (i%2) * 16 * r);
+		
 		/* 3: X <- H(X xor Bi) */
-		xor_bytes((uint8_t*)X, (uint8_t*)(B + i * 16), 64, (uint8_t*)X);
-		salsa20_8(X);
+		xor_bytes((uint8_t*) X, (uint8_t*)(B + i * 16), 64, (uint8_t*) Y);
+		salsa20_8(Y);
 
 		/* 4: Yi <- X */
 		/* 6: B' <- (Y0, Y2, ..., Y2r-2, Y1, Y3, ..., Y2r-1) */
-		memcpy(Bout + ((i/2) * 16) + ((i%2) * r * 16), X, 64);
+		X = Y;
 		
 	/* 5: end for */
 	}

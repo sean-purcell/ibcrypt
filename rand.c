@@ -44,3 +44,17 @@ err1: /* error occurred after file open */
 err0: /* opening/closing file failed */
 	return URANDOM_FAIL;
 }
+
+static uint32_t buf[64];
+static uint8_t count = 0;
+
+uint32_t cs_rand_int() {
+	if(count == 0) {
+		cs_rand((uint8_t*) buf, 64 * sizeof(uint32_t));
+	}
+	uint32_t res = buf[count];
+	count++;
+	count&=63;
+	
+	return res;
+}

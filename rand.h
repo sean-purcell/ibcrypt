@@ -9,4 +9,6 @@
 // returns URANDOM_FAIL if unsuccessful
 int cs_rand(uint8_t* buf, uint32_t buflen);
 
+uint32_t cs_rand_int();
+
 #endif

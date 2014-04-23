@@ -5,9 +5,10 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 
+#include <libibur/util.h>
+
 #include "scrypt.h"
 #include "sha256.h"
-#include "util.h"
 
 #define SCRYPT_USE_MMAP
 

@@ -1,7 +1,8 @@
 #include <stdlib.h>
 
-#include "util.h"
-#include "test.h"
+#include <libibur/test.h>
+#include <libibur/util.h>
+
 #include "scrypt.h"
 
 const static char* pass[] = {

@@ -3,8 +3,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <libibur/util.h>
+
 #include "sha256.h"
-#include "util.h"
 
 /**
  * sha256 constants

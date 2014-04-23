@@ -1,7 +1,8 @@
 #include <string.h>
 
+#include <libibur/util.h>
+
 #include "aes.h"
-#include "util.h"
 
 int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
 	if(length % 16 != 0) {

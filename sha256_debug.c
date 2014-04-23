@@ -1,7 +1,8 @@
 #include <stdio.h>
 
+#include <libibur/util.h>
+
 #include "sha256.h"
-#include "util.h"
 
 int main() {
 	char* m = "a\n";

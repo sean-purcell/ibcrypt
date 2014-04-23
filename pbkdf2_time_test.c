@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <libibur/util.h>
+
 #include "sha256.h"
-#include "util.h"
 
 int main() {
 	uint8_t* pw = "passwordPASSWORDpassword";

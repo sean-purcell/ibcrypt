@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "test_suite.h"
-#include "test.h"
+#include <libibur/util.h>
+#include <libibur/test.h>
 
-extern void aes_tests();
-extern void sha256_tests();
+void aes_tests();
+void sha256_tests();
+void aes_mode_tests();
+void scrypt_tests();
 
 void (*suite[])() = {
 	aes_tests,

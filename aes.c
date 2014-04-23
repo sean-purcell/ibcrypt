@@ -2,8 +2,9 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <libibur/util.h>
+
 #include "aes.h"
-#include "util.h"
 
 /* Rijndael key schedule rcon */
 uint8_t rcon[256] = {

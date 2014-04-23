@@ -1,8 +1,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "util.h"
+#include <libibur/test.h>
+#include <libibur/util.h>
+
 #include "aes.h"
 
 const char* keys_ctr[] = {

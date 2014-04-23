@@ -2,8 +2,9 @@
 #include <time.h>
 #include <stdio.h>
 
+#include <libibur/util.h>
+
 #include "sha256.h"
-#include "util.h"
 
 int main() {
 	const uint32_t iters = 65536;

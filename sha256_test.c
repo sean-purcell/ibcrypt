@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
-#include "util.h"
+#include <libibur/test.h>
+#include <libibur/util.h>
+
 #include "sha256.h"
 
 void sha256Test() {

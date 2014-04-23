@@ -6,7 +6,7 @@ LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o util.o
 
 TEST_OBJECTS=$(LIB_OBJECTS) test.o aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o
 
-.PHONY: clean cleanall remake remaketest test all lib
+.PHONY: clean cleanall remake remaketest test all lib install
 
 all: lib
 

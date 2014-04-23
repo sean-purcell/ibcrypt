@@ -19,7 +19,6 @@ void assert_equals(const uint8_t* const a, const uint8_t* const b, int len, cons
 			exit(-1);
 		}
 	}
-//	printf("%s passed\n", message);
 	_count++;
 }
 

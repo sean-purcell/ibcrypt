@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 // returns URANDOM_FAIL if unsuccessful
-int cs_rand(uint8_t* buf, uint32_t buflen);
+int cs_rand(void* buf, size_t buflen);
 
 uint32_t cs_rand_int();
 

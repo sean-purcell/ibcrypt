@@ -1,4 +1,8 @@
 ibur-crypto
 ===========
 
-Not for actual use, just to attempt implementation from spec.
+My implementation of some cryptographic algorithms.  Used in spass.
+
+Dependencies
+------------
+- libibur

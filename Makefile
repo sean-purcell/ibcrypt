@@ -4,8 +4,6 @@ CFLAGS= -g -c -O4 -Wall -std=c99
 LIB_HEADERS=aes.h sha256.h rand.h
 LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o
 
-LIBS=-llibibur
-
 TEST_OBJECTS=$(LIB_OBJECTS) aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o
 
 .PHONY: clean cleanall remake remaketest test all lib install
@@ -17,7 +15,7 @@ lib: bin $(LIB_OBJECTS)
 	ar -rs bin/libibcrypt.a $(LIB_OBJECTS) 
 
 test: bin $(TEST_OBJECTS)
-	gcc $(TEST_OBJECTS) $(LIBS) -o bin/test
+	gcc $(TEST_OBJECTS) -o bin/test
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@

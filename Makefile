@@ -4,8 +4,10 @@ ORIGFLAGS= -c -Wall -std=c99
 
 ifeq ($(DEBUG),1)
 	CFLAGS=$(ORIGFLAGS) -g
+	LFLAGS=
 else
-	CFLAGS=$(ORIGFLAGS) -O3
+	CFLAGS=$(ORIGFLAGS) -O3 -flto
+	LFLAGS=-flto
 endif
 
 LIB_HEADERS=aes.h sha256.h rand.h scrypt.h
@@ -22,7 +24,7 @@ lib: bin $(LIB_OBJECTS)
 	ar -rs bin/libibcrypt.a $(LIB_OBJECTS) 
 
 test: bin $(TEST_OBJECTS)
-	gcc $(TEST_OBJECTS) -o bin/test
+	gcc $(LFLAGS) $(TEST_OBJECTS) -o bin/test
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@

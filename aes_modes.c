@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <string.h>
 
 #include <libibur/util.h>
@@ -49,6 +50,53 @@ static void add_one(uint8_t* const nonce) {
 			return;
 		}
 	}
+}
+
+/* initialize an aes ctr context.  recommended for large messages instead of putting it all in one buffer */
+AES_CTR_CTX* init_ctr_AES(const AES_KEY* const key, const uint8_t* const nonce, const uint32_t noncelen) {
+	if(noncelen == 0 || noncelen > 16) {
+		/* not ok */
+		goto err0;
+	}
+	
+	AES_CTR_CTX* ctx;
+	
+	if((ctx = malloc(sizeof(AES_CTR_CTX))) == NULL) {
+		errno = ENOMEM;
+		goto err0;
+	}
+	
+	memcpy(&ctx->key, key, sizeof(AES_KEY));
+	memcpy(&ctx->nonce[0], nonce, noncelen);
+	memset(&ctx->nonce[noncelen], 0x00, 16 - noncelen);
+	
+	ctx->count = 0;
+	
+	/* success! */
+	return ctx;
+	
+err0:
+	/* failure! */
+	return NULL;
+}
+
+/* encrypt/decrypt a block of ctr */
+void stream_ctr_AES(AES_CTR_CTX* const ctx, const uint8_t* const in, const size_t len, uint8_t* const out) {
+	uint32_t i;
+	
+	for(i = 0; i < len; i++) {
+		if(ctx->count % 16 == 0) {
+			encrypt_block_AES(ctx->nonce, ctx->stream, &ctx->key);
+			add_one(ctx->nonce);
+		}
+		out[i] = in[i] ^ ctx->stream[i%16];
+	}
+}
+
+/* free the context and zero the memory */
+void free_ctr_AES(AES_CTR_CTX* ctx) {
+	memset(ctx, 0, sizeof(AES_CTR_CTX));
+	free(ctx);
 }
 
 int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {

@@ -1,5 +1,12 @@
 CC=gcc
-CFLAGS= -g -c -O4 -Wall -std=c99
+DEBUG=1
+ORIGFLAGS= -c -Wall -std=c99
+
+ifeq ($(DEBUG),1)
+	CFLAGS=$(ORIGFLAGS) -g
+else
+	CFLAGS=$(ORIGFLAGS) -O3
+endif
 
 LIB_HEADERS=aes.h sha256.h rand.h scrypt.h
 LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o

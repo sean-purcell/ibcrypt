@@ -89,7 +89,8 @@ void stream_ctr_AES(AES_CTR_CTX* const ctx, const uint8_t* const in, const size_
 			encrypt_block_AES(ctx->nonce, ctx->stream, &ctx->key);
 			add_one(ctx->nonce);
 		}
-		out[i] = in[i] ^ ctx->stream[i%16];
+		out[i] = in[i] ^ ctx->stream[ctx->count%16];
+		ctx->count++;
 	}
 }
 
@@ -100,23 +101,14 @@ void free_ctr_AES(AES_CTR_CTX* ctx) {
 }
 
 int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {
-	uint8_t encrypt_block[16];
-	// copy nonce into encrypt_block
-	memcpy(encrypt_block, nonce, 16);
-	
-	uint8_t keystream[16];
-	
-	for(int i = 0; i < length; i++) {
-		
-		uint8_t mod = i % 16;
-		if(mod == 0) { // generate more keystream bytes
-			encrypt_block_AES(encrypt_block, keystream, key);
-			add_one(encrypt_block);
-		}
-		
-		out[i] = message[i] ^ keystream[mod];
+	AES_CTR_CTX* ctx = init_ctr_AES(key, nonce, 16);
+	if(ctx == NULL) {
+		/* failure */
+		return -1;
 	}
 	
+	stream_ctr_AES(ctx, message, length, out);
+	free_ctr_AES(ctx);
 	return 0;
 }
 

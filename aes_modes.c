@@ -5,66 +5,7 @@
 
 #include "aes.h"
 
-/* initialize an aes ctr context.  recommended for large messages instead of putting it all in one buffer */
-AES_CBC_CTX* init_cbc_AES(const AES_KEY* const key, const uint8_t iv[16]) {
-	AES_CBC_CTX* ctx;
-	
-	if((ctx = malloc(sizeof(AES_CBC_CTX))) == NULL) {
-		errno = ENOMEM;
-		goto err0;
-	}
-	
-	memcpy(&ctx->key, key, sizeof(AES_KEY));
-	memcpy(&ctx->prev[0], iv, 16);
-	
-	ctx->count = 0;
-	
-	/* success! */
-	return ctx;
-	
-err0:
-	/* failure! */
-	return NULL;
-}
-
-/* returns the size of the output buffer required for an update of size blen */
-uint32_t output_size(const AES_CBC_CTX* const ctx, const uint32_t blen) {
-	uint32_t mod = ctx->count % 16;
-	return ((blen + mod) / 16) * 16;
-}
-
-#define min(a, b) ((a) > (b) ? (a) : (b))
-
-/* returns the amount written to the buffer */
-uint32_t enc_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len, uint8_t* out) {
-	uint32_t written = 0;
-	uint32_t mod;
-	while(len > 0) {
-		mod = ctx->count % 16;
-		if(mod != 0) {
-			uint32_t wrlen = min(16-mod, len);
-			memcpy(&ctx->buf[mod], in, wrlen);
-			len -= wrlen;
-			in += wrlen;
-			ctx->count += wrlen;
-		} else {
-			uint32_t wrlen = min(16, len);
-			memcpy(ctx->buf, in, wrlen);
-			len -= wrlen;
-			in += wrlen;
-			ctx->count += wrlen;
-		}
-		if(ctx->count % 16 == 0) {
-			encrypt_block_AES(ctx->buf, out, &ctx->key);
-			out += 16;
-			written += 16;
-		}
-	}
-	
-	return written;
-}
-
-int encrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
+int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
 	if(length % 16 != 0) {
 		return -1; // must be of proper size
 	}
@@ -82,7 +23,7 @@ int encrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, con
 	return 0;
 }
 
-int decrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
+int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
 	if(length % 16 != 0) {
 		return -1; // must be of proper size
 	}

@@ -16,7 +16,6 @@ typedef struct {
 typedef struct {
 	AES_KEY key;
 	uint8_t prev[16];
-	uint8_t buf[16];
 	uint32_t count;
 } AES_CBC_CTX;
 
@@ -35,20 +34,9 @@ void decrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KE
 
 void zero_key_AES(AES_KEY* const key);
 
-/* initialize an aes ctr context.  recommended for large messages instead of putting it all in one buffer */
-AES_CBC_CTX* init_cbc_AES(const AES_KEY* const key, const uint8_t iv[16]);
+int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
 
-/* returns the size of the output buffer required for an update of size blen */
-uint32_t output_size(const AES_CBC_CTX* const ctx, const uint32_t blen);
-
-/* adds the message to the buffer 
- * and encrypts at each 16 byte marker
- * returns the amount written to the buffer */
-uint32_t enc_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len, uint8_t* out);
-
-int encrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
-
-int decrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
+int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
 
 /* initialize an aes ctr context.  recommended for large messages instead of putting it all in one buffer */
 AES_CTR_CTX* init_ctr_AES(const AES_KEY* const key, const uint8_t* const nonce, const uint32_t noncelen);

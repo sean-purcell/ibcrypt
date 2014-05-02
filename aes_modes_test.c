@@ -165,8 +165,8 @@ void AES_CBC_Test() {
 		AES_KEY k;
 		create_key_AES(key_bytes, key_size_cbc[i], &k);
 		
-		encrypt_cbc_AES(ptext, len_cbc[i], iv, &k, outc);
-		decrypt_cbc_AES(ctext, len_cbc[i], iv, &k, outp);
+		encrypt_buf_cbc_AES(ptext, len_cbc[i], iv, &k, outc);
+		decrypt_buf_cbc_AES(ctext, len_cbc[i], iv, &k, outp);
 		
 		assert_equals(ctext, outc, len_cbc[i], "AES CBC test");
 		assert_equals(ptext, outp, len_cbc[i], "AES CBC test");

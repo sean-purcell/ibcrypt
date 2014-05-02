@@ -15,12 +15,6 @@ typedef struct {
 
 typedef struct {
 	AES_KEY key;
-	uint8_t prev[16];
-	uint32_t count;
-} AES_CBC_CTX;
-
-typedef struct {
-	AES_KEY key;
 	uint8_t stream[16];
 	uint8_t nonce[16];
 	uint32_t count;

@@ -46,8 +46,6 @@ uint32_t output_size(const AES_CBC_CTX* const ctx, const uint32_t blen);
  * returns the amount written to the buffer */
 uint32_t enc_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len, uint8_t* out);
 
-void free_cbc_AES(AES_CBC_CTX* ctx);
-
 int encrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);
 
 int decrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out);

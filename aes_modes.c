@@ -36,7 +36,7 @@ uint32_t output_size(const AES_CBC_CTX* const ctx, const uint32_t blen) {
 #define min(a, b) ((a) > (b) ? (a) : (b))
 
 /* returns the amount written to the buffer */
-uint32_t enc_upd_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len, uint8_t* out) {
+uint32_t enc_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len, uint8_t* out) {
 	uint32_t written = 0;
 	uint32_t mod;
 	while(len > 0) {
@@ -64,16 +64,21 @@ uint32_t enc_upd_cbc_AES(AES_CBC_CTX* const ctx, const uint8_t* in, uint32_t len
 	return written;
 }
 
-uint32_t enc_fin_cbc_AES()
-
-void free_cbc_AES(AES_CBC_CTX* ctx) {
-	memset(ctx, 0, sizeof(AES_CBC_CTX));
-	free(ctx);
-}
-
 int encrypt_buf_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
-	AES_CBC_CTX* ctx = init_cbc_AES(key, iv);
+	if(length % 16 != 0) {
+		return -1; // must be of proper size
+	}
 	
+	uint8_t prev[16];
+	memcpy(prev, iv, 16); // set up init vector
+	
+	uint8_t encbuf[16];
+	
+	for(uint32_t i = 0; i < length / 16; i++) {
+		xor_bytes(message + i * 16, prev, 16, encbuf); // xor in iv
+		encrypt_block_AES(encbuf, prev, key); // encrypt block
+		memcpy(out + i * 16, prev, 16); // copy to output
+	}
 	return 0;
 }
 

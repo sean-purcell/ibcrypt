@@ -7,12 +7,14 @@
 void aes_tests();
 void sha256_tests();
 void aes_mode_tests();
+void salsa20_tests();
 void scrypt_tests();
 
 void (*suite[])() = {
 	aes_tests,
 	sha256_tests,
 	aes_mode_tests,
+	salsa20_tests,
 	scrypt_tests
 };
 
@@ -20,6 +22,7 @@ const char* names[] = {
 	"AES",
 	"SHA256",
 	"AES modes",
+	"SALSA20",
 	"SCRYPT"
 };
 

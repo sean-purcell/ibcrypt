@@ -1,10 +1,13 @@
 #include <stdint.h>
+#include <libibur/util.h>
+#include <libibur/endian.h>
 
+#define ROT(x, n) (((x) << n) | ((x) >> (32 - n)))
 #define QROUND(a,b,c,d) \
-	((b) ^= ROT((a+d),  7))\
-	((c) ^= ROT((b+a),  9))\
-	((d) ^= ROT((c+b), 13))\
-	((a) ^= ROT((d+c), 18))
+	((b) ^= ROT((a+d),  7));\
+	((c) ^= ROT((b+a),  9));\
+	((d) ^= ROT((c+b), 13));\
+	((a) ^= ROT((d+c), 18));
 
 /* the salsa20 core hash function
  * in and out can overlap */

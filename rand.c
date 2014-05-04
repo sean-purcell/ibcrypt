@@ -27,7 +27,7 @@ int cs_rand(void* _buf, size_t buflen) {
 			goto err1;
 		}
 		
-		/* could not have read all in one go */
+		/* might not have read all in one go */
 		buf += lenread;
 		buflen -= lenread;
 	}

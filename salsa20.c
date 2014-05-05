@@ -100,6 +100,8 @@ SALSA20_CTX* init_salsa20(const uint8_t* key, const uint8_t ksize, const uint64_
 	ctx->nonce = nonce;
 	ctx->count = 0;
 
+	return ctx;
+
 err0:
 	/* failure! */
 	return NULL;
@@ -118,6 +120,7 @@ void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const ou
 			salsa20_expand(ctx->key, ctx->ksize, n, ctx->stream);
 		}
 		out[i] = in[i] ^ ctx->stream[ctx->count%64];
+		ctx->count++;
 	}
 }
 

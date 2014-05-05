@@ -2,13 +2,6 @@
 #include <libibur/util.h>
 #include <libibur/endian.h>
 
-#define ROT(x, n) (((x) << n) | ((x) >> (32 - n)))
-#define QROUND(a,b,c,d) \
-	((b) ^= ROT((a+d),  7));\
-	((c) ^= ROT((b+a),  9));\
-	((d) ^= ROT((c+b), 13));\
-	((a) ^= ROT((d+c), 18));
-
 /* the salsa20 core hash function
  * in and out can overlap */
 void salsa20_core(uint8_t in[64], uint8_t out[64]) {
@@ -20,6 +13,13 @@ void salsa20_core(uint8_t in[64], uint8_t out[64]) {
 	}
 	/* store original */
 	memcpy(o, x, 16 * sizeof(uint32_t));
+	
+#define ROT(x, n) (((x) << n) | ((x) >> (32 - n)))
+#define QROUND(a,b,c,d) \
+	((b) ^= ROT((a+d),  7));\
+	((c) ^= ROT((b+a),  9));\
+	((d) ^= ROT((c+b), 13));\
+	((a) ^= ROT((d+c), 18));
 	
 	/* iterate double round 20 times */
 	for(i = 0; i < 20; i += 2) {
@@ -35,6 +35,8 @@ void salsa20_core(uint8_t in[64], uint8_t out[64]) {
 		QROUND(x[10], x[11], x[ 8], x[ 9]);
 		QROUND(x[15], x[12], x[13], x[ 14]);
 	}
+#undef ROT
+#undef QROUND
 	
 	/* add result to orig and write to out */
 	for(i = 0; i < 16; i++) {

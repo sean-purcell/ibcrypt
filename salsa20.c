@@ -1,9 +1,15 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <libibur/util.h>
 #include <libibur/endian.h>
+
+#include "salsa20.h"
+
+#ifdef SALSA20_DEBUG
+#include <libibur/util.h>
+#endif
 
 /* the salsa20 core hash function
  * in and out can overlap */
@@ -55,7 +61,7 @@ const static uint8_t tau[] = "expand 16-byte k";
 /* the salsa20expansion function 
  * ksize must be 16 or 32, otherwise
  * this function will fail silently */
-void salsa20_expand(const uint8_t* const k, const uint8_t ksize, const uint8_t n[16], uint8_t out[64]) {
+void salsa20_expand(const uint8_t* const k, const int ksize, const uint8_t n[16], uint8_t out[64]) {
 	if(ksize != 32 && ksize != 16)
 		return;
 
@@ -79,7 +85,7 @@ void salsa20_expand(const uint8_t* const k, const uint8_t ksize, const uint8_t n
 
 /* initialize a salsa20 context
  * returns NULL on failure */
-SALSA20_CTX* init_salsa20(const uint8_t* key, const uint8_t ksize, const uint64_t nonce) {
+SALSA20_CTX* init_salsa20(const uint8_t* key, const int ksize, const uint64_t nonce) {
 	SALSA20_CTX* ctx;
 	
 	if(ksize != 16 && ksize != 32) {
@@ -118,6 +124,9 @@ void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const ou
 		if(ctx->count % 64 == 0) {
 			encle64(ctx->count / 64, &n[8]);
 			salsa20_expand(ctx->key, ctx->ksize, n, ctx->stream);
+#ifdef SALSA20_DEBUG
+			printbuf(n, 16);
+#endif
 		}
 		out[i] = in[i] ^ ctx->stream[ctx->count%64];
 		ctx->count++;
@@ -128,4 +137,20 @@ void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const ou
 void free_salsa20(SALSA20_CTX* ctx) {
 	memset(ctx, 0x00, sizeof(SALSA20_CTX));
 	free(ctx);
+}
+
+/* convenience functions */
+int salsa20_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
+	SALSA20_CTX* ctx = init_salsa20(key, ksize, nonce);
+	if(ctx == NULL) {
+		return 1;
+	}
+	
+	stream_salsa20(ctx, in, out, len);
+	free_salsa20(ctx);
+	return 0;
+}
+
+int salsa20_dec(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
+	return salsa20_enc(key, ksize, nonce, in, out, len);
 }

@@ -4,7 +4,7 @@
 
 /* the salsa20 core hash function
  * in and out can overlap */
-void salsa20_core(uint8_t in[64], uint8_t out[64]) {
+void salsa20_core(const uint8_t in[64], uint8_t out[64]) {
 	uint32_t x[16];
 	uint32_t o[16];
 	uint8_t i;
@@ -42,4 +42,34 @@ void salsa20_core(uint8_t in[64], uint8_t out[64]) {
 	for(i = 0; i < 16; i++) {
 		encle32(x[i] + o[i], &out[i * 4]);
 	}
+}
+
+/* salsa20 32-byte expansion constant */
+const static uint8_t sig[] = "expand 32-byte k";
+/* salsa20 16-byte expansion constant */
+const static uint8_t tau[] = "expand 16-byte k";
+
+/* the salsa20expansion function 
+ * ksize must be 16 or 32, otherwise
+ * this function will fail silently */
+void salsa20_expand(const uint8_t* const k, const uint8_t ksize, const uint8_t n[16], uint8_t out[64]) {
+	if(ksize != 32 && ksize != 16)
+		return;
+
+	/* prepare input for core function */
+	memcpy(&out[ 4], k, 16);
+	memcpy(&out[24], n, 16);
+	const uint8_t* expconst;
+	if(ksize == 32) {
+		memcpy(&out[44], k+16, 16);
+		expconst = sig;
+	} else {
+		memcpy(&out[44], k, 16);
+		expconst = tau;
+	}
+	memcpy(&out[ 0], &expconst[ 0], 4);
+	memcpy(&out[20], &expconst[ 4], 4);
+	memcpy(&out[40], &expconst[ 8], 4);
+	memcpy(&out[60], &expconst[12], 4);
+	salsa20_core(out, out);
 }

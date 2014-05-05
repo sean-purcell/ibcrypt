@@ -1,4 +1,7 @@
+#include <errno.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 #include <libibur/util.h>
 #include <libibur/endian.h>
 
@@ -72,4 +75,54 @@ void salsa20_expand(const uint8_t* const k, const uint8_t ksize, const uint8_t n
 	memcpy(&out[40], &expconst[ 8], 4);
 	memcpy(&out[60], &expconst[12], 4);
 	salsa20_core(out, out);
+}
+
+/* initialize a salsa20 context
+ * returns NULL on failure */
+SALSA20_CTX* init_salsa20(const uint8_t* key, const uint8_t ksize, const uint64_t nonce) {
+	SALSA20_CTX* ctx;
+	
+	if(ksize != 16 && ksize != 32) {
+		/* unacceptable */
+		goto err0;
+	}
+	
+	if((ctx = malloc(sizeof(SALSA20_CTX))) == NULL) {
+		errno = ENOMEM;
+		goto err0;
+	}
+
+	ctx->ksize = ksize;
+	memcpy(ctx->key, key, ksize);
+	/* for 16 byte keys 0 the rest */
+	memset(&ctx->key[ksize], 0x00, 32 - ksize);
+	
+	ctx->nonce = nonce;
+	ctx->count = 0;
+
+err0:
+	/* failure! */
+	return NULL;
+}
+
+/* encrypt/decrypt a section */
+void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
+	uint64_t i;
+	/* the n value to pass when expanding new stream block */
+	uint8_t n[16];
+	encle64(ctx->nonce, n);
+	
+	for(i = 0; i < len; i++) {
+		if(ctx->count % 64 == 0) {
+			encle64(ctx->count / 64, &n[8]);
+			salsa20_expand(ctx->key, ctx->ksize, n, ctx->stream);
+		}
+		out[i] = in[i] ^ ctx->stream[ctx->count%64];
+	}
+}
+
+/* frees an initialized salsa20 context */
+void free_salsa20(SALSA20_CTX* ctx) {
+	memset(ctx, 0x00, sizeof(SALSA20_CTX));
+	free(ctx);
 }

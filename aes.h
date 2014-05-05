@@ -17,7 +17,7 @@ typedef struct {
 	AES_KEY key;
 	uint8_t stream[16];
 	uint8_t nonce[16];
-	uint32_t count;
+	uint64_t count;
 } AES_CTR_CTX;
 
 int create_key_AES(const uint8_t* const source, const int bits, AES_KEY* const key);

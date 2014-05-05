@@ -82,7 +82,7 @@ err0:
 
 /* encrypt/decrypt a block of ctr */
 void stream_ctr_AES(AES_CTR_CTX* const ctx, const uint8_t* const in, const size_t len, uint8_t* const out) {
-	uint32_t i;
+	size_t i;
 	
 	for(i = 0; i < len; i++) {
 		if(ctx->count % 16 == 0) {

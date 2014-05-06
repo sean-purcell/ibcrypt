@@ -25,10 +25,10 @@ void salsa20_core(const uint8_t in[64], uint8_t out[64]) {
 	
 #define ROT(x, n) (((x) << n) | ((x) >> (32 - n)))
 #define QROUND(a,b,c,d) \
-	((b) ^= ROT((a+d),  7));\
-	((c) ^= ROT((b+a),  9));\
-	((d) ^= ROT((c+b), 13));\
-	((a) ^= ROT((d+c), 18));
+	((b) ^= ROT(((a)+(d)),  7));\
+	((c) ^= ROT(((b)+(a)),  9));\
+	((d) ^= ROT(((c)+(b)), 13));\
+	((a) ^= ROT(((d)+(c)), 18));
 	
 	/* iterate double round 20 times */
 	for(i = 0; i < 20; i += 2) {

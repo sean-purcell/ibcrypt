@@ -10,10 +10,10 @@ else
 	LFLAGS=-flto
 endif
 
-LIB_HEADERS=aes.h sha256.h rand.h scrypt.h salsa20.h
-LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o salsa20.o
+LIB_HEADERS=aes.h sha256.h rand.h scrypt.h salsa20.h chacha.h
+LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o salsa20.o chacha.o
 
-TEST_OBJECTS=$(LIB_OBJECTS) aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o salsa20_test.o
+TEST_OBJECTS=$(LIB_OBJECTS) aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o salsa20_test.o chacha_test.o
 
 .PHONY: clean cleanall remake remaketest test all lib install
 

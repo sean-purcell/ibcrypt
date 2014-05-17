@@ -3,6 +3,8 @@
 
 //#define CHACHA_DEBUG
 
+#include <stdint.h>
+
 typedef struct {
 	uint64_t nonce;
 	uint64_t count;

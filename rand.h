@@ -11,4 +11,6 @@ int cs_rand(void* buf, size_t buflen);
 
 uint32_t cs_rand_int();
 
+uint32_t cs_rand_int_range(uint32_t top);
+
 #endif

@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include <libibur/util.h>
+
 #include "rand.h"
 
 /* returns URANDOM_FAIL if unsuccessful, 0 if successful */
@@ -59,3 +61,22 @@ uint32_t cs_rand_int() {
 	
 	return res;
 }
+
+uint32_t cs_rand_int_range(uint32_t top) {
+	if(top == 0) {
+		return 0;
+	}
+	if(top & (top-1)) {
+		const uint32_t mask = (2 << lg(top)) - 1;
+		const uint32_t max = ((mask + 1) / top) * top;
+		while(1) {
+			uint32_t guess = cs_rand_int() & mask;
+			if(guess < max) {
+				return guess % top;
+			}
+		}
+	} else {
+		return cs_rand_int() & (top-1);
+	}
+}
+

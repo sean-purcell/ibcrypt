@@ -154,12 +154,12 @@ int scrypt(void* _pass, uint32_t plen, uint8_t* salt, uint32_t slen,
 	/* check params */
 #if SIZE_MAX > UINT32_MAX
 	if(dkLen > (((size_t)(1) << 32) - 1) * 32) {
-		errno = EFBIG;
+		errno = EINVAL;
 		goto err0;
 	}
 #endif
 	if((uint64_t)(r) * (uint64_t)(p) >= (1 << 30)) {
-		errno = EFBIG;
+		errno = EINVAL;
 		goto err0;
 	}
 	
@@ -239,3 +239,4 @@ err0:
 	return -1;
 #endif
 }
+

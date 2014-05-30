@@ -163,7 +163,7 @@ int scrypt(void* _pass, uint32_t plen, uint8_t* salt, uint32_t slen,
 		goto err0;
 	}
 	
-	if(N & N-1) {
+	if(N & (N-1)) {
 		errno = EINVAL;
 		goto err0;
 	}
@@ -171,14 +171,14 @@ int scrypt(void* _pass, uint32_t plen, uint8_t* salt, uint32_t slen,
 #ifdef SCRYPT_USE_MMAP
 	if((B = mmap(NULL, pMFlen, 
 	PROT_READ | PROT_WRITE,
-	MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED) {
+	MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)) == MAP_FAILED) {
 		/* map failed */
 		goto err0;
 	}
 	
 	if((V = mmap(NULL, 128 * r * N + 128 * r * 2,
 	PROT_READ | PROT_WRITE,
-	MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED) {
+	MAP_ANONYMOUS | MAP_PRIVATE, -1, 0)) == MAP_FAILED) {
 		/* map failed */
 		goto err1;
 	}

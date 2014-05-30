@@ -1,6 +1,6 @@
 CC=gcc
 DEBUG=1
-ORIGFLAGS= -c -Wall -std=c99
+ORIGFLAGS= -c -Wall -std=gnu99
 
 ifeq ($(DEBUG),1)
 	CFLAGS=$(ORIGFLAGS) -g

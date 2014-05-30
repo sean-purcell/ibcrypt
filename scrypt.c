@@ -12,6 +12,10 @@
 
 #define SCRYPT_USE_MMAP
 
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif
+
 static uint64_t integerify(uint32_t* B, uint32_t r) {
 	uint64_t val = 0;
 	uint32_t* x = B + (2 * r - 1) * 16;

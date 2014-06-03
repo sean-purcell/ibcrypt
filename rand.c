@@ -53,7 +53,9 @@ static uint8_t count = 0;
 
 uint32_t cs_rand_int() {
 	if(count == 0) {
-		cs_rand((uint8_t*) buf, 64 * sizeof(uint32_t));
+		if(cs_rand((uint8_t*) buf, 64 * sizeof(uint32_t)) != 0) {
+			return 0;
+		}
 	}
 	uint32_t res = buf[count];
 	count++;
@@ -66,11 +68,15 @@ uint32_t cs_rand_int_range(uint32_t top) {
 	if(top == 0) {
 		return 0;
 	}
+	errno = 0;
 	if(top & (top-1)) {
 		const uint32_t mask = (2 << lg(top)) - 1;
 		const uint32_t max = ((mask + 1) / top) * top;
 		while(1) {
 			uint32_t guess = cs_rand_int() & mask;
+			if(errno != 0) {
+				return 0;
+			}
 			if(guess < max) {
 				return guess % top;
 			}

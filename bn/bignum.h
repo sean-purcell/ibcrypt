@@ -1,6 +1,8 @@
 #ifndef IBCRYPT_BN_BIGNUM_H
 #define IBCRYPT_BN_BIGNUM_H
 
+#include <stdint.h>
+
 #define BN_DIG 64
 
 typedef struct bignum_struct {

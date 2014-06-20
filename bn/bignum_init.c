@@ -1,7 +1,10 @@
 #include <limits.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "bn/bignum.h"
-#include "bn/bignum_util.h"
+#include "bignum.h"
+#include "bignum_util.h"
 
 /* create an empty bignum */
 int bni_zero(BIGNUM* a) {
@@ -63,11 +66,14 @@ int bni_fstr(BIGNUM* a, const char* source) {
 	bnu_resize(a, (uint32_t) ((size + 15) / 16));
 
 	size_t i;
-	for(i = size-1; i >= 16; i -= 16, pos++) {
-		for(int j = 0; j < 16; j++) {
+	/* TODO: technically defined but I should rework to not use integer under/overflow later */
+	for(i = size-1; (i + 16) >= 16; i -= 16) {
+		for(int j = 0; j < 16 && j <= i; j++) {
 			a->d[(size-1-i)/16] |= ((uint64_t) fhex(source[i - j])) << (j * 4);
 		}
 	}
+
+	return 0;
 }
 
 int bni_cpy(BIGNUM* r, const BIGNUM* a);

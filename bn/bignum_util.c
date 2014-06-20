@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <stdint.h>
 
-#include "bn/bignum_util.h"
+#include "bignum.h"
+#include "bignum_util.h"
 
 /* size is in 64 bit blocks */
 int bnu_resize(BIGNUM* r, uint32_t size) {

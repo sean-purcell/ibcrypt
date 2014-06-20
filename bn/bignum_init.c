@@ -76,4 +76,15 @@ int bni_fstr(BIGNUM* a, const char* source) {
 	return 0;
 }
 
-int bni_cpy(BIGNUM* r, const BIGNUM* a);
+int bni_cpy(BIGNUM* r, const BIGNUM* a) {
+	if(a == NULL || r == NULL) {
+		return -1;
+	}
+
+	bnu_resize(r, a->size);
+	r->neg = a->neg;
+
+	memcpy(r->d, a->d, sizeof(uint64_t) * r->size);
+
+	return 0;
+}

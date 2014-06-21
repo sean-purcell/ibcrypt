@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "bignum.h"
 #include "bignum_util.h"
 
@@ -84,6 +86,8 @@ int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 
 	r->neg = swapped ? -b->neg : a->neg;
+
+	bnu_trim(r);
 
 	return 0;
 }

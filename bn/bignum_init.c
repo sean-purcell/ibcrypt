@@ -6,6 +6,8 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+BIGNUM BN_ZERO = {0, 0, 0};
+
 /* create an empty bignum */
 int bni_zero(BIGNUM* a) {
 	if(a == NULL) {

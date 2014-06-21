@@ -11,6 +11,8 @@ typedef struct bignum_struct {
 	int neg; /* negative flag */
 } BIGNUM;
 
+extern BIGNUM BN_ZERO;
+
 /* create an empty bignum */
 int bni_zero(BIGNUM* a);
 

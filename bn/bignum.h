@@ -30,4 +30,7 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 int bno_mult(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
+/* returns 1 if a > b, -1 if a < b, 0 if a == b */
+int bno_cmp(const BIGNUM* a, const BIGNUM* b);
+
 #endif

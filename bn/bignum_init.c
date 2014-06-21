@@ -53,12 +53,21 @@ static inline uint8_t fhex(const char c) {
 
 /* currently only works with radix 16 */
 int bni_fstr(BIGNUM* a, const char* source) {
+	if(source == 0) {
+		return -1;
+	}
+
 	if(bni_zero(a) != 0) {
 		return -1;
 	}
 
+	if(source[0] == '-') {
+		a->neg = 1;
+		source++;
+	}
+
 	const size_t size = strlen(source);
-	if(size > (0xffffffffLL * 16) /* uint32_t max */) {
+	if(size > (0xffffffffULL * 16) /* uint32_t max */) {
 		return 2; /* too large */
 	}
 

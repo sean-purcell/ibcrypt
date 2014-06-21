@@ -8,4 +8,6 @@
 
 int bnu_resize(BIGNUM* r, uint32_t size);
 
+int bnu_trim(BIGNUM* r);
+
 #endif

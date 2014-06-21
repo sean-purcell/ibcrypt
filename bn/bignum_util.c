@@ -66,6 +66,7 @@ int bnu_tstr(char* out, const BIGNUM* a) {
 			pos++;
 		}
 	}
+
 	out[pos] = '\0';
 
 	return 0;

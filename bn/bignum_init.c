@@ -74,7 +74,9 @@ int bni_fstr(BIGNUM* a, const char* source) {
 	}
 
 	                          /* round up */
-	bnu_resize(a, (uint32_t) ((size + 15) / 16));
+	if(bnu_resize(a, (uint32_t) ((size + 15) / 16)) != 0) {
+		return 1;
+	}
 
 	size_t i;
 	/* TODO: technically defined but I should rework to not use integer under/overflow later */
@@ -92,7 +94,9 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a) {
 		return -1;
 	}
 
-	bnu_resize(r, a->size);
+	if(bnu_resize(r, a->size) != 0) {
+		return 1;
+	}
 	r->neg = a->neg;
 
 	memcpy(r->d, a->d, sizeof(uint64_t) * r->size);

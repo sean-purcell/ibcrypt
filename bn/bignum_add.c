@@ -11,7 +11,9 @@ int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 
 	/* TODO: bounds checking */
-	bnu_resize(r, max(a->size, b->size) + 1);
+	if(bnu_resize(r, max(a->size, b->size) + 1) != 0) {
+		return 1;
+	}
 
 	uint64_t t0, t1;
 	uint32_t i;
@@ -39,7 +41,9 @@ int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 
 	r->neg = a->neg;
 
-	bnu_trim(r);
+	if(bnu_trim(r) != 0) {
+		return 1;
+	}
 
 	return 0;
 }
@@ -52,8 +56,7 @@ int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	int cmp = bno_ucmp(a, b);
 
 	if(cmp == 0) {
-		bnu_resize(r, 0);
-		return 0;
+		return bnu_resize(r, 0);
 	}
 
 	int swapped = 0;
@@ -65,7 +68,9 @@ int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 
 	/* TODO: bounds checking */
-	bnu_resize(r, max(a->size, b->size));
+	if(bnu_resize(r, max(a->size, b->size)) != 0) {
+		return 1;
+	}
 
 	uint64_t t0, t1;
 	uint32_t i;
@@ -87,7 +92,9 @@ int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 
 	r->neg = swapped ? -b->neg : a->neg;
 
-	bnu_trim(r);
+	if(bnu_trim(r) != 0) {
+		return 1;
+	}
 
 	return 0;
 }

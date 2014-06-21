@@ -24,16 +24,16 @@ int bni_fstr(BIGNUM* a, const char* source);
 int bni_cpy(BIGNUM* r, const BIGNUM* a);
 
 /* out must be big enough to hold a */
-int bn_tstr(char* out, BIGNUM* a);
+int bnu_tstr(char* out, const BIGNUM* a);
 
+int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
-
 int bno_mult(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */
 int bno_ucmp(const BIGNUM* a, const BIGNUM* b);
-
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b);
 

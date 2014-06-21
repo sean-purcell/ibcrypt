@@ -4,7 +4,7 @@
 
 int main() {
 	BIGNUM a, b;
-	bni_fstr(&a, "baa5bffffff00efffff0f");
+	bni_fstr(&a, "caa5bffffff00efffff0f");
 	bni_fstr(&b, "baa5bffffff00efffff0f");
 	uint32_t i;
 	for(i = 0; i < a.size; i++) {
@@ -12,4 +12,8 @@ int main() {
 	}
 
 	printf("%d\n", bno_cmp(&a, &b));
+
+	BIGNUM r;
+	bno_add(&r, &a, &b);
+
 }

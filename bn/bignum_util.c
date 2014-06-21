@@ -41,3 +41,7 @@ int bnu_trim(BIGNUM* r) {
 
 	return bnu_resize(r, (uint32_t) (i + 1));
 }
+
+int bnu_tstr(char* out, const BIGNUM* a) {
+	
+}

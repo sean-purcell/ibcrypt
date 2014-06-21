@@ -31,7 +31,8 @@ int bnu_tstr(char* out, const BIGNUM* a);
 int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
-int bno_mult(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+
+int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */

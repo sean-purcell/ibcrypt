@@ -2,6 +2,8 @@
 
 #include "bignum.h"
 
+/* bit shifts a given bignum, effectively << and >> operators */
+
 /* a and r may be the same bignum */
 int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 	if(a == NULL || r == NULL) {
@@ -45,13 +47,14 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 	const uint8_t lshift = bit_shift;
 	const uint8_t rshift = 64 - bit_shift;
 
+	/* lshift, OR carry, set new carry, set value */
 	for(i = blk_shift; i < nsize - 1; i++) {
 		t = (r->d[i] << lshift) | carry;
 		carry = r->d[i] >> rshift;
-		r->d[i] = rshift;
+		r->d[i] = t;
 	}
 
 	r->d[nsize - 1] = carry;
 
-	return 0;
+	return bnu_trim(r);
 }

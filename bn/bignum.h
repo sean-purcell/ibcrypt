@@ -30,9 +30,15 @@ int bnu_tstr(char* out, const BIGNUM* a);
 
 int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+/* + operator */
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
+/* * operator */
 int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+
+/* a and r may be the same bignum
+ * << operator */
+int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */

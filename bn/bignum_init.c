@@ -6,6 +6,7 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+/* equivalent to bni_zero(&bn); */
 BIGNUM BN_ZERO = {0, 0, 0};
 
 /* create an empty bignum */

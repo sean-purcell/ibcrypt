@@ -42,6 +42,31 @@ int bnu_trim(BIGNUM* r) {
 	return bnu_resize(r, (uint32_t) (i + 1));
 }
 
+static inline char fhex(const uint8_t v) {
+	if(v < 10) {
+		return (char) (v + '0');
+	} else {
+		return (char) (v + 'a' - 10);
+	}
+}
+
 int bnu_tstr(char* out, const BIGNUM* a) {
-	
+	uint32_t i = a->size;
+	size_t pos = 0;
+
+	if(a->neg) {
+		out[0] = '-';
+		pos++;
+	}
+
+	while(i--) {
+		for(int j = 15; j >= 0; j--) {
+			uint8_t val = (a->d[i] & (0xfULL << (j * 4))) >> (j * 4);
+			out[pos] = fhex(val);
+			pos++;
+		}
+	}
+	out[pos] = '\0';
+
+	return 0;
 }

@@ -24,4 +24,10 @@ int main() {
 	bnu_tstr(out, &r);
 
 	printf("%s\n", out);
+
+	bnu_tstr(out, &a);
+	printf("%s\n", out);
+	bno_lshift(&a, &a, 64);
+	bnu_tstr(out, &a);
+	printf("%s\n", out);
 }

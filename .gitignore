@@ -22,6 +22,9 @@
 *.x86_64
 *.hex
 
+# Debug symbols
+*.dSYM
+
 # bin folder
 bin/
 

@@ -4,8 +4,8 @@
 
 int main() {
 	BIGNUM a, b;
-	bni_fstr(&a, "-0");
-	bni_fstr(&b, "0");
+	bni_fstr(&a, "baa5bffffff00efffff0f");
+	bni_fstr(&b, "baa5bffffff00efffff0f");
 	uint32_t i;
 	for(i = 0; i < a.size; i++) {
 		printf("%llx\n", a.d[i]);

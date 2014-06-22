@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "bignum.h"
 #include "bignum_util.h"
@@ -11,10 +12,17 @@ int bnu_resize(BIGNUM* r, uint32_t size) {
 	}
 
 	/* check for realloc fail */
-	uint64_t* ptr = realloc(r->d, sizeof(uint64_t) * (uint64_t) size);
+
+	uint64_t* ptr = malloc(sizeof(uint64_t) * (uint64_t) size);
 	if(ptr == NULL) {
 		return 1;
 	}
+
+	memcpy(ptr, r->d, sizeof(uint64_t) * (uint64_t) r->size);
+	memset(r->d, 0x00, sizeof(uint64_t) * (uint64_t) r->size);
+
+	free(r->d);
+
 	r->d = ptr;
 
 	/* zero allocated space */

@@ -27,7 +27,10 @@ int main() {
 
 	bnu_tstr(out, &a);
 	printf("%s\n", out);
-	bno_lshift(&a, &a, 64);
+	bno_lshift(&a, &a, 65);
+	bnu_tstr(out, &a);
+	printf("%s\n", out);
+	bno_rshift(&a, &a, 63);
 	bnu_tstr(out, &a);
 	printf("%s\n", out);
 }

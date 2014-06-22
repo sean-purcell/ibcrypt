@@ -5,23 +5,30 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 /* size is in 64 bit blocks */
 int bnu_resize(BIGNUM* r, uint32_t size) {
 	if(r->size == size) {
 		return 0;
 	}
 
-	/* check for realloc fail */
-
-	uint64_t* ptr = malloc(sizeof(uint64_t) * (uint64_t) size);
-	if(ptr == NULL) {
-		return 1;
+	uint64_t* ptr;
+	/* check for malloc fail */
+	if(size != 0) {
+		ptr = malloc(sizeof(uint64_t) * (uint64_t) size);
+		if(ptr == NULL) {
+			return 1;
+		}
+	} else {
+		ptr = 0;
 	}
 
-	memcpy(ptr, r->d, sizeof(uint64_t) * (uint64_t) r->size);
-	memset(r->d, 0x00, sizeof(uint64_t) * (uint64_t) r->size);
-
-	free(r->d);
+	if(r->d != 0) {
+		memcpy(ptr, r->d, sizeof(uint64_t) * (uint64_t) min(r->size, size));
+		memset(r->d, 0x00, sizeof(uint64_t) * (uint64_t) r->size);
+		free(r->d);
+	}
 
 	r->d = ptr;
 
@@ -48,6 +55,14 @@ int bnu_trim(BIGNUM* r) {
 	} while(r->d[i] == 0 && i >= 0);
 
 	return bnu_resize(r, (uint32_t) (i + 1));
+}
+
+int bnu_free(BIGNUM* r) {
+	if(r == NULL) {
+		return -1;
+	}
+
+	return bnu_resize(r, 0);
 }
 
 static inline char fhex(const uint8_t v) {

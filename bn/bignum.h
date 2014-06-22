@@ -28,6 +28,9 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a);
 /* out must be big enough to hold a */
 int bnu_tstr(char* out, const BIGNUM* a);
 
+/* frees a bignum, should be used before it goes out of scope */
+int bnu_free(BIGNUM* r);
+
 int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 /* + operator */

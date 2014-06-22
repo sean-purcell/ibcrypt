@@ -33,4 +33,8 @@ int main() {
 	bno_rshift(&a, &a, 63);
 	bnu_tstr(out, &a);
 	printf("%s\n", out);
+
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&r);
 }

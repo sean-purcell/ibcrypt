@@ -5,12 +5,12 @@
 int main() {
 	BIGNUM a, b;
 	bni_fstr(&a, "caa5bffffff00efffff0f");
-	bni_fstr(&b, "-baa5bffffff00efffff0f");
+	bni_fstr(&b, "baa5bffffff00efffff0f");
 	uint32_t i;
 	for(i = 0; i < a.size; i++) {
 		printf("%llx\n", a.d[i]);
 	}
-	char out[64];
+	char out[1024];
 	bnu_tstr(out, &a);
 	printf("%s\n", out);
 	bnu_tstr(out, &b);
@@ -32,6 +32,15 @@ int main() {
 	printf("%s\n", out);
 	bno_rshift(&a, &a, 63);
 	bnu_tstr(out, &a);
+	printf("%s\n", out);
+
+	bnu_tstr(out, &a);
+	printf("%s\n", out);
+	bnu_tstr(out, &b);
+	printf("%s\n", out);
+
+	bno_mul(&r, &a, &b);
+	bnu_tstr(out, &r);
 	printf("%s\n", out);
 
 	bnu_free(&a);

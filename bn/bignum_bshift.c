@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "bignum.h"
 #include "bignum_util.h"
@@ -14,7 +15,7 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 
 	const uint32_t osize = a->size;
 	/* round up */
-	const uint64_t nsize = osize + (shift + 63) / 64;
+	const uint64_t nsize = osize + shift / 64 + 1;
 	if(nsize > 0xffffffff) {
 		return 2; /* too big */
 	}
@@ -26,37 +27,24 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 	const uint32_t blk_shift = shift / 64;
 	const uint32_t bit_shift = shift % 64;
 
-	/* move the numbers block by block to the extent that we can */
-	/* note: must be block by block not byte by byte due to endian-ness */
-	/* TODO: check parameters to memove, make sure it can handle this */
-	memmove(&r->d[blk_shift], &a->d[0], sizeof(uint64_t) * osize);
-	/* zero introduced space at LS side */
-	memset(&r->d[0], 0x00, sizeof(uint64_t) * blk_shift);
-
-	/* TODO: point of concern: this is not constant time */
-	/* if there is no bitshift we are done */
-	if(bit_shift == 0) {
-		return 0;
-	}
-
 	/* now shift each block individually */
 	uint32_t i;
-	uint64_t carry = 0;
-	uint64_t t;
 
 	/* amount to shift left by,
 	 * amount to shift right by to get the carry */
 	const uint8_t lshift = bit_shift;
 	const uint8_t rshift = 64 - bit_shift;
 
+	r->d[nsize-1] = rshift == 64 ? 0 : a->d[osize-1] >> rshift;
+
 	/* lshift, OR carry, set new carry, set value */
-	for(i = blk_shift; i < nsize - 1; i++) {
-		t = (r->d[i] << lshift) | carry;
-		carry = r->d[i] >> rshift;
-		r->d[i] = t;
+	for(i = osize-1; i > 0; i--) {
+		r->d[i+blk_shift] = (a->d[i] << lshift) | (rshift == 64 ? 0 : a->d[i-1] >> rshift);
 	}
 
-	r->d[nsize - 1] = carry;
+	r->d[blk_shift] = a->d[0] << lshift;
+
+	memset(r->d, 0x00, sizeof(uint64_t) * blk_shift);
 
 	return bnu_trim(r);
 }

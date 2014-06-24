@@ -13,6 +13,10 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 		return -1;
 	}
 
+	if(a->size == 0) {
+		return bnu_resize(r, 0);
+	}
+
 	const uint32_t osize = a->size;
 	/* round up */
 	const uint64_t nsize = osize + shift / 64 + 1;
@@ -54,6 +58,10 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 		return -1;
 	}
 
+	if(a->size == 0) {
+		return bnu_resize(r, 0);
+	}
+
 	const uint32_t osize = a->size;
 	/* round up */
 	const uint32_t nsize = osize - shift / 64;
@@ -65,34 +73,21 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 	const uint32_t blk_shift = shift / 64;
 	const uint32_t bit_shift = shift % 64;
 
-	/* move blocks */
-	memmove(&r->d[0], &a->d[blk_shift], sizeof(uint64_t) * nsize);
-
-	/* no point zeroing, just resize */
-	if(bnu_resize(r, nsize) != 0) {
-		return 1;
-	}
-
-	if(bit_shift == 0) {
-		return 0;
-	}
-
 	/* now shift block by block */
 	uint32_t i;
 	uint64_t carry = 0;
 	uint64_t t;
-	
+
 	/* amount to shift left, right */
 	const uint8_t lshift = 64 - bit_shift;
 	const uint8_t rshift = bit_shift;
 
-	for(i = nsize - 1; i > 0; i--) {
-		t = (r->d[i] >> rshift) | carry;
-		carry = r->d[i] << lshift;
-		r->d[i] = t;
+	for(i = blk_shift; i < osize-1; i++) {
+		r->d[i-blk_shift] = (a->d[i] >> rshift) | (lshift == 64 ? 0 : a->d[i+1] << lshift);
 	}
+	r->d[osize-1-blk_shift] = a->d[osize-1] >> rshift;
 
-	r->d[0] = (r->d[0] >> rshift) | carry;
+	memset(&r->d[nsize], 0x00, sizeof(uint64_t) * blk_shift);
 
 	return bnu_trim(r);
 }

@@ -66,6 +66,10 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		return 1;
 	}
 
+	if(bno_rmod(&a, &a, n) != 0 || bno_rmod(&b, &b, n) != 0) {
+		return 1;
+	}
+
 	if(bnu_resize(r, 0) != 0) {
 		return 1;
 	}

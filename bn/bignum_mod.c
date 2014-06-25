@@ -21,20 +21,23 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	uint32_t msb = 63;
 	while(!(nt.d[nt.size-1] & (1 << msb))) {msb++;}
 
-	const uint64_t shift = (uint64_t)at.size * 64 - (uint64_t)(nt.size-1) * 64 + msb;
-	/* shift nt so that the most significant 1 bit is at the top of the array */
-	if(bno_lshift(&nt, &nt, shift) != 0) {
-		return 1;
+	uint64_t shift = 0;
+	/* shift nt so that its greater than a */
+	while(bno_ucmp(&nt, &at) <= 0) {
+		if(bno_lshift(&nt, &nt, 32) != 0) {
+			return 1;
+		}
+		shift += 32;
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {
-		if(bno_ucmp(&nt, &at) < 0) {
+		if(bno_rshift(&nt, &nt, 1) != 0) {
+			return 1;
+		}
+		if(bno_ucmp(&nt, &at) <= 0) {
 			if(bno_usub(&at, &at, &nt) != 0) {
 				return 1;
 			}
-		}
-		if(bno_rshift(&nt, &nt, 1) != 0) {
-			return 1;
 		}
 	}
 

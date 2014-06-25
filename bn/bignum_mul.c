@@ -51,7 +51,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 }
 
 int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) {
-	if(r == NULL || _a == NULL || _b == NULL) {
+	if(r == NULL || _a == NULL || _b == NULL || n == NULL) {
 		return -1;
 	}
 

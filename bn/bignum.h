@@ -42,6 +42,9 @@ int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 /* ^ operator */
 int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp);
 
+/* % operator */
+int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
+
 /* a and r may be the same bignum
  * << operator */
 int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);

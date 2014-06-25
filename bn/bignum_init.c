@@ -95,6 +95,10 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a) {
 		return -1;
 	}
 
+	if(r == a) {
+		return 0;
+	}
+
 	if(bnu_resize(r, a->size) != 0) {
 		return 1;
 	}

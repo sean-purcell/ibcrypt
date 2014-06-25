@@ -48,6 +48,14 @@ int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	return 0;
 }
 
+int bno_uadd_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
+	if(bno_uadd(r, a, b) != 0) {
+		return 1;
+	}
+
+	return bno_rmod(r, r, n);
+}
+
 int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;

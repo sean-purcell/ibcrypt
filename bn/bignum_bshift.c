@@ -75,8 +75,6 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, uint64_t shift) {
 
 	/* now shift block by block */
 	uint32_t i;
-	uint64_t carry = 0;
-	uint64_t t;
 
 	/* amount to shift left, right */
 	const uint8_t lshift = 64 - bit_shift;

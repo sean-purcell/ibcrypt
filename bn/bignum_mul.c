@@ -30,7 +30,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 		int j;
 		for(j = 0; j < 64; j++) {
 			/* if bit is set */
-			if(b.d[i] & (1ULL << j)) {
+			if(b.d[i] & ((uint64_t)1 << j)) {
 				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
 					return 1;
 				}
@@ -80,7 +80,7 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		int j;
 		for(j = 0; j < 64; j++) {
 			/* if bit is set */
-			if(b.d[i] & (1ULL << j)) {
+			if(b.d[i] & ((uint64_t)1 << j)) {
 				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
 					return 1;
 				}

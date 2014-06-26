@@ -75,12 +75,6 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("a^2%%c:%s\n", out);
 
-	BIGNUM two = BN_ZERO;
-	bni_fstr(&two, "700000000000001");
-	bno_exp_mod(&r, &a, &two, &c);
-	bnu_tstr(out, &r);
-	printf("a^70000000000000000%%c:%s\n", out);
-
 	bno_mul(&r, &a, &a);
 	bnu_tstr(out, &r);
 	printf("a*a  :%s\n", out);
@@ -122,4 +116,5 @@ int main() {
 	bnu_free(&b);
 	bnu_free(&r);
 	bnu_free(&c);
+	bnu_free(&q);
 }

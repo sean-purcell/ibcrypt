@@ -18,9 +18,6 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 		return 1;
 	}
 
-	uint32_t msb = 63;
-	while(!(nt.d[nt.size-1] & (1 << msb))) {msb++;}
-
 	uint64_t shift = 0;
 	/* shift nt so that its greater than a */
 	while(bno_ucmp(&nt, &at) <= 0) {

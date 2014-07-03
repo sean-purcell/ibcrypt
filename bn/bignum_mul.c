@@ -4,6 +4,44 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+/*int bno_mul_fst(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
+	if(r == NULL || a == NULL || b == NULL) {
+		return -1;
+	}
+
+	const BIGNUM a = BN_ZERO;
+	const BIGNUM b = BN_ZERO;
+	if(bni_cpy(&a, _a) != 0 || bni_cpy(&b, _b) != 0) {
+		return 1;
+	}
+
+	uint64_t size = a.size * b.size;
+	if(size > 0xffffffffU) {
+		return 2; /* too big 
+	}
+
+	if(bnu_resize(r, 0) != 0) {
+		return 1;
+	}
+
+	const uint64_t ablks = a.size * 2;
+	const uint64_t bblks = b.size * 2;
+
+	BIGNUM tmp = BN_ZERO;
+
+	/* long multiplication with 32 bit digits 
+	uint64_t i, j;
+	for(i = 0; i < ablks; i++) {
+		for(j = 0; j < bblks; j++) {
+			if(bnu_resize(tmp, 1) != 0) {
+				return 1;
+			}
+
+			tmp.d[0] = (a.d[i/2] & ((uint64_t)0xffffffff << (32 * (i&1))))
+		}
+	}
+}*/
+
 int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(r == NULL || _a == NULL || _b == NULL) {
 		return -1;

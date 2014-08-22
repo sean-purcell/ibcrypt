@@ -56,10 +56,10 @@ int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 		int j;
 		for(j = 63; j >= 0; j--) {
 			uint8_t bit = ((exp->d[i] & ((uint64_t)1 << j)) >> j);
-			if(bno_mul_mod(&R[!bit], &R[0], &R[1], n) != 0) {
+			if(bno_mul_mod_fst(&R[!bit], &R[0], &R[1], n) != 0) {
 				return 1;
 			}
-			if(bno_mul_mod(&R[bit], &R[bit], &R[bit], n) != 0) {
+			if(bno_mul_mod_fst(&R[bit], &R[bit], &R[bit], n) != 0) {
 				return 1;
 			}
 		}

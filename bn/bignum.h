@@ -48,6 +48,7 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
 
 int bno_uadd_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
 int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n);
+int bno_mul_mod_fst(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n);
 int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 
 /* a and r may be the same bignum

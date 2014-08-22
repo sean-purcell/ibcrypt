@@ -55,6 +55,14 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("a*b  :%s\n", out);
 
+	bno_mul_mod(&r, &a, &b, &c);
+	bnu_tstr(out, &r);
+	printf("a*b%%c:%s\n", out);
+
+	bno_mul_mod_fst(&r, &a, &b, &c);
+	bnu_tstr(out, &r);
+	printf("a*b%%c:%s\n", out);
+
 	//bnu_tstr(out, &a);
 	//printf("%s\n", out);
 	bno_lshift(&a, &a, 65);
@@ -95,7 +103,7 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("%s\n", out);*/
 	bno_rmod(&r, &r, &c);
-	
+
 	bnu_tstr(out, &r);
 //	printf("%s\n", out);
 
@@ -145,6 +153,6 @@ int main() {
 	bnu_free(&r);
 	bnu_free(&c);
 	bnu_free(&q);
-	
+
 	speed_test();
 }

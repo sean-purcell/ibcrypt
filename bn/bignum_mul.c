@@ -4,6 +4,8 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+void bno_uadd_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+void bno_rmod_no_resize(BUGNUM* r, const BIGNUM* n);
 
 int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(r == NULL || _a == NULL || _b == NULL) {

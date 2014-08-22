@@ -38,6 +38,7 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* * operator */
 int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_mul_fst(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* ^ operator */
 int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp);

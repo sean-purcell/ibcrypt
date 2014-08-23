@@ -20,6 +20,11 @@ void speed_test() {
 	bno_exp_mod(&r, &m, &e, &n);
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
+
+	bnu_free(&m);
+	bnu_free(&e);
+	bnu_free(&n);
+	bnu_free(&r);
 }
 
 int main() {

@@ -28,6 +28,8 @@ int bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n) {
 			bno_usub_no_resize(r, r, &nt);
 		}
 	}
+
+	return 0;
 }
 
 int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {

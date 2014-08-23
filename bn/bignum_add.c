@@ -3,6 +3,8 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+void bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n);
+
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -67,7 +69,7 @@ int bno_uadd_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
 	return bno_rmod(r, r, n);
 }
 
-int bno_usub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {	
+void bno_usub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {	
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;

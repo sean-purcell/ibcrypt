@@ -18,7 +18,7 @@ int bno_cmp(const BIGNUM* a, const BIGNUM* b) {
 		}
 		return 0;
 	}
-	
+
 	BIGNUM _a = *a;
 	BIGNUM _b = *b;
 

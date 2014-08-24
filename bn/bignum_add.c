@@ -6,6 +6,14 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
+/* returns 1 if there was a carry, 0 if not */
+int add_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen) {
+	
+}
+
+/* returns 1 if there was a carry, 0 if not */
+int sub_words(uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
+
 void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	uint64_t t0, t1;
 	uint32_t i;
@@ -30,6 +38,7 @@ void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		r->d[i] = t0;
 		i++;
 	}
+	if(carry) r->d[i] = 1;
 }
 
 int bno_add_mod_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {

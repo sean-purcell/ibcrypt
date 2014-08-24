@@ -15,7 +15,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	}
 
 	BIGNUM a = BN_ZERO;
-	BIGNUM b = *b;
+	BIGNUM b = *_b;
 	if(bni_cpy(&a, _a) != 0) {
 		return 1;
 	}

@@ -9,7 +9,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 		return -1;
 	}
 
-	uint64_t size = _a->size * _b->size;
+	uint64_t size = _a->size + _b->size;
 	if(size > 0xffffffffU) {
 		return 2; /* too big */
 	}
@@ -53,7 +53,7 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		return -1;
 	}
 
-	uint64_t size = _a->size * _b->size;
+	uint64_t size = _a->size + _b->size;
 	if(size > 0xffffffffU) {
 		return 2; /* too big */
 	}

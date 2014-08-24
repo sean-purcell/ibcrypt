@@ -15,8 +15,8 @@ void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 int bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n);
 
 /* returns 1 if there was a carry, 0 if not */
-int add_words(uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
+int add_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
 /* returns 1 if there was a carry, 0 if not */
-int sub_words(uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
+int sub_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
 
 #endif

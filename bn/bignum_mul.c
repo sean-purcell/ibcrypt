@@ -4,9 +4,6 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
-void bno_uadd_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
-void bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n);
-
 int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(r == NULL || _a == NULL || _b == NULL) {
 		return -1;
@@ -38,7 +35,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 					return 1;
 				}
 
-				if(bno_uadd(r, r, &a) != 0) {
+				if(bno_add(r, r, &a) != 0) {
 					return 1;
 				}
 				lpos = i * 64 + j;
@@ -49,7 +46,6 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	bnu_free(&a);
 	bnu_free(&b);
 
-	r->neg = _a->neg != _b->neg;
 	return bnu_trim(r);
 }
 
@@ -91,7 +87,7 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 					return 1;
 				}
 
-				if(bno_uadd_mod(r, r, &a, n) != 0) {
+				if(bno_add_mod(r, r, &a, n) != 0) {
 					return 1;
 				}
 				lpos = i * 64 + j;
@@ -102,6 +98,5 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 	bnu_free(&a);
 	bnu_free(&b);
 
-	r->neg = _a->neg != _b->neg;
 	return bnu_trim(r);
 }

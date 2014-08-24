@@ -3,35 +3,11 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */
-int bno_ucmp(const BIGNUM* a, const BIGNUM* b) {
-	if(a == NULL || b == NULL) {
-		if(a == NULL) {
-			return -1;
-		}
-		if(b == NULL) {
-			return 1;
-		}
-		return 0;
-	}
-
-	if(a->size != b->size) {
-		return a->size > b->size ? 1 : -1;
-	}
-
-	int result = 0;
-	uint32_t i = a->size;
-	while(i-- != 0) {
-		if(a->d[i] != b->d[i] && result == 0) {
-			result = a->d[i] > b->d[i] ? 1 : -1;
-		}
-	}
-	return result;
-}
-
-/* returns 1 if a > b, -1 if a < b, 0 if a == b
- * note: -0 < 0 */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b) {
 	if(a == NULL || b == NULL) {
 		if(a == NULL) {
@@ -42,15 +18,27 @@ int bno_cmp(const BIGNUM* a, const BIGNUM* b) {
 		}
 		return 0;
 	}
+	
+	BIGNUM _a = *a;
+	BIGNUM _b = *b;
 
-	if(a->neg != b->neg) {
-		return a->neg ? -1 : 1;
+	uint64_t* ad = _a.d;
+	uint64_t* bd = _b.d;
+
+	int result = 0;
+	uint32_t i = max(_a.size, _b.size);
+	while(i > _b.size) {
+		i--;
+		if(ad[i] != 0) result = 1;
 	}
-
-	int mul = 1;
-	if(a->neg) {
-		mul = -1;
+	while(i > _a.size) {
+		i--;
+		if(bd[i] != 0) result = -1;
 	}
-
-	return bno_ucmp(a, b) * mul;
+	while(i-- != 0) {
+		if(ad[i] != bd[i] && result == 0) {
+			result = ad[i] > bd[i] ? 1 : -1;
+		}
+	}
+	return result;
 }

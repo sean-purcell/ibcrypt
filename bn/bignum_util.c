@@ -77,11 +77,6 @@ int bnu_tstr(char* out, const BIGNUM* a) {
 	uint32_t i = a->size;
 	size_t pos = 0;
 
-	if(a->neg) {
-		out[0] = '-';
-		pos++;
-	}
-
 	while(i--) {
 		for(int j = 15; j >= 0; j--) {
 			uint8_t val = (a->d[i] & (0xfULL << (j * 4))) >> (j * 4);

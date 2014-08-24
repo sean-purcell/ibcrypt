@@ -3,12 +3,10 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
-void bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n);
-
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-void bno_uadd_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
+void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
@@ -34,13 +32,13 @@ void bno_uadd_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 }
 
-void bno_uadd_mod_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
-	bno_uadd_no_resize(r, a, b);
+int bno_add_mod_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
+	bno_add_no_resize(r, a, b);
 
 	return bno_rmod_no_resize(r, n);
 }
 
-int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
+int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -50,9 +48,7 @@ int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	bno_uadd_no_resize(r, a, b);
-
-	r->neg = a->neg;
+	bno_add_no_resize(r, a, b);
 
 	if(bnu_trim(r) != 0) {
 		return 1;
@@ -61,15 +57,15 @@ int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	return 0;
 }
 
-int bno_uadd_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
-	if(bno_uadd(r, a, b) != 0) {
+int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
+	if(bno_add(r, a, b) != 0) {
 		return 1;
 	}
 
 	return bno_rmod(r, r, n);
 }
 
-void bno_usub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {	
+void bno_sub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
@@ -89,23 +85,15 @@ void bno_usub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 }
 
-int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
+int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
 
-	int cmp = bno_ucmp(a, b);
+	int cmp = bno_cmp(a, b);
 
 	if(cmp == 0) {
 		return bnu_resize(r, 0);
-	}
-
-	int swapped = 0;
-	if(cmp == -1) {
-		const BIGNUM* tmp = a;
-		a = b;
-		b = tmp;
-		swapped = 1;
 	}
 
 	/* TODO: bounds checking */
@@ -113,24 +101,7 @@ int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	bno_usub_no_resize(r, a, b);
+	bno_sub_no_resize(r, a, b);
 
-	r->neg = swapped ? -b->neg : a->neg;
-
-	if(bnu_trim(r) != 0) {
-		return 1;
-	}
-
-	return 0;
+	return bnu_trim(r);
 }
-
-int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
-	if(a->neg == b->neg) {
-		return bno_uadd(r, a, b);
-	} else {
-		return bno_usub(r, a, b);
-	}
-}
-
-#undef min
-#undef max

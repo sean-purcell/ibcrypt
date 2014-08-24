@@ -8,7 +8,6 @@
 typedef struct bignum_struct {
 	uint64_t* d; /* array of 64 bit digits */
 	uint32_t size; /* size of d array */
-	int neg; /* negative flag */
 } BIGNUM;
 
 extern BIGNUM BN_ZERO;
@@ -17,8 +16,7 @@ extern BIGNUM BN_ZERO;
 int bni_zero(BIGNUM* a);
 
 /* create a bignum from the given source */
-int bni_uint(BIGNUM* a, uint64_t source);
-int bni_int(BIGNUM* a, int64_t source);
+int bni_int(BIGNUM* a, uint64_t source);
 
 /* currently only works with radix 16 */
 int bni_fstr(BIGNUM* a, const char* source);
@@ -31,10 +29,11 @@ int bnu_tstr(char* out, const BIGNUM* a);
 /* frees a bignum, should be used before it goes out of scope */
 int bnu_free(BIGNUM* r);
 
-int bno_uadd(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
-int bno_usub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 /* + operator */
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+
+/* - operator */
+int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* * operator */
 int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
@@ -45,8 +44,8 @@ int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp);
 /* % operator */
 int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
 
-int bno_uadd_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
-int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n);
+int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
+int bno_mul_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
 int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 
 /* a and r may be the same bignum
@@ -55,9 +54,6 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);
 /* >> operator */
 int bno_rshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);
 
-/* returns 1 if a > b, -1 if a < b, 0 if a == b
- * ignores sign */
-int bno_ucmp(const BIGNUM* a, const BIGNUM* b);
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b);
 

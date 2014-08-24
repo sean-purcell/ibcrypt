@@ -7,7 +7,7 @@
 #include "bignum_util.h"
 
 /* equivalent to bni_zero(&bn); */
-BIGNUM BN_ZERO = {0, 0, 0};
+BIGNUM BN_ZERO = {0, 0};
 
 /* create an empty bignum */
 int bni_zero(BIGNUM* a) {
@@ -17,12 +17,11 @@ int bni_zero(BIGNUM* a) {
 
 	a->d = 0;
 	a->size = 0;
-	a->neg = 0;
 	return 0;
 }
 
 /* create a bignum from the given source */
-int bni_uint(BIGNUM* a, uint64_t source) {
+int bni_int(BIGNUM* a, uint64_t source) {
 	if(bni_zero(a) != 0) {
 		return -1;
 	}
@@ -32,17 +31,6 @@ int bni_uint(BIGNUM* a, uint64_t source) {
 	}
 
 	a->d[0] = source;
-	return 0;
-}
-
-int bni_int(BIGNUM* a, int64_t source) {
-	int rc;
-	int neg = source < 0 ? 1 : 0;
-	if((rc = bni_uint(a, neg ? -source : source)) != 0) {
-		return rc;
-	}
-
-	a->neg = 1;
 	return 0;
 }
 
@@ -62,11 +50,6 @@ int bni_fstr(BIGNUM* a, const char* source) {
 
 	if(bni_zero(a) != 0) {
 		return -1;
-	}
-
-	if(source[0] == '-') {
-		a->neg = 1;
-		source++;
 	}
 
 	const size_t size = strlen(source);
@@ -102,7 +85,6 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a) {
 	if(bnu_resize(r, a->size) != 0) {
 		return 1;
 	}
-	r->neg = a->neg;
 
 	memcpy(r->d, a->d, sizeof(uint64_t) * r->size);
 

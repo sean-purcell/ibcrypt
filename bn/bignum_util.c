@@ -52,7 +52,7 @@ int bnu_trim(BIGNUM* r) {
 	int64_t i = r->size; /* use signed so that we can go lower than 0 */
 	do {
 		i--;
-	} while(r->d[i] == 0 && i >= 0);
+	} while(i >= 0 && r->d[i] == 0);
 
 	return bnu_resize(r, (uint32_t) (i + 1));
 }

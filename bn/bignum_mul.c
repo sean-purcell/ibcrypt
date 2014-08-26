@@ -26,7 +26,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 
 	BIGNUM a = BN_ZERO;
 	BIGNUM b = *_b;
-	if(bni_cpy(&a, _a) != 0 || bnu_resize(&a, size) != 0) {
+	if(bni_cpy(&a, _a) != 0 || bnu_resize(&a, size + 1) != 0) {
 		return 1;
 	}
 

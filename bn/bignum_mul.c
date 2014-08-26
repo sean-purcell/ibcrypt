@@ -76,7 +76,11 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		return 1;
 	}
 
-	if(bnu_resize(r, 0) != 0) {
+	if(bnu_resize(r, 0) != 0 || bnu_resize(r, n->size)) {
+		return 1;
+	}
+
+	if(bnu_resize(&a, size) != 0) {
 		return 1;
 	}
 
@@ -90,17 +94,20 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		for(j = 0; j < 64; j++) {
 			/* if bit is set */
 			if(b.d[i] & ((uint64_t)1 << j)) {
-				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
-					return 1;
-				}
-//				lshift_words(ad, ad, )
-				if(bno_rmod(&a, &a, n) != 0) {
-					return 1;
-				}
+//				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
+//					return 1;
+//				}
+				lshift_words(ad, ad, n->size, ((uint64_t)i * 64 + j) - lpos);
+//				if(bno_rmod(&a, &a, n) != 0) {
+//					return 1;
+//				}
+				rmod_words(ad, size, n);
 
-				if(bno_add_mod(r, r, &a, n) != 0) {
-					return 1;
-				}
+				add_words(rd, rd, n->size, ad, n->size);
+				rmod_words(rd, n->size, n);
+//				if(bno_add_mod(r, r, &a, n) != 0) {
+//					return 1;
+//				}
 				lpos = i * 64 + j;
 			}
 		}

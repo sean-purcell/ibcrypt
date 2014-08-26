@@ -68,7 +68,8 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	add_words(r->d, a->d, a->size, b->d, b->size);
+	int carry = add_words(r->d, a->d, a->size, b->d, b->size);
+	if(carry) r->d[max(a->size, b->size)] = 1;
 
 	if(bnu_trim(r) != 0) {
 		return 1;

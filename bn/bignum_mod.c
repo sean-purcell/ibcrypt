@@ -11,22 +11,25 @@ int rmod_words(uint64_t* r, const uint32_t rlen, const BIGNUM* n) {
 		return 1;
 	}
 
+	uint64_t* const nd = nt.d;
+
 	uint64_t shift = 0;
 	/* shift nt so that its greater than a */
-	while(cmp_words(nt.d, nt.size, r, rlen) <= 0) {
-		if(bno_lshift(&nt, &nt, 64) != 0) {
-			return 1;
-		}
-//		lshift_words(nt.d, nt.d, 64, nt.size)
-		shift += 64;
+	while(cmp_words(nd, nt.size, r, rlen) <= 0) {
+//		if(bno_lshift(&nt, &nt, 32) != 0) {
+//			return 1;
+//		}
+		lshift_words(nd, nd, nt.size, 32);
+		shift += 32;
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {
-		if(bno_rshift(&nt, &nt, 1) != 0) {
-			return 1;
-		}
-		if(cmp_words(nt.d, nt.size, r, rlen) <= 0) {
-			sub_words(r, r, rlen, nt.d, nt.size);
+//		if(bno_rshift(&nt, &nt, 1) != 0) {
+//			return 1;
+//		}
+		rshift_words(nd, nd, nt.size, 1);
+		if(cmp_words(nd, nt.size, r, rlen) <= 0) {
+			sub_words(r, r, rlen, nd, nt.size);
 		}
 	}
 
@@ -51,10 +54,10 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	uint64_t shift = 0;
 	/* shift nt so that its greater than a */
 	while(bno_cmp(&nt, &at) <= 0) {
-		if(bno_lshift(&nt, &nt, 64) != 0) {
+		if(bno_lshift(&nt, &nt, 32) != 0) {
 			return 1;
 		}
-		shift += 64;
+		shift += 32;
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {

@@ -4,6 +4,16 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+int bno_mul_karatsuba(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
+	if(r == NULL || _a == NULL || _b == NULL) {
+		return -1;
+	}
+
+	uint64_t size = _a->size + _b->size;
+
+	return 0;
+}
+
 int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(r == NULL || _a == NULL || _b == NULL) {
 		return -1;
@@ -16,13 +26,15 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 
 	BIGNUM a = BN_ZERO;
 	BIGNUM b = *_b;
-	if(bni_cpy(&a, _a) != 0) {
+	if(bni_cpy(&a, _a) != 0 || bnu_resize(&a, size) != 0) {
 		return 1;
 	}
 
-	if(bnu_resize(r, 0) != 0) {
+	if(bnu_resize(r, 0) != 0 || bnu_resize(r, size) != 0) {
 		return 1;
 	}
+	
+	uint64_t* const ad = a.d;
 
 	uint32_t i;
 	uint64_t lpos = 0;
@@ -31,13 +43,9 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 		for(j = 0; j < 64; j++) {
 			/* if bit is set */
 			if(b.d[i] & ((uint64_t)1 << j)) {
-				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
-					return 1;
-				}
+				lshift_words(ad, ad, _a->size + (lpos + 63)/64, ((uint64_t) i * 64 + j) - lpos);
+				add_words(r->d, r->d, size, ad, size);
 
-				if(bno_add(r, r, &a) != 0) {
-					return 1;
-				}
 				lpos = i * 64 + j;
 			}
 		}

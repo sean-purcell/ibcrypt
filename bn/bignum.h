@@ -50,9 +50,9 @@ int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 
 /* a and r may be the same bignum
  * << operator */
-int bno_lshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);
+int bno_lshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
 /* >> operator */
-int bno_rshift(BIGNUM* r, const BIGNUM* a, uint64_t shift);
+int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b);

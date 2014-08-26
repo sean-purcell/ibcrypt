@@ -7,7 +7,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 /* returns 1 if there was a carry, 0 if not */
-int add_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen) {
+int add_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const uint32_t blen) {
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
@@ -36,7 +36,27 @@ int add_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t ble
 }
 
 /* returns 1 if there was a carry, 0 if not */
-int sub_words(uint64_t* r, uint64_t* a, uint32_t alen, uint64_t* b, uint32_t blen);
+int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const uint32_t blen) {
+	uint64_t t0, t1;
+	uint32_t i;
+	int carry = 0;
+	for(i = 0; i < min(blen, alen); i++) {
+		t0 = a[i] - carry;
+		carry = (a[i] < t0);
+		t1 = t0 - b[i];
+		carry = (t0 < t1);
+		r[i] = t1;
+	}
+
+	while(i < alen) {
+		t0 = a[i] - carry;
+		carry = (a[i] < t0);
+		r[i] = t0;
+		i++;
+	}
+
+	return 0;
+}
 
 void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	int carry = add_words(r->d, a->d, a->size, b->d, b->size);
@@ -76,26 +96,6 @@ int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
 	return bno_rmod(r, r, n);
 }
 
-void bno_sub_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
-	uint64_t t0, t1;
-	uint32_t i;
-	int carry = 0;
-	for(i = 0; i < b->size; i++) {
-		t0 = a->d[i] - carry;
-		carry = (a->d[i] < t0);
-		t1 = t0 - b->d[i];
-		carry = (t0 < t1);
-		r->d[i] = t1;
-	}
-
-	while(i < a->size) {
-		t0 = a->d[i] - carry;
-		carry = (a->d[i] < t0);
-		r->d[i] = t0;
-		i++;
-	}
-}
-
 int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
@@ -112,7 +112,7 @@ int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	bno_sub_no_resize(r, a, b);
+	sub_words(r->d, a->d, a->size, b->d, b->size);
 
 	return bnu_trim(r);
 }

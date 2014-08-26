@@ -25,7 +25,7 @@ int bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n) {
 			return 1;
 		}
 		if(bno_cmp(&nt, r) <= 0) {
-			bno_sub_no_resize(r, r, &nt);
+			sub_words(r->d, r->d, r->size, nt.d, nt.size);
 		}
 	}
 
@@ -57,13 +57,15 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {
-		if(bno_rshift(&nt, &nt, 1) != 0) {
-			return 1;
-		}
+		//if(bno_rshift(&nt, &nt, 1) != 0) {
+		//	return 1;
+		//}
+		rshift_words(nt.d, nt.d, nt.size, 1);
 		if(bno_cmp(&nt, &at) <= 0) {
-			if(bno_sub(&at, &at, &nt) != 0) {
-				return 1;
-			}
+			sub_words(at.d, at.d, at.size, nt.d, nt.size);
+			//if(bno_sub(&at, &at, &nt) != 0) {
+			//	return 1;
+			//}
 		}
 	}
 

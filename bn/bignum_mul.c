@@ -33,7 +33,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(bnu_resize(r, 0) != 0 || bnu_resize(r, size) != 0) {
 		return 1;
 	}
-	
+
 	uint64_t* const ad = a.d;
 
 	uint32_t i;
@@ -80,6 +80,9 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		return 1;
 	}
 
+	uint64_t* ad = a.d;
+	uint64_t* rd = r->d;
+
 	uint32_t i;
 	uint64_t lpos = 0;
 	for(i = 0; i < b.size; i++) {
@@ -90,6 +93,7 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
 					return 1;
 				}
+//				lshift_words(ad, ad, )
 				if(bno_rmod(&a, &a, n) != 0) {
 					return 1;
 				}

@@ -4,28 +4,29 @@
 #include "bignum_util.h"
 
 // don't resize, do inplace
-int bno_rmod_no_resize(BIGNUM* r, const BIGNUM* n) {
+int rmod_words(uint64_t* r, const uint32_t rlen, const BIGNUM* n) {
 	BIGNUM nt = BN_ZERO;
 
-	if(bni_cpy(&nt, n) != 0) {
+	if(bni_cpy(&nt, n) != 0 || bnu_resize(&nt, rlen+1)) {
 		return 1;
 	}
 
 	uint64_t shift = 0;
 	/* shift nt so that its greater than a */
-	while(bno_cmp(&nt, r) <= 0) {
-		if(bno_lshift(&nt, &nt, 32) != 0) {
+	while(cmp_words(nt.d, nt.size, r, rlen) <= 0) {
+		if(bno_lshift(&nt, &nt, 64) != 0) {
 			return 1;
 		}
-		shift += 32;
+//		lshift_words(nt.d, nt.d, 64, nt.size)
+		shift += 64;
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {
 		if(bno_rshift(&nt, &nt, 1) != 0) {
 			return 1;
 		}
-		if(bno_cmp(&nt, r) <= 0) {
-			sub_words(r->d, r->d, r->size, nt.d, nt.size);
+		if(cmp_words(nt.d, nt.size, r, rlen) <= 0) {
+			sub_words(r, r, rlen, nt.d, nt.size);
 		}
 	}
 
@@ -50,10 +51,10 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	uint64_t shift = 0;
 	/* shift nt so that its greater than a */
 	while(bno_cmp(&nt, &at) <= 0) {
-		if(bno_lshift(&nt, &nt, 32) != 0) {
+		if(bno_lshift(&nt, &nt, 64) != 0) {
 			return 1;
 		}
-		shift += 32;
+		shift += 64;
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {

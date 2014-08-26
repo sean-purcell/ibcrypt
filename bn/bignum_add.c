@@ -58,17 +58,6 @@ int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 	return 0;
 }
 
-void bno_add_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
-	int carry = add_words(r->d, a->d, a->size, b->d, b->size);
-	if(carry) r->d[max(a->size, b->size)] = 1;
-}
-
-int bno_add_mod_no_resize(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
-	bno_add_no_resize(r, a, b);
-
-	return bno_rmod_no_resize(r, n);
-}
-
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
@@ -79,7 +68,7 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	bno_add_no_resize(r, a, b);
+	add_words(r->d, a->d, a->size, b->d, b->size);
 
 	if(bnu_trim(r) != 0) {
 		return 1;

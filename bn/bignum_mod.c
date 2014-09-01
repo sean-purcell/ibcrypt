@@ -19,7 +19,7 @@ int rmod_words(uint64_t* r, const uint32_t rlen, const BIGNUM* n) {
 //		if(bno_lshift(&nt, &nt, 32) != 0) {
 //			return 1;
 //		}
-		lshift_words(nd, nd, nt.size, 32);
+		lshift_words(nd, nd, n->size + (shift + 32) / 64, 32);
 		shift += 32;
 	}
 
@@ -27,9 +27,9 @@ int rmod_words(uint64_t* r, const uint32_t rlen, const BIGNUM* n) {
 //		if(bno_rshift(&nt, &nt, 1) != 0) {
 //			return 1;
 //		}
-		rshift_words(nd, nd, nt.size, 1);
-		if(cmp_words(nd, nt.size, r, rlen) <= 0) {
-			sub_words(r, r, rlen, nd, nt.size);
+		rshift_words(nd, nd, nt.size-(i/64), 1);
+		if(cmp_words(nd, nt.size-(i/64), r, rlen) <= 0) {
+			sub_words(r, r, rlen, nd, nt.size-(i/64));
 		}
 	}
 

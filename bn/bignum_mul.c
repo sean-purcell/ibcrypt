@@ -76,7 +76,7 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 		return 1;
 	}
 
-	if(bnu_resize(r, 0) != 0 || bnu_resize(r, n->size)) {
+	if(bnu_resize(r, 0) != 0 || bnu_resize(r, n->size+1)) {
 		return 1;
 	}
 
@@ -103,8 +103,9 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 //				}
 				rmod_words(ad, size, n);
 
-				add_words(rd, rd, n->size, ad, n->size);
-				rmod_words(rd, n->size, n);
+				int carry = add_words(rd, rd, n->size, ad, n->size);
+				rd[n->size] = carry;
+				rmod_words(rd, n->size+1, n);
 //				if(bno_add_mod(r, r, &a, n) != 0) {
 //					return 1;
 //				}

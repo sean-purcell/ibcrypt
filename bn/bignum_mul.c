@@ -94,23 +94,16 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* con
 		for(j = 0; j < 64; j++) {
 			/* if bit is set */
 			if(b.d[i] & ((uint64_t)1 << j)) {
-//				if(bno_lshift(&a, &a, ((uint64_t)i * 64 + j) - lpos) != 0) {
-//					return 1;
-//				}
 				lshift_words(ad, ad, n->size, ((uint64_t)i * 64 + j) - lpos);
-//				if(bno_rmod(&a, &a, n) != 0) {
-//					return 1;
-//				}
+
 				rmod_words(ad, size, n);
 
 				int carry = add_words(rd, rd, n->size, ad, n->size);
 				rd[n->size] = carry;
-//				rmod_words(rd, n->size+1, n);
-				if(cmp_words(rd, n->size+1, n->d, n->size) >= 0)
+				if(cmp_words(rd, n->size+1, n->d, n->size) >= 0) {
 					sub_words(rd, rd, n->size+1, n->d, n->size);
-//				if(bno_add_mod(r, r, &a, n) != 0) {
-//					return 1;
-//				}
+				}
+
 				lpos = i * 64 + j;
 			}
 		}

@@ -56,7 +56,7 @@ int bno_mul(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	return bnu_trim(r);
 }
 
-int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) {
+int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* const n) {
 	if(r == NULL || _a == NULL || _b == NULL || n == NULL) {
 		return -1;
 	}
@@ -105,7 +105,9 @@ int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* n) 
 
 				int carry = add_words(rd, rd, n->size, ad, n->size);
 				rd[n->size] = carry;
-				rmod_words(rd, n->size+1, n);
+//				rmod_words(rd, n->size+1, n);
+				if(cmp_words(rd, n->size+1, n->d, n->size) >= 0)
+					sub_words(rd, rd, n->size+1, n->d, n->size);
 //				if(bno_add_mod(r, r, &a, n) != 0) {
 //					return 1;
 //				}

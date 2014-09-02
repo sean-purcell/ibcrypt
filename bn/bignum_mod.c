@@ -70,3 +70,8 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 
 	return bnu_trim(r);
 }
+
+// note: if the GCD of a and n isn't 1, the execution is undefined
+int bno_modular_inverse(BIGNUM* r, BIGNUM* a, BIGNUM* n) {
+	
+}

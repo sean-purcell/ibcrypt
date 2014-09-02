@@ -1,6 +1,8 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+/* exponentiation using the montgomery powering ladder
+ * http://cr.yp.to/bib/2003/joye-ladder.pdf */
 int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp) {
 	if(r == 0 || base == 0 || exp == 0) {
 		return -1;

@@ -4,6 +4,7 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
+// TODO: implement karatsuba multiplication
 int bno_mul_karatsuba(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	if(r == NULL || _a == NULL || _b == NULL) {
 		return -1;

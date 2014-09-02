@@ -38,7 +38,6 @@ int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp) {
 	return bnu_trim(r);
 }
 
-/*
 int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n) {
 	if(r == 0 || base == 0 || exp == 0 || n == 0) {
 		return -1;
@@ -77,7 +76,6 @@ int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 
 	return bnu_trim(r);
 }
-*/
 
 int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 

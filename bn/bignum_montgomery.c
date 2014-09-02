@@ -1,10 +1,10 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
-int montgomery_reduce(BIGNUM* T, const BGINUM* N, const BIGNUM* Nres, const uint64_t R_size) {
+int montgomery_reduce(BIGNUM* T, const BIGNUM* N, const BIGNUM* Nres, const uint64_t R_size) {
 	BIGNUM m = BN_ZERO;
 	// calculate m:=T(-N^-1) mod R
-	if(bno_mul(&m, T, Nres) != 0 || bno_resize(&m, R_size) != 0) {
+	if(bno_mul(&m, T, Nres) != 0 || bnu_resize(&m, R_size) != 0) {
 		return 1;
 	}
 

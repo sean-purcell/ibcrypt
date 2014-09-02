@@ -138,6 +138,14 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("a*c%%b:%s\n", out);
 
+	bno_div(&r, &a, &c);
+	bnu_tstr(out, &r);
+	printf("a/c  :%s\n", out);
+
+	bno_div(&r, &q, &b);
+	bnu_tstr(out, &r);
+	printf("q/b  :%s\n", out);
+
 	bnu_tstr(out, &a);
 	printf("a    :%s\n", out);
 	bnu_tstr(out, &b);

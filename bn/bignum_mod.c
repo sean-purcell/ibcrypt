@@ -55,9 +55,9 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	}
 
 	for(uint64_t i = 0; i < shift; i++) {
-		rshift_words(nt.d, nt.d, nt.size, 1);
-		if(bno_cmp(&nt, &at) <= 0) {
-			sub_words(at.d, at.d, at.size, nt.d, nt.size);
+		rshift_words(nt.d, nt.d, nt.size-(i/64), 1);
+		if(cmp_words(nt.d, nt.size-(i/64), at.d, at.size) <= 0) {
+			sub_words(at.d, at.d, at.size, nt.d, nt.size-(i/64));
 		}
 	}
 

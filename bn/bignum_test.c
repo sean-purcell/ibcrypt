@@ -17,6 +17,10 @@ void speed_test() {
 	bnu_tstr(out, &n);
 	printf("n    :%s\n", out);
 
+	bno_inv_mod(&r, &m, &n);
+	bnu_tstr(out, &r);
+	printf("m-1%%n:%s\n", out);
+
 	bno_exp_mod(&r, &m, &e, &n);
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
@@ -153,11 +157,33 @@ int main() {
 	bnu_tstr(out, &c);
 	printf("c    :%s\n", out);
 
+	BIGNUM five = BN_ZERO, four = BN_ZERO;
+	bni_fstr(&five, "5");
+	bni_fstr(&four, "4");
+
+	bno_inv_mod(&r, &five, &four);
+	bnu_tstr(out, &r);
+	printf("5iv%%4:%s\n", out);
+	bno_inv_mod(&r, &four, &five);
+	bnu_tstr(out, &r);
+	printf("4iv%%5:%s\n", out);
+
+	BIGNUM x = BN_ZERO, y = BN_ZERO;
+	bni_fstr(&x, "17");
+	bni_fstr(&y, "20");
+	bno_inv_mod(&r, &y, &x);
+	bnu_tstr(out, &r);
+	printf("xiv%%n:%s\n", out);
+
 	bnu_free(&a);
 	bnu_free(&b);
 	bnu_free(&r);
 	bnu_free(&c);
 	bnu_free(&q);
+	bnu_free(&five);
+	bnu_free(&four);
+	bnu_free(&y);
+	bnu_free(&x);
 
 	speed_test();
 }

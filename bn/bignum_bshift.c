@@ -7,6 +7,7 @@
 
 /* shift the actual words, no resizing or checks etc. */
 void lshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_t shift) {
+	if(a_size == 0) return;
 	const uint32_t osize = a_size;
 	/* round up */
 	const uint64_t nsize = osize + (shift+63) / 64;
@@ -37,6 +38,7 @@ void lshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_
 }
 
 void rshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_t shift) {
+	if(a_size == 0) return;
 	const uint32_t blk_shift = shift / 64;
 	const uint32_t bit_shift = shift % 64;
 

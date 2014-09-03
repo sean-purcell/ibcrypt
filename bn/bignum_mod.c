@@ -71,7 +71,67 @@ int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
 	return bnu_trim(r);
 }
 
+/* return n - a */
+int bno_neg_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n) {
+	if(bno_rmod(r, a, n) != 0) {
+		return 1;
+	}
+	return bno_sub(r, n, r);
+}
+
 // note: if the GCD of a and n isn't 1, the execution is undefined
-int bno_modular_inverse(BIGNUM* r, BIGNUM* a, BIGNUM* n) {
-	
+int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n) {
+	/* compute the inverse using the extended euclidean algorithm */
+	BIGNUM t = BN_ZERO, newt = BN_ZERO;
+	BIGNUM r = BN_ZERO, newr = BN_ZERO;
+
+	BIGNUM tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO;
+
+	if(bni_fstr(&newt, "1") != 0 || bni_cpy(&r, _n) != 0 || bni_cpy(&newr, _a) != 0) {
+		return 1;
+	}
+
+	bno_rmod(&newr, &newr, &r);
+
+	while(newr.size != 0) {
+		if(bno_div(&quot, &r, &newr) != 0) {
+			return 1;
+		}
+
+		// calculate (t, newt) := (newt, t - quotient * newt)
+		{
+			if(bno_mul_mod(&tmp, &quot, &newt, _n) != 0 || bno_neg_mod(&tmp, &tmp, _n) != 0) {
+				return 1;
+			}
+
+			tmp2 = newt;
+			newt = BN_ZERO;
+
+			if(bno_add_mod(&newt, &t, &tmp, _n) != 0) {
+				return 1;
+			}
+
+			t = tmp2;
+		}
+
+		// calculate (r, newr) := (newr, r - quotient * newr)
+		{
+			if(bno_mul_mod(&tmp, &quot, &newr, _n) != 0 || bno_neg_mod(&tmp, &tmp, _n) != 0) {
+				return 1;
+			}
+
+			tmp2 = newr;
+			newr = BN_ZERO;
+
+			if(bno_add_mod(&newr, &r, &tmp, _n) != 0) {
+				return 1;
+			}
+
+			r = tmp2;
+		}
+	}
+
+	*inv = t;
+	return bnu_free(&newt) || bnu_free(&r) || bnu_free(&newr) || bnu_free(&tmp)
+		|| bnu_free(&quot);
 }

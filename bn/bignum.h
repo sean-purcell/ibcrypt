@@ -38,14 +38,22 @@ int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 /* * operator */
 int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
-/* / operator */
+/* integer / operator */
 int bno_div(BIGNUM* q, const BIGNUM* a, const BIGNUM* b);
+/* returns the remainder as well as the quotient */
+int bno_div_mod(BIGNUM* q, BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
 
 /* ^ operator */
 int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp);
 
 /* % operator */
 int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
+
+/* return r such that (r + a) == 0 mod n */
+int bno_neg_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
+
+/* return r such that (r*a) == 1 mod n */
+int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n);
 
 int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
 int bno_mul_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* const n);

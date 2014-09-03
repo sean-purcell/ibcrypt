@@ -85,7 +85,7 @@ int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n) {
 	BIGNUM t = BN_ZERO, newt = BN_ZERO;
 	BIGNUM r = BN_ZERO, newr = BN_ZERO;
 
-	BIGNUM tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO;
+	BIGNUM tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO, remain = BN_ZERO;
 
 	if(bni_fstr(&newt, "1") != 0 || bni_cpy(&r, _n) != 0 || bni_cpy(&newr, _a) != 0) {
 		return 1;
@@ -94,7 +94,7 @@ int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n) {
 	bno_rmod(&newr, &newr, &r);
 
 	while(newr.size != 0) {
-		if(bno_div(&quot, &r, &newr) != 0) {
+		if(bno_div_mod(&quot, &remain, &r, &newr) != 0) {
 			return 1;
 		}
 
@@ -116,18 +116,9 @@ int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n) {
 
 		// calculate (r, newr) := (newr, r - quotient * newr)
 		{
-			if(bno_mul_mod(&tmp, &quot, &newr, _n) != 0 || bno_neg_mod(&tmp, &tmp, _n) != 0) {
-				return 1;
-			}
-
-			tmp2 = newr;
-			newr = BN_ZERO;
-
-			if(bno_add_mod(&newr, &r, &tmp, _n) != 0) {
-				return 1;
-			}
-
-			r = tmp2;
+			r = newr;
+			newr = remain;
+			remain = BN_ZERO;
 		}
 	}
 

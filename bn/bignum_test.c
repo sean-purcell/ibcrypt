@@ -2,6 +2,8 @@
 
 #include "bignum.h"
 
+int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
+
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;
 	char out[1024];
@@ -83,7 +85,7 @@ int main() {
 	//bnu_tstr(out, &r);
 	//printf("%s\n", out);
 
-	bno_exp_mod(&r, &a, &b, &c);
+	exp_mod_odd(&r, &a, &b, &c);
 	bnu_tstr(out, &r);
 	printf("a^b%%c:%s\n", out);
 

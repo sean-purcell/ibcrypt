@@ -19,11 +19,15 @@ void speed_test() {
 	bnu_tstr(out, &n);
 	printf("n    :%s\n", out);
 
+	bno_neg_mod(&r, &m, &n);
+	bnu_tstr(out, &r);
+	printf("-m%%n :%s\n", out);
+
 	bno_inv_mod(&r, &m, &n);
 	bnu_tstr(out, &r);
 	printf("m-1%%n:%s\n", out);
 
-	exp_mod_odd(&r, &m, &e, &n);
+	bno_exp_mod(&r, &m, &e, &n);
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
 

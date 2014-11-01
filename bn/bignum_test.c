@@ -2,7 +2,7 @@
 
 #include "bignum.h"
 
-int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
+//int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
 
 void speed_test() {
@@ -90,9 +90,9 @@ int main() {
 	//bnu_tstr(out, &r);
 	//printf("%s\n", out);
 
-	exp_mod_odd(&r, &a, &b, &c);
-	bnu_tstr(out, &r);
-	printf("a^b%%c:%s\n", out);
+//	exp_mod_odd(&r, &a, &b, &c);
+//	bnu_tstr(out, &r);
+//	printf("a^b%%c:%s\n", out);
 
 	bno_mul_mod(&r, &a, &b, &c);
 	bnu_tstr(out, &r);

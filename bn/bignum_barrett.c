@@ -9,7 +9,7 @@
 /* get 2 to the power of k */
 int bnu_2power(BIGNUM* _r, const uint64_t k) {
 	if(_r == NULL) {
-		return 1;
+		return -1;
 	}
 
 	const uint64_t block = k / 64;
@@ -33,7 +33,7 @@ int bnu_2power(BIGNUM* _r, const uint64_t k) {
 /* assumes that n is "trimmed" */
 int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 	if(r == NULL || n == NULL) {
-		return 1;
+		return -1;
 	}
 
 	const uint64_t k2 = n->size * 64ULL * 2ULL;
@@ -47,12 +47,9 @@ int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 	bnu_tstr(out, &four_k);
 	printf("four_k:%s\n", out);
 
-	BIGNUM q = BN_ZERO;
-	if(bno_div_mod(r, &q, &four_k, n) != 0) {
+	if(bno_div(r, &four_k, n) != 0) {
 		return 1;
 	}
-	bnu_tstr(out, &q);
-	printf("q:%s\n", out);
 
 	return bnu_free(&four_k);
 }
@@ -60,7 +57,7 @@ int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 /* use the m factor to effect a modular reduction */
 int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNUM* n) {
 	if(_r == NULL || a == NULL || m == NULL || n == NULL) {
-		return 1;
+		return -1;
 	}
 
 	/* calculate q = floor(ma/4^k) */
@@ -88,7 +85,7 @@ int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNU
 
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n) {
 	if(_r == NULL || a == NULL || n == NULL) {
-		return 1;
+		return -1;
 	}
 
 	BIGNUM m = BN_ZERO;

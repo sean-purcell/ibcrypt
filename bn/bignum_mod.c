@@ -111,17 +111,22 @@ int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n) {
 				return 1;
 			}
 
+			bnu_free(&t);
 			t = tmp2;
 		}
 
 		// calculate (r, newr) := (newr, r - quotient * newr)
 		{
+			bnu_free(&r);
 			r = newr;
 			newr = remain;
 			remain = BN_ZERO;
 		}
 	}
 
+	if(bnu_free(inv) != 0) {
+		return 1;
+	}
 	*inv = t;
 	return bnu_free(&newt) || bnu_free(&r) || bnu_free(&newr) || bnu_free(&tmp)
 		|| bnu_free(&quot);

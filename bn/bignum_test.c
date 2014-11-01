@@ -3,6 +3,7 @@
 #include "bignum.h"
 
 int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
+int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;
@@ -145,6 +146,11 @@ int main() {
 	printf("a*c%%a:%s\n", out);
 
 	bno_mul_mod(&r, &a, &c, &b);
+	bnu_tstr(out, &r);
+	printf("a*c%%b:%s\n", out);
+
+	bno_mul(&r, &a, &c);
+	bno_barrett_rmod(&r, &r, &b);
 	bnu_tstr(out, &r);
 	printf("a*c%%b:%s\n", out);
 

@@ -25,4 +25,8 @@ void rshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_
 int cmp_words(const uint64_t* a, const uint32_t alen, const uint64_t* b, const uint32_t blen);
 int rmod_words(uint64_t* r, const uint32_t rlen, const BIGNUM* n);
 
+/* barrett mod reduce operations */
+int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNUM* n);
+int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n);
+
 #endif

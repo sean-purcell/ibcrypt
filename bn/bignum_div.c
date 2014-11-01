@@ -14,8 +14,7 @@ int bno_div_mod(BIGNUM* q, BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	}
 
 	if(bno_cmp(a, b) < 0) {
-		*q = BN_ZERO;
-		return 0;
+		return bnu_resize(q, 0);
 	}
 
 	BIGNUM nt = BN_ZERO;
@@ -37,7 +36,7 @@ int bno_div_mod(BIGNUM* q, BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	const uint64_t o_shift = shift; 
+	const uint64_t o_shift = shift;
 	for(uint64_t i = 0; i < shift; i++) {
 		rshift_words(nt.d, nt.d, nt.size-(i/64), 1);
 		if(cmp_words(nt.d, nt.size-(i/64), at.d, at.size) <= 0) {

@@ -11,11 +11,12 @@ int add_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
-	for(i = 0; i < min(alen, blen); i++) {
+	const int bound = min(alen, blen);
+	for(i = 0; i < bound; i++) {
 		t0 = a[i] + carry;
 		carry = (t0 < a[i]); /* C standard 3.3.8 */
 		t1 = t0 + b[i];
-		carry = (t1 < t0);
+		carry |= (t1 < t0);
 		r[i] = t1;
 	}
 
@@ -40,11 +41,12 @@ int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
-	for(i = 0; i < min(blen, alen); i++) {
+	const int bound = min(alen, blen);
+	for(i = 0; i < bound; i++) {
 		t0 = a[i] - carry;
 		carry = (a[i] < t0);
 		t1 = t0 - b[i];
-		carry = (t0 < t1);
+		carry |= (t0 < t1);
 		r[i] = t1;
 	}
 
@@ -71,11 +73,7 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	int carry = add_words(r->d, a->d, a->size, b->d, b->size);
 	if(carry) r->d[max(a->size, b->size)] = 1;
 
-	if(bnu_trim(r) != 0) {
-		return 1;
-	}
-
-	return 0;
+	return bnu_trim(r);
 }
 
 int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {

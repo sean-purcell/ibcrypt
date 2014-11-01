@@ -16,7 +16,7 @@ int bnu_2power(BIGNUM* _r, const uint64_t k) {
 	const uint64_t size = block + 1;
 	const uint64_t shift = k % 64;
 	if(size > 0xffffffffULL) {
-		return 1; /* too big */
+		return 2; /* too big */
 	}
 
 	BIGNUM r = BN_ZERO;

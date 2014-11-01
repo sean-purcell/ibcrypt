@@ -53,7 +53,8 @@ int bni_fstr(BIGNUM* a, const char* source) {
 	}
 
 	const size_t size = strlen(source);
-	if(size > (0xffffffffULL * 16) /* uint32_t max */) {
+	/* uint32_t max / (bits/char) * length of word */
+	if(size > (0xffffffffULL / 4 * 64)) {
 		return 2; /* too large */
 	}
 

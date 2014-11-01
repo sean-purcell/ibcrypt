@@ -21,7 +21,7 @@ int bno_mul(BIGNUM* _r, const BIGNUM* _a, const BIGNUM* _b) {
 	}
 
 	uint64_t size = _a->size + _b->size;
-	if(size > 0xffffffffU) {
+	if(size > 0xffffffffULL) {
 		return 2; /* too big */
 	}
 

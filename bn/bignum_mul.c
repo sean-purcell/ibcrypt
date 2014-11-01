@@ -15,7 +15,7 @@ int bno_mul_karatsuba(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b) {
 	return 0;
 }
 
-int bno_mul_fast(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
+int bno_mul(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 	if(_r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -88,53 +88,6 @@ int bno_mul_fast(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 
 	*_r = r;
 	return 0;
-}
-
-int bno_mul(BIGNUM* _r, const BIGNUM* _a, const BIGNUM* _b) {
-	if(_r == NULL || _a == NULL || _b == NULL) {
-		return -1;
-	}
-
-	uint64_t size = _a->size + _b->size;
-	if(size > 0xffffffffULL) {
-		return 2; /* too big */
-	}
-
-	BIGNUM a = BN_ZERO;
-	BIGNUM b = *_b;
-	BIGNUM r = BN_ZERO;
-	if(bni_cpy(&a, _a) != 0 || bnu_resize(&a, size + 1) != 0) {
-		return 1;
-	}
-
-	if(bnu_resize(&r, size) != 0) {
-		return 1;
-	}
-
-	uint64_t* const ad = a.d;
-
-	uint32_t i;
-	uint64_t lpos = 0;
-	for(i = 0; i < b.size; i++) {
-		int j;
-		for(j = 0; j < 64; j++) {
-			/* if bit is set */
-			if(b.d[i] & ((uint64_t)1 << j)) {
-				lshift_words(ad, ad, _a->size + (lpos + 63)/64, ((uint64_t) i * 64 + j) - lpos);
-				add_words(r.d, r.d, size, ad, size);
-
-				lpos = i * 64 + j;
-			}
-		}
-	}
-
-	if(bnu_free(&a) != 0 || bnu_free(_r) != 0) {
-		return 1;
-	}
-
-	*_r = r;
-
-	return bnu_trim(_r);
 }
 
 int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* const n) {

@@ -5,7 +5,7 @@
 #include "bignum_util.h"
 
 
-void mul_words(uint64_t* const r, uint32_t rlen, uint64_t* const a, uint32_t alen, uint64_t* b, uint32_t blen) {
+void mul_words(uint64_t* const r, uint64_t* const a, uint32_t alen, uint64_t* b, uint32_t blen) {
 	/* generic empty vars */
 	uint64_t t0, t1;
 
@@ -18,7 +18,7 @@ void mul_words(uint64_t* const r, uint32_t rlen, uint64_t* const a, uint32_t ale
 		/* reset the carry */
 		uint64_t carry = 0;
 
-		for(j = 0, k = i; j < blen && k < rlen; j++, k++) {
+		for(j = 0, k = i; j < blen; j++, k++) {
 			/* split the current b word into two segments */
 			const uint64_t bw0 = b[j] & 0xffffffffULL;
 			const uint64_t bw1 = b[j] >> 32;
@@ -70,7 +70,7 @@ int bno_mul(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 		return -1;
 	}
 
-	uint64_t size = a->size + b->size + 1;
+	uint64_t size = a->size + b->size;
 	if(size > 0xffffffffULL) {
 		return 2; /* too big */
 	}
@@ -80,7 +80,7 @@ int bno_mul(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 		return 1;
 	}
 
-	mul_words(r.d, r.size, a->d, a->size, b->d, b->size);
+	mul_words(r.d, a->d, a->size, b->d, b->size);
 
 	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
 		return 1;

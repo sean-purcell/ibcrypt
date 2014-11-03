@@ -107,4 +107,6 @@ int bno_exp_mod_crt(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGN
 	if(_n.d[0] & 1) {
 
 	}
+
+	return 0;
 }

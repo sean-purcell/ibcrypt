@@ -83,8 +83,9 @@ int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 		return 1;
 	}
 
-	bnu_free(&R[0]);
-	bnu_free(&R[1]);
+	if(bnu_free(&R[0]) != 0 || bnu_free(&R[1]) != 0 || bnu_free(&m) != 0) {
+		return 1;
+	}
 
 	return bnu_trim(r);
 }

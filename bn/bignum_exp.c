@@ -1,8 +1,6 @@
 #include "bignum.h"
 #include "bignum_util.h"
 
-int bno_mul_karatsuba(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b);
-
 /* exponentiation using the montgomery powering ladder
  * http://cr.yp.to/bib/2003/joye-ladder.pdf */
 int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp) {
@@ -66,10 +64,10 @@ int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 		int j;
 		for(j = 63; j >= 0; j--) {
 			uint8_t bit = ((exp->d[i] & ((uint64_t)1 << j)) >> j);
-			if(bno_mul_karatsuba(&R[!bit], &R[0], &R[1]) != 0) {
+			if(bno_mul(&R[!bit], &R[0], &R[1]) != 0) {
 				return 1;
 			}
-			if(bno_mul_karatsuba(&R[bit], &R[bit], &R[bit]) != 0) {
+			if(bno_mul(&R[bit], &R[bit], &R[bit]) != 0) {
 				return 1;
 			}
 			if(bno_barrett_reduce(&R[0], &R[0], &m, n) != 0) {

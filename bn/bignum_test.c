@@ -48,8 +48,8 @@ void speed_test() {
 
 int main() {
 	BIGNUM a, b, c;
-	bni_fstr(&a, "ec154596e28d60228c0b3");
-	bni_fstr(&b, "baa5bffffff00efffff0f");
+	bni_fstr(&a, "ec154596e28d60228c0b3ec154596e28d60228c0b3ec154596e28d60228c0b3ec154596e28d60228c0b3");
+	bni_fstr(&b, "baa5bffffff00efffff0f1f29285726fb9a9d05a97baa5bffffff00efffff0f1f29285726fb9a9d05a97");
 //	bni_fstr(&b, "ff");
 	bni_fstr(&c, "1f29285726fb9a9d05a97");
 	uint32_t i;

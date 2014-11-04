@@ -43,10 +43,6 @@ int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 		return 1;
 	}
 
-	char out[10000];
-	bnu_tstr(out, &four_k);
-	printf("four_k:%s\n", out);
-
 	if(bno_div(r, &four_k, n) != 0) {
 		return 1;
 	}
@@ -92,9 +88,6 @@ int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n) {
 	if(bnu_barrett_mfactor(&m, n) != 0) {
 		return 1;
 	}
-	char out[10000];
-	bnu_tstr(out, &m);
-	printf("m:%s\n", out);
 
 	if(bno_barrett_reduce(_r, a, &m, n) != 0) {
 		return 1;

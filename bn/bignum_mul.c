@@ -83,19 +83,23 @@ void mul_words_karatsuba(uint64_t* const r, uint64_t* const a, uint32_t alen, ui
 	const uint32_t a1len = alen - wsize;
 	const uint32_t b1len = blen - wsize;
 
+	/* add_words carries */
+	int carry;
 	/* zero memory out
 	 * 1 word size for each sum
 	 * 2 word sizes for the scratch space */
-	memset(scratch, 0, 4 * wsize * sizeof(uint64_t));
+	memset(scratch, 0, 5 * wsize * sizeof(uint64_t));
 	/* effect (a0+a1)(b0+b1) */
-	add_words(scratch, a0, wsize, a1, a1len);
-	add_words(&scratch[wsize], b0, wsize, b1, b1len);
-	mul_words_karatsuba(&r[wsize], scratch, wsize, &scratch[wsize], wsize, &scratch[2 * wsize]);
+	carry = add_words(scratch, a0, wsize, a1, a1len);
+	scratch[wsize] = carry;
+	carry = add_words(&scratch[wsize+1], b0, wsize, b1, b1len);
+	scratch[2 * wsize + 1] = carry;
+	mul_words_karatsuba(&r[wsize], scratch, wsize+1, &scratch[wsize+1], wsize+1, &scratch[2 * wsize + 2]);
 
 	/* zero memory out
 	 * 2 word sizes for the product
 	 * 2 word sizes for the scratch space */
-	memset(scratch, 0, 4 * wsize * sizeof(uint64_t));
+	memset(scratch, 0, 5 * wsize * sizeof(uint64_t));
 	/* effect a0*b0 */
 	mul_words_karatsuba(scratch, a0, wsize, b0, wsize, &scratch[2 * wsize]);
 	/* start adding them to r */
@@ -104,8 +108,8 @@ void mul_words_karatsuba(uint64_t* const r, uint64_t* const a, uint32_t alen, ui
 
 	/* zero memory out
 	 * 2 word sizes for the product
-	 * 4 word sizes for the scratch space */
-	memset(scratch, 0, 4 * wsize * sizeof(uint64_t));
+	 * 2 word sizes for the scratch space */
+	memset(scratch, 0, 5 * wsize * sizeof(uint64_t));
 	/* effect a0*b0 */
 	mul_words_karatsuba(scratch, a1, a1len, b1, b1len, &scratch[2 * wsize]);
 	/* start adding them to r */
@@ -122,7 +126,8 @@ int bno_mul_karatsuba(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 	if(size > 0xffffffffULL) {
 		return 2; /* too big */
 	}
-	uint64_t scratch_size = (uint64_t) (max(a->size, b->size) + 1) / 2 * 4;
+	uint64_t wsize = (max(a->size, b->size) + 1) / 2;
+	uint64_t scratch_size = wsize * 20;
 	if(scratch_size > 0xffffffffULL) {
 		return 2; /* too big */
 	}

@@ -57,7 +57,7 @@ int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 		i++;
 	}
 
-	return 0;
+	return carry;
 }
 
 int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {

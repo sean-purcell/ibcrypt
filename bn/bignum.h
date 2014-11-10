@@ -55,6 +55,10 @@ int bno_neg_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
 /* return r such that (r*a) == 1 mod n */
 int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n);
 
+/* barrett reduction functions */
+int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n);
+int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNUM* n);
+
 int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
 int bno_mul_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* const n);
 int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);

@@ -4,7 +4,6 @@
 
 //int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
-int bno_mul_karatsuba(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;

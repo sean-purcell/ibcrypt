@@ -1,5 +1,5 @@
 CC=gcc
-DEBUG=1
+DEBUG=0
 ORIGFLAGS= -c -Wall -std=gnu99
 
 ifeq ($(DEBUG),1)

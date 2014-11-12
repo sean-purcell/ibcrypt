@@ -1,0 +1,33 @@
+CC=gcc
+BUILDDIR=bin
+CFLAGS=-c -Wall -std=gnu99
+
+DIRS=test cipher hash bn misc
+BUILDDIRS=$(patsubst %,$(BUILDDIR)/%,$(DIRS))
+
+SOURCES:= 
+TESTSOURCES:= 
+
+include $(patsubst %,%/inc.mk,$(DIRS))
+
+OBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(SOURCES))
+TESTSOURCES+=$(SOURCES)
+TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(TESTSOURCES))
+
+allb: $(OBJECTS)
+	echo $(OBJECTS)
+
+test: $(TESTOBJECTS) $(BUILDDIR)
+
+lib: $(BUILDDIR) $(BUILDDIRS)
+
+$(BUILDDIR)/%.o: %.c
+	echo $<
+	echo $@
+
+$(BUILDDIR):
+	@mkdir $(BUILDDIR)
+
+$(BUILDDIR)/%:
+	@mkdir $@
+

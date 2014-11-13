@@ -7,7 +7,7 @@
 #include <libibur/test.h>
 #include <libibur/util.h>
 
-#include "aes.h"
+#include <ibcrypt/aes.h>
 
 #define A_SIZE(x) (sizeof(x)/sizeof(x[0]))
 

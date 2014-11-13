@@ -5,7 +5,7 @@
 
 #include <libibur/endian.h>
 
-#include "salsa20.h"
+#include <ibcrypt/salsa20.h>
 
 #ifdef SALSA20_DEBUG
 #include <libibur/util.h>

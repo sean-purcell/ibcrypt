@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "bignum.h"
+#include <ibcrypt/bignum.h>
 #include "bignum_util.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))

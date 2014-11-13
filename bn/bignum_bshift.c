@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "bignum.h"
+#include <ibcrypt/bignum.h>
 #include "bignum_util.h"
 
 /* shift the actual words, no resizing or checks etc. */

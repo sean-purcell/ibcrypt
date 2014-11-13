@@ -1,6 +1,9 @@
 CC=gcc
 BUILDDIR=bin
-CFLAGS=-c -Wall -std=gnu99
+CFLAGS=-Wall -std=gnu99 -O3
+LINKFLAGS=-flto
+
+LIBINC=-I/usr/local/include -I$(BUILDDIR)/include
 
 DIRS=test cipher hash bn misc
 BUILDDIRS=$(patsubst %,$(BUILDDIR)/%,$(DIRS))
@@ -8,26 +11,36 @@ BUILDDIRS=$(patsubst %,$(BUILDDIR)/%,$(DIRS))
 SOURCES:= 
 TESTSOURCES:= 
 
+INCLUDEDIR=include
+HEADERDIR=$(BUILDDIR)/include/ibcrypt
+
 include $(patsubst %,%/inc.mk,$(DIRS))
 
 OBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(SOURCES))
 TESTSOURCES+=$(SOURCES)
 TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(TESTSOURCES))
 
-allb: $(OBJECTS)
-	echo $(OBJECTS)
+BUILDHEADERS:=$(patsubst %.h,$(HEADERDIR)/%.h,$(HEADERS))
 
-test: $(TESTOBJECTS) $(BUILDDIR)
+.PHONY: libheaders lib clean
 
-lib: $(BUILDDIR) $(BUILDDIRS)
+lib: $(BUILDHEADERS) $(BUILDDIR) $(BUILDDIRS) $(OBJECTS)
+
+libheaders: $(HEADERS) $(BUILDDIR)/$(HEADERDIR)
+	cp $(HEADERS) $(BUILDDIR)/$(HEADERDIR)/
 
 $(BUILDDIR)/%.o: %.c
-	echo $<
-	echo $@
+	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@
+
+$(BUILDDIR)/include/%.h: include/%.h
+	cp $< $@
 
 $(BUILDDIR):
-	@mkdir $(BUILDDIR)
+	@mkdir -p $(BUILDDIR)
 
 $(BUILDDIR)/%:
-	@mkdir $@
+	@mkdir -p $@
+
+clean:
+	rm -rf $(BUILDDIR)
 

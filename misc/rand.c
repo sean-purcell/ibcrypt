@@ -7,7 +7,7 @@
 
 #include <libibur/util.h>
 
-#include "rand.h"
+#include <ibcrypt/rand.h>
 
 /* returns URANDOM_FAIL if unsuccessful, 0 if successful */
 int cs_rand(void* _buf, size_t buflen) {

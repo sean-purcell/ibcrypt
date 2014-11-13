@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bignum.h"
+#include <ibcrypt/bignum.h>
 #include "bignum_util.h"
 
 /* get 2 to the power of k */

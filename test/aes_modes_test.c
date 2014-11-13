@@ -4,7 +4,7 @@
 #include <libibur/test.h>
 #include <libibur/util.h>
 
-#include "aes.h"
+#include <ibcrypt/aes.h>
 
 const char* keys_ctr[] = {
 	"2b7e151628aed2a6abf7158809cf4f3c",

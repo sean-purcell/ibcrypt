@@ -7,8 +7,8 @@
 
 #include <libibur/util.h>
 
-#include "scrypt.h"
-#include "sha256.h"
+#include <ibcrypt/scrypt.h>
+#include <ibcrypt/sha256.h>
 
 #define SCRYPT_USE_MMAP
 

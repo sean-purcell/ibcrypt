@@ -1,4 +1,4 @@
-#include "bignum.h"
+#include <ibcrypt/bignum.h>
 #include "bignum_util.h"
 
 int montgomery_reduce(BIGNUM* T, const BIGNUM* N, const BIGNUM* Nres, const uint32_t R_size) {

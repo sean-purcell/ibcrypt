@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "bignum.h"
+#include <ibcrypt/bignum.h>
 
 //int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);

@@ -32,7 +32,7 @@ lib: $(BUILDDIR) $(BUILDHEADERS) $(OBJECTS)
 $(BUILDDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@
 
-$(HEADERDIR)/%.h: include/%.h $(BUILDDIR)
+$(HEADERDIR)/%.h: include/%.h
 	cp $< $@
 
 $(BUILDDIR):

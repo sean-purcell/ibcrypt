@@ -40,7 +40,6 @@ int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* 
 	if(r == 0 || base == 0 || exp == 0 || n == 0) {
 		return -1;
 	}
-	BIGNUM b = *base;
 
 	const uint32_t R_exp_words = n->size;
 	const uint64_t R_bits = R_exp_words * 64;

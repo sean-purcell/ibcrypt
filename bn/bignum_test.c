@@ -23,9 +23,6 @@ void speed_test() {
 	bno_mul(&r, &m, &n);
 	bnu_tstr(out, &r);
 	printf("m*n  :%s\n", out);
-	bno_mul_karatsuba(&r, &m, &n);
-	bnu_tstr(out, &r);
-	printf("m*n  :%s\n", out);
 
 	bno_neg_mod(&r, &m, &n);
 	bnu_tstr(out, &r);
@@ -74,8 +71,6 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("a*b  :%s\n", out);
 
-	bno_mul_karatsuba(&r, &a, &b);
-	bnu_tstr(out, &r);
 	printf("a*b  :%s\n", out);
 
 	bno_mul_mod(&r, &a, &b, &c);

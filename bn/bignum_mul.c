@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <ibcrypt/bignum.h>
+#include <bignum.h>
 #include "bignum_util.h"
 
 /* words must be at least this size to do karatsuba multiplication */

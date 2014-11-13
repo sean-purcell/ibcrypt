@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <ibcrypt/bignum.h>
+#include <bignum.h>
 #include "bignum_util.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))

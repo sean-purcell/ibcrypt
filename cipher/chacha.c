@@ -5,7 +5,7 @@
 
 #include <libibur/endian.h>
 
-#include <ibcrypt/chacha.h>
+#include <chacha.h>
 
 #ifdef CHACHA_DEBUG
 #include <libibur/util.h>

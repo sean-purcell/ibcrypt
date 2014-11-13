@@ -1,48 +1,47 @@
 CC=gcc
-DEBUG=0
-ORIGFLAGS= -c -Wall -std=gnu99
+BUILDDIR=bin
+CFLAGS=-Wall -std=gnu99 -O3
+LINKFLAGS=-flto
 
-ifeq ($(DEBUG),1)
-	CFLAGS=$(ORIGFLAGS) -g
-	LFLAGS=
-else
-	CFLAGS=$(ORIGFLAGS) -O3 -flto
-	LFLAGS=-flto
-endif
+LIBINC=-I/usr/local/include
 
-LIB_HEADERS=aes.h sha256.h rand.h scrypt.h salsa20.h chacha.h
-LIB_OBJECTS=aes.o sha256.o aes_modes.o scrypt.o rand.o salsa20.o chacha.o
+DIRS=test cipher hash bn misc include
+BUILDDIRS=$(patsubst %,$(BUILDDIR)/%,$(DIRS))
 
-TEST_OBJECTS=$(LIB_OBJECTS) aes_test.o sha256_test.o aes_modes_test.o test_suite.o scrypt_test.o salsa20_test.o chacha_test.o
+SOURCES:= 
+TESTSOURCES:= 
 
-.PHONY: clean cleanall remake remaketest test all lib install
+INCLUDEDIR=include
+HEADERDIR=$(BUILDDIR)/include/ibcrypt
 
-all: lib
+LIBINC+=-I$(HEADERDIR)
 
-lib: bin $(LIB_OBJECTS)
-	cp $(LIB_HEADERS) bin/ibcrypt/
-	ar -rs bin/libibcrypt.a $(LIB_OBJECTS) 
+include $(patsubst %,%/inc.mk,$(DIRS))
 
-test: bin $(TEST_OBJECTS)
-	gcc $(LFLAGS) $(TEST_OBJECTS) -o bin/test
+OBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(SOURCES))
+TESTSOURCES+=$(SOURCES)
+TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(TESTSOURCES))
 
-.c.o:
-	$(CC) $(CFLAGS) $< -o $@
+BUILDHEADERS:=$(patsubst include/%.h,$(HEADERDIR)/%.h,$(HEADERS))
 
-bin:
-	@mkdir bin
-	@mkdir bin/ibcrypt
-	
-clean:
-	rm -rf *.o 
-	
-cleanall: clean
-	rm -rf bin
+.PHONY: libheaders lib clean install
 
-remake: clean lib
+lib: $(BUILDDIR) $(BUILDHEADERS) $(OBJECTS)
+	ar -rs bin/libibcrypt.a $(OBJECTS)
 
-remaketest: clean test
+$(BUILDDIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@
+
+$(HEADERDIR)/%.h: include/%.h $(BUILDDIR)
+	cp $< $@
+
+$(BUILDDIR):
+	@mkdir -p $(BUILDDIR) $(BUILDDIRS) $(HEADERDIR)
 
 install:
 	cp bin/libibcrypt.a /usr/local/lib/
-	cp -r bin/ibcrypt /usr/local/include/
+	cp -r bin/include/ibcrypt /usr/local/include/
+
+clean:
+	rm -rf $(BUILDDIR)
+

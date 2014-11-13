@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <ibcrypt/bignum.h>
+#include <bignum.h>
 #include "bignum_util.h"
 
 // don't resize, do inplace

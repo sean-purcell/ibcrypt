@@ -1,2 +1,2 @@
-#include <ibcrypt/bignum.h>
-#include <ibcrypt/rand.h>
+#include <bignum.h>
+#include <rand.h>

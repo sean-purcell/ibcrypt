@@ -3,7 +3,7 @@
 #include <libibur/test.h>
 #include <libibur/util.h>
 
-#include <ibcrypt/scrypt.h>
+#include <scrypt.h>
 
 const static char* pass[] = {
 	"",

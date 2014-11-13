@@ -1,3 +1,3 @@
 DIR:=include
-HEADERS=$(wildcard $(DIR)/*.h)
+HEADERS:=$(wildcard $(DIR)/*.h)
 

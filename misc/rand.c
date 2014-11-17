@@ -9,80 +9,121 @@
 
 #include <rand.h>
 
-/* returns URANDOM_FAIL if unsuccessful, 0 if successful */
-int cs_rand(void* _buf, size_t buflen) {
-	uint8_t* buf = (uint8_t*) _buf;
-	int fd;
-	size_t lenread;
+static uint8_t random_buf[1024];
+static const size_t RANDOM_BUFLEN = 1024;
+static size_t buf_index = 0;
+/* set to 0 after the first use */
+static int random_init = 1;
+
+static int reset_buf() {
+	buf_index = 0;
 	
-	if((fd = open("/dev/urandom", O_RDONLY)) == -1) {
+	size_t len = RANDOM_BUFLEN;
+	int ur_fd;
+	size_t lenread;
+	size_t index = 0;
+	if((ur_fd = open("/dev/urandom", O_RDONLY)) == -1) {
 		goto err0;
 	}
-	
-	while(buflen > 0) {
-		if((lenread = read(fd, buf, buflen)) == 0) {
-			/* /dev/urandom should never EOF */
+
+	while(len > 0) {
+		if((lenread = read(ur_fd, &random_buf[index], len)) == 0) {
+			/* urandom should never EOF */
 			goto err1;
 		}
+
 		if(lenread == -1) {
 			/* other error, caller can read errno to figure it out */
 			goto err1;
 		}
-		
+
 		/* might not have read all in one go */
-		buf += lenread;
-		buflen -= lenread;
+		index += lenread;
+		len -= lenread;
 	}
-	
-	while(close(fd) == -1) {
-		if(errno != EINTR) { /* if close did not fail due to interrupt */
+
+	while(close(ur_fd) == -1) {
+		/* close might have failed from interrupt */
+		if(errno != EINTR) {
 			goto err0;
 		}
 	}
-	
+
 	return 0;
-	
+
 err1: /* error occurred after file open */
-	close(fd);
-err0: /* opening/closing file failed */
-	return URANDOM_FAIL;
+	close(ur_fd);
+err0: /* error occurred while closing/opening fd */
+	return RANDOM_FAIL;
 }
 
-static uint32_t buf[64];
-static uint8_t count = 0;
-
-uint32_t cs_rand_int() {
-	if(count == 0) {
-		if(cs_rand((uint8_t*) buf, 64 * sizeof(uint32_t)) != 0) {
-			return 0;
-		}
+/* returns RANDOM_FAIL if unsuccessful, 0 if successful */
+int cs_rand(void* _buf, size_t buflen) {
+	if(random_init) {
+		reset_buf();
+		random_init = 0;
 	}
-	uint32_t res = buf[count];
-	count++;
-	count&=63;
-	
-	return res;
+	uint8_t* buf = (uint8_t*) _buf;
+	size_t space = RANDOM_BUFLEN - buf_index;
+	while(buflen >= space) {
+		memcpy(buf, &random_buf[buf_index], space * sizeof(uint8_t*));
+		buf += space;
+		buflen -= space;
+
+		if(reset_buf() != 0) {
+			return RANDOM_FAIL;
+		}
+		space = RANDOM_BUFLEN;
+	}
+
+	memcpy(buf, &random_buf[buf_index], buflen);
+	buf_index += buflen;
+
+	return 0;
 }
 
-uint32_t cs_rand_int_range(uint32_t top) {
+int cs_rand_uint64(uint64_t* r) {
+	return cs_rand(r, sizeof(uint64_t));
+}
+
+int cs_rand_uint64_range(uint64_t* r, uint64_t top) {
 	if(top == 0) {
+		*r = 0;
 		return 0;
 	}
-	errno = 0;
+	uint64_t guess;
 	if(top & (top-1)) {
-		const uint32_t mask = (2 << lg(top)) - 1;
-		const uint32_t max = ((mask + 1) / top) * top;
+		const uint64_t mask = (2 << lg(top)) - 1;
 		while(1) {
-			uint32_t guess = cs_rand_int() & mask;
-			if(errno != 0) {
-				return 0;
+			if(cs_rand_uint64(&guess) != 0) {
+				return RANDOM_FAIL;
 			}
-			if(guess < max) {
-				return guess % top;
+			guess = guess & mask;
+			if(guess < top) {
+				*r = guess;
+				return 0;
 			}
 		}
 	} else {
-		return cs_rand_int() & (top-1);
+		if(cs_rand_uint64(&guess) != 0) {
+			return RANDOM_FAIL;
+		}
+		*r = guess & (top - 1);
+		return 0;
 	}
+}
+
+int cs_rand_uint32(uint32_t* r) {
+	return cs_rand(r, sizeof(uint32_t));
+}
+
+int cs_rand_uint32_range(uint32_t* r, uint32_t top) {
+	uint64_t res;
+	if(cs_rand_uint64_range(&res, (uint64_t) top) != 0) {
+		return RANDOM_FAIL;
+	}
+
+	*r = (uint32_t) res;
+	return 0;
 }
 

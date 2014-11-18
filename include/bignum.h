@@ -72,4 +72,7 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b);
 
+/* returns a random bignum within the range [bot, top) */
+int bnu_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
+
 #endif

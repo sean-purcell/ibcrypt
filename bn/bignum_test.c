@@ -2,7 +2,6 @@
 
 #include <bignum.h>
 
-//int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
 
 void speed_test() {
@@ -20,6 +19,10 @@ void speed_test() {
 	bnu_tstr(out, &n);
 	printf("n    :%s\n", out);
 
+	bnu_rand(&r, &BN_ZERO, &m);
+	bnu_tstr(out, &r);
+	printf("rand<m:%s\n", out);
+
 	bno_mul(&r, &m, &n);
 	bnu_tstr(out, &r);
 	printf("m*n  :%s\n", out);
@@ -35,6 +38,10 @@ void speed_test() {
 	bno_exp_mod(&r, &m, &e, &n);
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
+
+	int prime = 0;
+	rabin_miller(&prime, &m, 128);
+	printf("mprime:%d\n", prime);
 
 	bnu_free(&m);
 	bnu_free(&e);
@@ -195,6 +202,10 @@ int main() {
 	bno_inv_mod(&r, &y, &x);
 	bnu_tstr(out, &r);
 	printf("xiv%%n:%s\n", out);
+
+	bnu_rand(&r, &x, &y);
+	bnu_tstr(out, &r);
+	printf("randxy:%s\n", out);
 
 	bnu_free(&a);
 	bnu_free(&b);

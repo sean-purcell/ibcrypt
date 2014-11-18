@@ -104,6 +104,10 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift) {
 		return bnu_resize(r, 0);
 	}
 
+	if(bnu_resize(r, a->size) != 0) {
+		return 1;
+	}
+
 	rshift_words(r->d, a->d, a->size, shift);
 
 	return bnu_trim(r);

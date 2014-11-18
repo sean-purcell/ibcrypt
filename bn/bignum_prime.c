@@ -10,30 +10,30 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 		return 1;
 	}
 
-	/* find a=2^s * d where d is odd */
-	/* find the first set bit of a */
-	uint64_t i, j;
-	for(i = 0; i < a->size; i++) {
-		for(j = 0; j < 64; j++) {
-			if(a->d[i] | (1ULL < j)) {
-				goto dloopend;
-			}
-		}
-	}
-	dloopend:
-	const uint64_t s = i * 64 + j;
-	BIGNUM d = BN_ZERO;
-
-	if(bno_rshift(&d, a, s) != 0) {
-		return 1;
-	}
-
 	/* get 1 and n - 1 in bignum form for comparison */
 	BIGNUM one = BN_ZERO, n_minus_one = BN_ZERO;
 	if(bni_int(&one, 1) != 0) {
 		return 1;
 	}
 	if(bno_sub(&n_minus_one, n, &one) != 0) {
+		return 1;
+	}
+
+	/* find n=2^s * d where d is odd */
+	/* find the first set bit of a */
+	uint64_t i, j;
+	for(i = 0; i < n_minus_one.size; i++) {
+		for(j = 0; j < 64; j++) {
+			if(n_minus_one.d[i] & (1ULL << j)) {
+				goto dloopend;
+			}
+		}
+	}
+	dloopend:;
+	const uint64_t s = i * 64 + j;
+	BIGNUM d = BN_ZERO;
+
+	if(bno_rshift(&d, &n_minus_one, s) != 0) {
 		return 1;
 	}
 
@@ -57,19 +57,19 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 			return 1;
 		}
 
-		if(bnu_cmp(&x, &one) == 0 || bnu_cmp(&x, &n_minus_one) == 0) {
+		if(bno_cmp(&x, &one) == 0 || bno_cmp(&x, &n_minus_one) == 0) {
 			goto testloopend;
 		}
 
 		for(j = 0; j < s - 1; j++) {
-			if(bno_mul_mod(&x, &x, &x) == 0) {
+			if(bno_mul_mod(&x, &x, &x, n) == 0) {
 				return 1;
 			}
-			if(bnu_cmp(&x, &one) == 0) {
+			if(bno_cmp(&x, &one) == 0) {
 				*r = 0;
 				return 0;
 			}
-			if(bnu_cmp(&x, &n_minus_one) == 0) {
+			if(bno_cmp(&x, &n_minus_one) == 0) {
 				goto testloopend;
 			}
 		}

@@ -39,8 +39,8 @@ void speed_test() {
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
 
-	int prime = 0;
-	rabin_miller(&prime, &m, 128);
+	int prime = 5;
+	printf("%d\n", rabin_miller(&prime, &m, 128));
 	printf("mprime:%d\n", prime);
 
 	bnu_free(&m);

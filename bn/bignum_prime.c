@@ -43,13 +43,14 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 		return 1;
 	}
 
+
+	BIGNUM a = BN_ZERO;
+	BIGNUM x = BN_ZERO;
+
 	/* each iteration has a 1/4 chance of false positive */
 	/* run ceil(certainty/2) times to obtain the certainty value*/
 	const uint64_t iters = (certainty + 1) / 2;
 	for(i = 0; i < iters; i++) {
-		BIGNUM a = BN_ZERO;
-		BIGNUM x = BN_ZERO;
-
 		if(bnu_rand(&a, &two, &n_minus_one) != 0) {
 			return 1;
 		}
@@ -62,7 +63,7 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 		}
 
 		for(j = 0; j < s - 1; j++) {
-			if(bno_mul_mod(&x, &x, &x, n) == 0) {
+			if(bno_mul_mod(&x, &x, &x, n) != 0) {
 				return 1;
 			}
 			if(bno_cmp(&x, &one) == 0) {

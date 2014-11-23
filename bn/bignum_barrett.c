@@ -6,30 +6,6 @@
 #include <bignum.h>
 #include "bignum_util.h"
 
-/* get 2 to the power of k */
-int bnu_2power(BIGNUM* _r, const uint64_t k) {
-	if(_r == NULL) {
-		return -1;
-	}
-
-	const uint64_t block = k / 64;
-	const uint64_t size = block + 1;
-	const uint64_t shift = k % 64;
-	if(size > 0xffffffffULL) {
-		return 2; /* too big */
-	}
-
-	BIGNUM r = BN_ZERO;
-	if(bnu_resize(&r, size) != 0) {
-		return 1; /* failed to resize */
-	}
-
-	r.d[block] = 1ULL << shift;
-	*_r = r;
-
-	return 0;
-}
-
 /* assumes that n is "trimmed" */
 int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 	if(r == NULL || n == NULL) {
@@ -39,7 +15,7 @@ int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 	const uint64_t k2 = n->size * 64ULL * 2ULL;
 
 	BIGNUM four_k = BN_ZERO;
-	if(bnu_2power(&four_k, k2) != 0) {
+	if(bni_2power(&four_k, k2) != 0) {
 		return 1;
 	}
 

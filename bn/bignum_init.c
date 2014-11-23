@@ -91,3 +91,28 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a) {
 
 	return 0;
 }
+
+/* get 2 to the power of k */
+int bni_2power(BIGNUM* _r, const uint64_t k) {
+	if(_r == NULL) {
+		return -1;
+	}
+
+	const uint64_t block = k / 64;
+	const uint64_t size = block + 1;
+	const uint64_t shift = k % 64;
+	if(size > 0xffffffffULL) {
+		return 2; /* too big */
+	}
+
+	BIGNUM r = BN_ZERO;
+	if(bnu_resize(&r, size) != 0) {
+		return 1; /* failed to resize */
+	}
+
+	r.d[block] = 1ULL << shift;
+	*_r = r;
+
+	return 0;
+}
+

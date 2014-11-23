@@ -23,8 +23,16 @@ int bni_fstr(BIGNUM* a, const char* source);
 
 int bni_cpy(BIGNUM* r, const BIGNUM* a);
 
+int bni_2power(BIGNUM* r, const uint64_t k);
+
+/* returns a random bignum within the range [bot, top) */
+int bni_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
+
 /* out must be big enough to hold a */
 int bnu_tstr(char* out, const BIGNUM* a);
+
+/* prints a to stdout */
+int bnu_print(const BIGNUM* a);
 
 /* frees a bignum, should be used before it goes out of scope */
 int bnu_free(BIGNUM* r);
@@ -71,8 +79,5 @@ int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const BIGNUM* a, const BIGNUM* b);
-
-/* returns a random bignum within the range [bot, top) */
-int bnu_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
 
 #endif

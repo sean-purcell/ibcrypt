@@ -4,7 +4,7 @@
 #include <bignum.h>
 #include <rand.h>
 
-int bnu_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top) {
+int bni_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top) {
 	if(r == NULL || bot == NULL || top == NULL) {
 		return 1;
 	}

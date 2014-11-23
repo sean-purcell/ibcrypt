@@ -51,7 +51,7 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 	/* run ceil(certainty/2) times to obtain the certainty value*/
 	const uint64_t iters = (certainty + 1) / 2;
 	for(i = 0; i < iters; i++) {
-		if(bnu_rand(&a, &two, &n_minus_one) != 0) {
+		if(bni_rand(&a, &two, &n_minus_one) != 0) {
 			return 1;
 		}
 		if(bno_exp_mod(&x, &a, &d, n) != 0) {

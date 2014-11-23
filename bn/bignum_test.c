@@ -19,7 +19,7 @@ void speed_test() {
 	bnu_tstr(out, &n);
 	printf("n    :%s\n", out);
 
-	bnu_rand(&r, &BN_ZERO, &m);
+	bni_rand(&r, &BN_ZERO, &m);
 	bnu_tstr(out, &r);
 	printf("rand<m:%s\n", out);
 
@@ -39,6 +39,10 @@ void speed_test() {
 	bnu_tstr(out, &r);
 	printf("m^e%%n:%s\n", out);
 
+	bno_exp_mod(&r, &e, &n, &m);
+	bnu_tstr(out, &r);
+	printf("e^n%%m:%s\n", out);
+
 	int prime = 5;
 	printf("%d\n", rabin_miller(&prime, &m, 128));
 	printf("mprime:%d\n", prime);
@@ -46,6 +50,45 @@ void speed_test() {
 	bnu_free(&m);
 	bnu_free(&e);
 	bnu_free(&n);
+	bnu_free(&r);
+}
+
+void rand_exp_test() {
+	char out[1025];
+	puts("rand exp test");
+	BIGNUM a = BN_ZERO;
+	BIGNUM b = BN_ZERO;
+	BIGNUM c = BN_ZERO;
+
+	BIGNUM max = BN_ZERO;
+	BIGNUM min = BN_ZERO;
+	
+	BIGNUM r = BN_ZERO;
+
+	bni_2power(&max, 2048);
+	bni_int(&min, 0);
+
+	bni_rand(&a, &min, &max);
+	bni_rand(&b, &min, &max);
+	bni_rand(&c, &min, &max);
+
+	bnu_tstr(out, &a);
+	printf("a    :%s\n", out);
+	bnu_tstr(out, &b);
+	printf("b    :%s\n", out);
+	bnu_tstr(out, &c);
+	printf("c    :%s\n", out);
+
+	bno_exp_mod(&r, &a, &b, &c);
+
+	bnu_tstr(out, &r);
+	printf("a^b%%c:%s\n", out);
+
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&c);
+	bnu_free(&max);
+	bnu_free(&min);
 	bnu_free(&r);
 }
 
@@ -203,7 +246,7 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("xiv%%n:%s\n", out);
 
-	bnu_rand(&r, &x, &y);
+	bni_rand(&r, &x, &y);
 	bnu_tstr(out, &r);
 	printf("randxy:%s\n", out);
 
@@ -217,5 +260,6 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	speed_test();
+	//speed_test();
+	rand_exp_test();
 }

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <bignum.h>
 #include "bignum_util.h"
@@ -89,3 +90,12 @@ int bnu_tstr(char* out, const BIGNUM* a) {
 
 	return 0;
 }
+
+int bnu_print(const BIGNUM* a) {
+	char* str = malloc(16 * a->size + 1);
+	bnu_tstr(str, a);
+	printf("%s", str);
+	free(str);
+	return 0;
+}
+

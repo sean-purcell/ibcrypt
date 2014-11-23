@@ -66,7 +66,7 @@ int cs_rand(void* _buf, size_t buflen) {
 	uint8_t* buf = (uint8_t*) _buf;
 	size_t space = RANDOM_BUFLEN - buf_index;
 	while(buflen >= space) {
-		memcpy(buf, &random_buf[buf_index], space * sizeof(uint8_t*));
+		memcpy(buf, &random_buf[buf_index], space * sizeof(uint8_t));
 		buf += space;
 		buflen -= space;
 

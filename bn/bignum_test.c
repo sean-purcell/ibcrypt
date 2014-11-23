@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#include <stdlib.h>
 
 #include <bignum.h>
 
@@ -94,29 +92,18 @@ void rand_exp_test() {
 	bnu_tstr(bstr, &b);
 	bnu_tstr(cstr, &c);
 
+	char command[4096];
+	sprintf(command, "python -c 'print(\"rand exp test passes:\");print(pow(0x%s,0x%s,0x%s)==0x%s)'", astr, bstr, cstr, out);
+	printf("command: %s\n", command);
+	system(command);
+
+
 	bnu_free(&a);
 	bnu_free(&b);
 	bnu_free(&c);
 	bnu_free(&max);
 	bnu_free(&min);
 	bnu_free(&r);
-
-	char arg[4096];
-	sprintf(arg, "'print(\"rand exp test passes:\");print(pow(0x%s,0x%s,0x%s)==0x%s)'", astr, bstr, cstr, out);
-
-	pid_t pid = fork();
-	if(pid == -1) {
-		printf("fork failed");
-	} else if(pid == 0) {
-		//printf("command: python -c %s\n", arg);
-		int ret = execlp("python", "python", "-c", arg, NULL);
-		if(ret != 0) {
-			printf("exec failed:%d\n", errno);
-		}
-	} else {
-		int ret;
-		waitpid(pid, &ret, 0);
-	}
 }
 
 int main() {

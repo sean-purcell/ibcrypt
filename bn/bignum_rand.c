@@ -4,7 +4,29 @@
 #include <bignum.h>
 #include <rand.h>
 
-int bni_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top) {
+int bni_rand_bits(BIGNUM* r, const uint32_t bits) {
+	if(r == NULL) {
+		return 1;
+	}
+
+	const uint32_t size = (bits + 63) / 64;
+	if(bnu_resize(r, size) != 0) {
+		return 1;
+	}
+
+	if(cs_rand(&r->d[0], sizeof(uint64_t) * size) != 0) {
+		return 1;
+	}
+
+	if(bits % 64 != 0) {
+		uint64_t mask = (1 << (bits % 64)) - 1;
+		r->d[size - 1] &= mask;
+	}
+
+	return 0;
+}
+
+int bni_rand_range(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top) {
 	if(r == NULL || bot == NULL || top == NULL) {
 		return 1;
 	}

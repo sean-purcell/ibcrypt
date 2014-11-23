@@ -5,7 +5,7 @@
 /* runs rabin-miller primality test on the number
  * http://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
  */
-int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
+int rabin_miller(int* r, const BIGNUM* n, const uint32_t certainty) {
 	if(n == NULL) {
 		return 1;
 	}
@@ -51,7 +51,7 @@ int rabin_miller(int* r, BIGNUM* n, const uint32_t certainty) {
 	/* run ceil(certainty/2) times to obtain the certainty value*/
 	const uint64_t iters = (certainty + 1) / 2;
 	for(i = 0; i < iters; i++) {
-		if(bni_rand(&a, &two, &n_minus_one) != 0) {
+		if(bni_rand_range(&a, &two, &n_minus_one) != 0) {
 			return 1;
 		}
 		if(bno_exp_mod(&x, &a, &d, n) != 0) {

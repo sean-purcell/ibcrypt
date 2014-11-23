@@ -4,6 +4,7 @@
 #include <bignum.h>
 
 int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
+int rabin_miller(int* r, const BIGNUM* n, const uint32_t certainty);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;
@@ -20,7 +21,7 @@ void speed_test() {
 	bnu_tstr(out, &n);
 	printf("n    :%s\n", out);
 
-	bni_rand(&r, &BN_ZERO, &m);
+	bni_rand_range(&r, &BN_ZERO, &m);
 	bnu_tstr(out, &r);
 	printf("rand<m:%s\n", out);
 
@@ -69,9 +70,9 @@ void rand_exp_test() {
 	bni_2power(&max, 2048);
 	bni_int(&min, 0);
 
-	bni_rand(&a, &min, &max);
-	bni_rand(&b, &min, &max);
-	bni_rand(&c, &min, &max);
+	bni_rand_range(&a, &min, &max);
+	bni_rand_range(&b, &min, &max);
+	bni_rand_range(&c, &min, &max);
 
 	bnu_tstr(out, &a);
 	printf("a    :%s\n", out);
@@ -96,7 +97,6 @@ void rand_exp_test() {
 	sprintf(command, "python -c 'print(\"rand exp test passes:\");print(pow(0x%s,0x%s,0x%s)==0x%s)'", astr, bstr, cstr, out);
 	printf("command: %s\n", command);
 	system(command);
-
 
 	bnu_free(&a);
 	bnu_free(&b);
@@ -260,7 +260,7 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("xiv%%n:%s\n", out);
 
-	bni_rand(&r, &x, &y);
+	bni_rand_range(&r, &x, &y);
 	bnu_tstr(out, &r);
 	printf("randxy:%s\n", out);
 

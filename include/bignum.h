@@ -26,7 +26,10 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a);
 int bni_2power(BIGNUM* r, const uint64_t k);
 
 /* returns a random bignum within the range [bot, top) */
-int bni_rand(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
+int bni_rand_range(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
+
+/* returns a random bignum with `bits' bits */
+int bni_rand_bits(BIGNUM* r, const uint64_t bits);
 
 /* out must be big enough to hold a */
 int bnu_tstr(char* out, const BIGNUM* a);

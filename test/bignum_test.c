@@ -54,9 +54,12 @@ static void bn_mul_test() {
 	close(w_pipe[0]);
 	close(r_pipe[1]);
 
-	write(w_pipe[1], "ibase=16;obase=10;\n", strlen("ibase=16;obase=10;\n"));
-
+	FILE* bcin = fdopen(w_pipe[1], "w");
 	FILE* bcout = fdopen(r_pipe[0], "r");
+
+	fprintf(bcin, "ibase=16;obase=10;\n");
+
+	/* run tests */
 
 	BIGNUM a = BN_ZERO;
 	BIGNUM b = BN_ZERO;
@@ -68,7 +71,7 @@ static void bn_mul_test() {
 		char* astr = malloc(numsize + 1);
 		char* bstr = malloc(numsize + 1);
 		char* res = malloc(numsize * 2 + 1);
-		char* iobuf = malloc(numsize * 2 + 2);
+		char* bcres = malloc(numsize * 2 + 2);
 		for(j = 0; j < tests[i]; j++) {
 			if(bni_rand_bits(&a, sizes[i]) != 0 ||
 			   bni_rand_bits(&b, sizes[i]) != 0) {
@@ -88,16 +91,16 @@ static void bn_mul_test() {
 			uppercase(bstr);
 			uppercase(res);
 
-			sprintf(iobuf, "%s*%s\n", astr, bstr);
-			write(w_pipe[1], iobuf, strlen(iobuf));
-			fgets(iobuf, 1000000, bcout);
-			iobuf[strlen(iobuf)-1] = '\0';
+			fprintf(bcin, "%s*%s\n", astr, bstr);
+			fflush(bcin);
+			fgets(bcres, 1000000, bcout);
+			bcres[strlen(bcres)-1] = '\0';
 
 			/* compare */
-			if(res[0] == '\0' ? !(iobuf[0] == '0' && iobuf[1] == '\0') /* result was 0 */
-				: strcmp(&res[strlen(res)-strlen(iobuf)], iobuf) != 0) {
+			if(res[0] == '\0' ? !(bcres[0] == '0' && bcres[1] == '\0') /* result was 0 */
+				: strcmp(&res[strlen(res)-strlen(bcres)], bcres) != 0) {
 				printf("MUL FAILED:\n%s*%s=\n%s\n%s\n\n",
-					astr, bstr, res, iobuf);
+					astr, bstr, res, bcres);
 			}
 		}
 
@@ -110,6 +113,7 @@ static void bn_mul_test() {
 	bnu_free(&b);
 	bnu_free(&r);
 
+	fclose(bcin);
 	fclose(bcout);
 	close(w_pipe[1]);
 	close(r_pipe[0]);

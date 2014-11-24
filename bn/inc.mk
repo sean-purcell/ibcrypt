@@ -1,4 +1,4 @@
 DIR:=bn
-$(DIR)SOURCES:=$(wildcard $(DIR)/*.c)
+$(DIR)SOURCES:=$(filter-out $(DIR)/bignum_test.c,$(wildcard $(DIR)/*.c))
 SOURCES+=$($(DIR)SOURCES)
 

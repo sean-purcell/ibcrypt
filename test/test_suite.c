@@ -10,6 +10,7 @@ void aes_mode_tests();
 void salsa20_tests();
 void chacha_tests();
 void scrypt_tests();
+void bignum_tests();
 
 void (*suite[])() = {
 	aes_tests,
@@ -17,7 +18,8 @@ void (*suite[])() = {
 	aes_mode_tests,
 	salsa20_tests,
 	chacha_tests,
-	scrypt_tests
+	scrypt_tests,
+	bignum_tests,
 };
 
 const char* names[] = {
@@ -26,10 +28,11 @@ const char* names[] = {
 	"AES modes",
 	"SALSA20",
 	"CHACHA",
-	"SCRYPT"
+	"SCRYPT",
+	"BIGNUM",
 };
 
-int main() {
+int main(int argc, char** argv) {
 	for(int i = 0; i < sizeof(suite)/sizeof(suite[0]); i++) {
 		clock_t start = clock();
 		(*suite[i])();

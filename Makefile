@@ -1,12 +1,13 @@
 CC=gcc
 BUILDDIR=bin
+OBJECTDIR=objects
 CFLAGS=-Wall -std=gnu99 -O3
 LINKFLAGS=-flto
 
 LIBINC=-I/usr/local/include
 
 DIRS=test cipher hash bn misc include
-BUILDDIRS=$(patsubst %,$(BUILDDIR)/%,$(DIRS))
+BUILDDIRS=$(patsubst %,$(BUILDDIR)/$(OBJECTDIR)/%,$(DIRS))
 
 SOURCES:= 
 TESTSOURCES:= 
@@ -18,9 +19,9 @@ LIBINC+=-I$(HEADERDIR)
 
 include $(patsubst %,%/inc.mk,$(DIRS))
 
-OBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(SOURCES))
+OBJECTS:=$(patsubst %.c,$(BUILDDIR)/$(OBJECTDIR)/%.o,$(SOURCES))
 TESTSOURCES+=$(SOURCES)
-TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/%.o,$(TESTSOURCES))
+TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/$(OBJECTDIR)/%.o,$(TESTSOURCES))
 
 BUILDHEADERS:=$(patsubst include/%.h,$(HEADERDIR)/%.h,$(HEADERS))
 
@@ -29,7 +30,10 @@ BUILDHEADERS:=$(patsubst include/%.h,$(HEADERDIR)/%.h,$(HEADERS))
 lib: $(BUILDDIR) $(BUILDHEADERS) $(OBJECTS)
 	ar -rs bin/libibcrypt.a $(OBJECTS)
 
-$(BUILDDIR)/%.o: %.c
+test: $(BUILDDIR) $(BUILDHEADERS) $(TESTOBJECTS)
+	gcc $(LINKFLAGS) $(TESTOBJECTS) -o $(BUILDDIR)/test
+
+$(BUILDDIR)/$(OBJECTDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@
 
 $(HEADERDIR)/%.h: include/%.h

@@ -23,7 +23,7 @@ int bni_rand_bits(BIGNUM* r, const uint64_t bits) {
 	}
 
 	if(bits % 64 != 0) {
-		uint64_t mask = (1 << (bits % 64)) - 1;
+		uint64_t mask = (1ULL << (bits % 64)) - 1;
 		r->d[size - 1] &= mask;
 	}
 

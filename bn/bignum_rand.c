@@ -4,9 +4,13 @@
 #include <bignum.h>
 #include <rand.h>
 
-int bni_rand_bits(BIGNUM* r, const uint32_t bits) {
+int bni_rand_bits(BIGNUM* r, const uint64_t bits) {
 	if(r == NULL) {
 		return 1;
+	}
+
+	if(bits / 64 > 0xffffffffULL) {
+		return 2; /* too big */
 	}
 
 	const uint32_t size = (bits + 63) / 64;

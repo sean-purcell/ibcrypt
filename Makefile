@@ -1,7 +1,7 @@
 CC=gcc
 BUILDDIR=bin
 OBJECTDIR=objects
-CFLAGS=-Wall -std=gnu99 -O3
+CFLAGS=-Wall -std=gnu99 -O3 -g
 LINKFLAGS=-flto
 
 LIBINC=-I/usr/local/include

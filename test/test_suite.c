@@ -25,20 +25,41 @@ void (*suite[])() = {
 const char* names[] = {
 	"AES",
 	"SHA256",
-	"AES modes",
+	"AES_MODES",
 	"SALSA20",
 	"CHACHA",
 	"SCRYPT",
 	"BIGNUM",
 };
 
+void run_test(int num) {
+	clock_t start = clock();
+	(*suite[num])();
+	clock_t end = clock();
+	float seconds = (float)(end-start) / CLOCKS_PER_SEC;
+	printf("%s done.  %f seconds elapsed.\n", names[num], seconds);
+}
+
 int main(int argc, char** argv) {
-	for(int i = 0; i < sizeof(suite)/sizeof(suite[0]); i++) {
-		clock_t start = clock();
-		(*suite[i])();
-		clock_t end = clock();
-		float seconds = (float)(end-start) / CLOCKS_PER_SEC;
-		printf("%s done.  %f seconds elapsed.\n", 
-			names[i], seconds);
+	const int num_tests = sizeof(suite) / sizeof(suite[0]);
+	if(argc > 1) {
+		for(int i = 1; i < argc; i++) {
+			/* find test to run */
+			int test;
+			for(test = 0; test < num_tests; test++) {
+				if(strcmp(names[test], argv[i]) == 0) {
+					break;
+				}
+			}
+			if(test == num_tests) {
+				printf("test %s not found.\n", argv[i]);
+			} else {
+				run_test(test);
+			}
+		}
+	} else {
+		for(int i = 0; i < num_tests; i++) {
+			run_test(i);
+		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "bignum_util.h"
 
 /* shift the actual words, no resizing or checks etc. */
-void lshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_t shift) {
+void lshift_words(uint64_t *r, const uint64_t *a, uint32_t a_size, const uint64_t shift) {
 	if(a_size == 0) return;
 	const uint32_t osize = a_size;
 	/* round up */
@@ -37,7 +37,7 @@ void lshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_
 	memset(r, 0x00, sizeof(uint64_t) * blk_shift);
 }
 
-void rshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_t shift) {
+void rshift_words(uint64_t *r, const uint64_t *a, uint32_t a_size, const uint64_t shift) {
 	if(a_size == 0) return;
 	const uint32_t blk_shift = shift / 64;
 	const uint32_t bit_shift = shift % 64;
@@ -62,13 +62,13 @@ void rshift_words(uint64_t* r, const uint64_t* a, uint32_t a_size, const uint64_
 	}
 	r[osize-1-blk_shift] = a[osize-1] >> rshift;
 
-	memset(&r[nsize], 0x00, sizeof(uint64_t) * blk_shift);
+	memset(&r[nsize], 0x00, sizeof(uint64_t)  *blk_shift);
 }
 
 /* bit shifts a given bignum, effectively << and >> operators */
 
 /* a and r may be the same bignum */
-int bno_lshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift) {
+int bno_lshift(BIGNUM *r, const BIGNUM *a, const uint64_t shift) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}
@@ -93,7 +93,7 @@ int bno_lshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift) {
 	return bnu_trim(r);
 }
 
-int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift) {
+int bno_rshift(BIGNUM *r, const BIGNUM *a, const uint64_t shift) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}

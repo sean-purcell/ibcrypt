@@ -61,14 +61,14 @@ const static uint8_t tau[] = "expand 16-byte k";
 /* the salsa20expansion function 
  * ksize must be 16 or 32, otherwise
  * this function will fail silently */
-void salsa20_expand(const uint8_t* const k, const int ksize, const uint8_t n[16], uint8_t out[64]) {
+void salsa20_expand(const uint8_t *const k, const int ksize, const uint8_t n[16], uint8_t out[64]) {
 	if(ksize != 32 && ksize != 16)
 		return;
 
 	/* prepare input for core function */
 	memcpy(&out[ 4], k, 16);
 	memcpy(&out[24], n, 16);
-	const uint8_t* expconst;
+	const uint8_t *expconst;
 	if(ksize == 32) {
 		memcpy(&out[44], k+16, 16);
 		expconst = sig;
@@ -85,8 +85,8 @@ void salsa20_expand(const uint8_t* const k, const int ksize, const uint8_t n[16]
 
 /* initialize a salsa20 context
  * returns NULL on failure */
-SALSA20_CTX* init_salsa20(const uint8_t* key, const int ksize, const uint64_t nonce) {
-	SALSA20_CTX* ctx;
+SALSA20_CTX *init_salsa20(const uint8_t *key, const int ksize, const uint64_t nonce) {
+	SALSA20_CTX *ctx;
 	
 	if(ksize != 16 && ksize != 32) {
 		/* unacceptable */
@@ -114,7 +114,7 @@ err0:
 }
 
 /* encrypt/decrypt a section */
-void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
+void stream_salsa20(SALSA20_CTX *ctx, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
 	uint64_t i;
 	/* the n value to pass when expanding new stream block */
 	uint8_t n[16];
@@ -134,14 +134,14 @@ void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const ou
 }
 
 /* frees an initialized salsa20 context */
-void free_salsa20(SALSA20_CTX* ctx) {
+void free_salsa20(SALSA20_CTX *ctx) {
 	memset(ctx, 0x00, sizeof(SALSA20_CTX));
 	free(ctx);
 }
 
 /* convenience functions */
-int salsa20_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
-	SALSA20_CTX* ctx = init_salsa20(key, ksize, nonce);
+int salsa20_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
+	SALSA20_CTX *ctx = init_salsa20(key, ksize, nonce);
 	if(ctx == NULL) {
 		return 1;
 	}
@@ -151,6 +151,6 @@ int salsa20_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const
 	return 0;
 }
 
-int salsa20_dec(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len) {
+int salsa20_dec(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
 	return salsa20_enc(key, ksize, nonce, in, out, len);
 }

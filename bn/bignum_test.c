@@ -3,8 +3,8 @@
 
 #include <bignum.h>
 
-int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n);
-int rabin_miller(int* r, const BIGNUM* n, const uint32_t certainty);
+int bno_barrett_rmod(BIGNUM *_r, const BIGNUM *a, const BIGNUM *n);
+int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;

@@ -6,7 +6,7 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-int cmp_words(const uint64_t* a, const uint32_t alen, const uint64_t* b, const uint32_t blen) {
+int cmp_words(const uint64_t *a, const uint32_t alen, const uint64_t *b, const uint32_t blen) {
 	int result = 0;
 	uint32_t i = max(alen, blen);
 	while(i > blen) {
@@ -28,7 +28,7 @@ int cmp_words(const uint64_t* a, const uint32_t alen, const uint64_t* b, const u
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */
-int bno_cmp(const BIGNUM* a, const BIGNUM* b) {
+int bno_cmp(const BIGNUM *a, const BIGNUM *b) {
 	if(a == NULL || b == NULL) {
 		if(a == NULL) {
 			return -1;

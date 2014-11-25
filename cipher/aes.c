@@ -187,7 +187,7 @@ uint8_t tm14[256] = {
 	0xd7,0xd9,0xcb,0xc5,0xef,0xe1,0xf3,0xfd,0xa7,0xa9,0xbb,0xb5,0x9f,0x91,0x83,0x8d
 };
 
-static inline void rotate(uint8_t* const t) {
+static inline void rotate(uint8_t *const t) {
 	uint8_t f = t[0];
 	t[0] = t[1];
 	t[1] = t[2];
@@ -195,20 +195,20 @@ static inline void rotate(uint8_t* const t) {
 	t[3] = f;
 }
 
-static inline void apply_sbox(uint8_t* const t) {
+static inline void apply_sbox(uint8_t *const t) {
 	t[0] = sbox[t[0]];
 	t[1] = sbox[t[1]];
 	t[2] = sbox[t[2]];
 	t[3] = sbox[t[3]];
 }
 
-void schedule_core(uint8_t* const t, const int i) {
+void schedule_core(uint8_t *const t, const int i) {
 	rotate(t);
 	apply_sbox(t);
 	t[0] ^= rcon[i];
 }
 
-static inline void xor_4byte(uint8_t* const a, const uint8_t* const b) {
+static inline void xor_4byte(uint8_t *const a, const uint8_t *const b) {
 	a[0] ^= b[0];
 	a[1] ^= b[1];
 	a[2] ^= b[2];
@@ -218,7 +218,7 @@ static inline void xor_4byte(uint8_t* const a, const uint8_t* const b) {
 /**
  * Create AES key by Rijndael's key schedule
  */
-int create_key_AES(const uint8_t* const source, const int bits, AES_KEY* const key) {
+int create_key_AES(const uint8_t *const source, const int bits, AES_KEY *const key) {
 	if(bits != 128 && bits != 192 && bits != 256) {
 		/* key size must be 128, 192, or 256 */
 		return -2;
@@ -228,7 +228,7 @@ int create_key_AES(const uint8_t* const source, const int bits, AES_KEY* const k
 	const int b = (rounds + 1) * 16; /* bytes of expanded key */
 	
 	key->rounds = rounds;
-	uint8_t* const rd = key->rd_key;
+	uint8_t *const rd = key->rd_key;
 	
 	/* first n bytes of expanded key are key bytes */
 	memcpy(rd, source, n);
@@ -269,25 +269,25 @@ int create_key_AES(const uint8_t* const source, const int bits, AES_KEY* const k
 
 /* Rijndael basic operations */
 
-static inline void add_round_key(uint8_t* const buf, const AES_KEY* const key, const int round) {
+static inline void add_round_key(uint8_t *const buf, const AES_KEY *const key, const int round) {
 	for(int i = 0; i < 16; i++) {
 		buf[i] ^= key->rd_key[round * 16 + i];
 	}
 }
 
-static inline void sub_bytes(uint8_t* const buf) {
+static inline void sub_bytes(uint8_t *const buf) {
 	for(int i = 0; i < 16; i++) {
 		buf[i] = sbox[buf[i]];
 	}
 }
 
-static inline void sub_bytes_inv(uint8_t* const buf) {
+static inline void sub_bytes_inv(uint8_t *const buf) {
 	for(int i = 0; i < 16; i++) {
 		buf[i] = sbox_inv[buf[i]];
 	}
 }
 
-static inline void shift_rows(uint8_t* const buf) {
+static inline void shift_rows(uint8_t *const buf) {
 	uint8_t f0, f1;
 	f0      = buf[ 1];
 	buf[ 1] = buf[ 5];
@@ -309,7 +309,7 @@ static inline void shift_rows(uint8_t* const buf) {
 	buf[ 3] =      f0;
 }
 
-static inline void shift_rows_inv(uint8_t* const buf) {
+static inline void shift_rows_inv(uint8_t *const buf) {
 	uint8_t f0, f1;
 	f0      = buf[ 1];
 	buf[ 1] = buf[13];
@@ -331,7 +331,7 @@ static inline void shift_rows_inv(uint8_t* const buf) {
 	buf[11] =      f0;
 }
 
-static inline void mix_single_column(uint8_t* const a) {
+static inline void mix_single_column(uint8_t *const a) {
 	uint8_t r[4];
 	memcpy(r, a, 4);
 	a[0] = tm02[r[0]] ^ tm03[r[1]] ^      r[2]  ^      r[3] ;
@@ -340,13 +340,13 @@ static inline void mix_single_column(uint8_t* const a) {
 	a[3] = tm03[r[0]] ^      r[1]  ^      r[2]  ^ tm02[r[3]];
 }
 
-static inline void mix_columns(uint8_t* const buf) {
+static inline void mix_columns(uint8_t *const buf) {
 	for(int i = 0; i < 4; i++) {
-		mix_single_column(buf + i * 4);
+		mix_single_column(buf + i  *4);
 	}
 }
 
-static inline void mix_single_column_inv(uint8_t* const a) {
+static inline void mix_single_column_inv(uint8_t *const a) {
 	uint8_t r[4];
 	memcpy(r, a, 4);
 	a[0] = tm14[r[0]] ^ tm11[r[1]] ^ tm13[r[2]] ^ tm09[r[3]];
@@ -355,13 +355,13 @@ static inline void mix_single_column_inv(uint8_t* const a) {
 	a[3] = tm11[r[0]] ^ tm13[r[1]] ^ tm09[r[2]] ^ tm14[r[3]];
 }
 
-static inline void mix_columns_inv(uint8_t* const buf) {
+static inline void mix_columns_inv(uint8_t *const buf) {
 	for(int i = 0; i < 4; i++) {
-		mix_single_column_inv(buf + i * 4);
+		mix_single_column_inv(buf + i  *4);
 	}
 }
 
-void encrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KEY* const key) {
+void encrypt_block_AES(const uint8_t *const in, uint8_t *const out, const AES_KEY *const key) {
 	/* begin AES encryption */
 	memcpy(out, in, 16);
 	add_round_key(out, key, 0);
@@ -378,7 +378,7 @@ void encrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KE
 	add_round_key(out, key, rounds);
 }
 
-void decrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KEY* const key) {
+void decrypt_block_AES(const uint8_t *const in, uint8_t *const out, const AES_KEY *const key) {
 	/* begin aes decryption */
 	memcpy(out, in, 16);
 	const int rounds = key->rounds;
@@ -395,6 +395,6 @@ void decrypt_block_AES(const uint8_t* const in, uint8_t* const out, const AES_KE
 	add_round_key(out, key, 0);
 }
 
-void zero_key_AES(AES_KEY* const key) {
+void zero_key_AES(AES_KEY *const key) {
 	memset(key, 0, sizeof(AES_KEY));
 }

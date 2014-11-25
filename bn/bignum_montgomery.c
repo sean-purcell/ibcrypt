@@ -1,7 +1,7 @@
 #include <bignum.h>
 #include "bignum_util.h"
 
-int montgomery_reduce(BIGNUM* T, const BIGNUM* N, const BIGNUM* Nres, const uint32_t R_size) {
+int montgomery_reduce(BIGNUM *T, const BIGNUM *N, const BIGNUM *Nres, const uint32_t R_size) {
 	BIGNUM m = BN_ZERO;
 	// calculate m:=T(-N^-1) mod R
 	if(bno_mul(&m, T, Nres) != 0 || bnu_resize(&m, R_size) != 0) {
@@ -26,17 +26,17 @@ int montgomery_reduce(BIGNUM* T, const BIGNUM* N, const BIGNUM* Nres, const uint
 	return (bno_cmp(T, N) >= 0 ? bno_sub(T, T, N) : 0);
 }
 
-int montgomery_mul(BIGNUM* res, const BIGNUM* a, const BIGNUM* b, const BIGNUM* N, const BIGNUM* Nres, const uint32_t R_size) {
+int montgomery_mul(BIGNUM *res, const BIGNUM *a, const BIGNUM *b, const BIGNUM *N, const BIGNUM *Nres, const uint32_t R_size) {
 	return bno_mul(res, a, b) != 0 || montgomery_reduce(res, N, Nres, R_size) != 0;
 }
 
-int montgomery_step(BIGNUM* res, const BIGNUM* a, const BIGNUM* b, const uint64_t R_bits) {
+int montgomery_step(BIGNUM *res, const BIGNUM *a, const BIGNUM *b, const uint64_t R_bits) {
 	return bno_mul(res, a, b) != 0 || bno_rshift(res, res, R_bits) != 0;
 }
 
 // montgomery multiplication, uses next largest power of 2 as R, therefore only works with odd numbers
 
-int exp_mod_odd(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n) {
+int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *n) {
 	if(r == 0 || base == 0 || exp == 0 || n == 0) {
 		return -1;
 	}

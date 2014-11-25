@@ -9,12 +9,12 @@
 
 #include <bignum.h>
 
-static void bn_err(const char* err) {
+static void bn_err(const char *err) {
 	fprintf(stderr, "bignum lib error: %s\n", err);
 	exit(1);
 }
 
-static void uppercase(char* str) {
+static void uppercase(char *str) {
 	size_t len = strlen(str);
 	size_t i;
 	for(i = 0; i < len; i++) {
@@ -23,7 +23,7 @@ static void uppercase(char* str) {
 }
 
 /* initialize a bc subprocess for calculation */
-static void init_bc(pid_t* pid, FILE** bcin, FILE** bcout) {
+static void init_bc(pid_t *pid, FILE **bcin, FILE **bcout) {
 	int w_pipe[2];
 	int r_pipe[2];
 
@@ -63,8 +63,8 @@ static void bn_mul_test() {
 
 	/* create bc process to check our answers */
 	pid_t bc;
-	FILE* bcin;
-	FILE* bcout;
+	FILE *bcin;
+	FILE *bcout;
 	init_bc(&bc, &bcin, &bcout);
 
 	/* run tests */
@@ -76,10 +76,10 @@ static void bn_mul_test() {
 	for(i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
 		int j;
 		const size_t numsize = (sizes[i] + 63) / 64 * 16;
-		char* astr = malloc(numsize + 1);
-		char* bstr = malloc(numsize + 1);
-		char* res = malloc(numsize * 2 + 1);
-		char* bcres = malloc(numsize * 2 + 2);
+		char *astr = malloc(numsize + 1);
+		char *bstr = malloc(numsize + 1);
+		char *res = malloc(numsize * 2 + 1);
+		char *bcres = malloc(numsize * 2 + 2);
 		for(j = 0; j < tests[i]; j++) {
 			if(bni_rand_bits(&a, sizes[i]) != 0 ||
 			   bni_rand_bits(&b, sizes[i]) != 0) {

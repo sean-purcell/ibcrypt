@@ -12,7 +12,7 @@
 #define A_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
 // plaintext:ciphertext
-const char* GFSBox128[] = {
+const char *GFSBox128[] = {
 	"f34481ec3cc627bacd5dc3fb08f273e6", "0336763e966d92595a567cc9ce537f5e",
 	"9798c4640bad75c7c3227db910174e72", "a9a1631bf4996954ebc093957b234589", 
 	"96ab5c2ff612d9dfaae8c31f30c42168", "ff4f8391a6a40ca5b25d23bedd44a597",
@@ -46,7 +46,7 @@ void GFSBox128Test() {
 }
 
 // plaintext:ciphertext
-const char* GFSBox192[] = {
+const char *GFSBox192[] = {
 	"1b077a6af4b7f98229de786d7516b639", "275cfc0413d8ccb70513c3859b1d0f72",
 	"9c2d8842e5f48f57648205d39a239af1", "c9b8135ff1b5adc413dfd053b21bd96d",
 	"bff52510095f518ecca60af4205444bb", "4a3650c3371ce2eb35e389a171427440",
@@ -79,7 +79,7 @@ void GFSBox192Test() {
 }
 
 // plaintext:ciphertext
-const char* GFSBox256[] = {
+const char *GFSBox256[] = {
 	"014730f80ac625fe84f026c60bfd547d", "5c9d844ed46f9885085e5d6a4f94c7d7",
 	"0b24af36193ce4665f2825d7b4749c98", "a9ff75bd7cf6613d3731c77c3b6d0c04",
 	"761c1fe41a18acf20d241650611d90f1", "623a52fcea5d443e48d9181ab32c7421",
@@ -111,7 +111,7 @@ void GFSBox256Test() {
 }
 
 // key:ciphertext
-const char* KeySbox128[] = {
+const char *KeySbox128[] = {
 	"10a58869d74be5a374cf867cfb473859", "6d251e6944b051e04eaa6fb4dbf78465",
 	"caea65cdbb75e9169ecd22ebe6e54675", "6e29201190152df4ee058139def610bb",
 	"a2e2fa9baf7d20822ca9f0542f764a41", "c3b44b95d9d2f25670eee9a0de099fa3",
@@ -159,7 +159,7 @@ void KeySbox128Test() {
 }
 
 // key:ciphertext
-const char* KeySbox192[] = {
+const char *KeySbox192[] = {
 	"e9f065d7c13573587f7875357dfbb16c53489f6a4bd0f7cd", "0956259c9cd5cfd0181cca53380cde06",
 	"15d20f6ebc7e649fd95b76b107e6daba967c8a9484797f29", "8e4e18424e591a3d5b6f0876f16f8594",
 	"a8a282ee31c03fae4f8e9b8930d5473c2ed695a347e88b7c", "93f3270cfc877ef17e106ce938979cb0",

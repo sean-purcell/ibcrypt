@@ -22,7 +22,7 @@ void (*suite[])() = {
 	bignum_tests,
 };
 
-const char* names[] = {
+const char *names[] = {
 	"AES",
 	"SHA256",
 	"AES_MODES",
@@ -40,7 +40,7 @@ void run_test(int num) {
 	printf("%s done.  %f seconds elapsed.\n", names[num], seconds);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 	const int num_tests = sizeof(suite) / sizeof(suite[0]);
 	if(argc > 1) {
 		for(int i = 1; i < argc; i++) {

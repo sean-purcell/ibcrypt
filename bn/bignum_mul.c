@@ -10,7 +10,7 @@
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-void mul_words(uint64_t* const r, uint64_t* const a, uint32_t alen, uint64_t* b, uint32_t blen) {
+void mul_words(uint64_t *const r, uint64_t *const a, uint32_t alen, uint64_t *b, uint32_t blen) {
 	/* generic empty vars */
 	uint64_t t0, t1;
 
@@ -57,7 +57,7 @@ void mul_words(uint64_t* const r, uint64_t* const a, uint32_t alen, uint64_t* b,
 	}
 }
 
-int bno_mul(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
+int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 	if(_r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -82,7 +82,7 @@ int bno_mul(BIGNUM* _r, const BIGNUM* a, const BIGNUM* b) {
 	return 0;
 }
 
-int bno_mul_mod(BIGNUM* r, const BIGNUM* _a, const BIGNUM* _b, const BIGNUM* const n) {
+int bno_mul_mod(BIGNUM *r, const BIGNUM *_a, const BIGNUM *_b, const BIGNUM *const n) {
 	if(bno_mul(r, _a, _b) != 0) {
 		return 1;
 	}

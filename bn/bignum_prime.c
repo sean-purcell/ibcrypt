@@ -5,7 +5,7 @@
 /* runs rabin-miller primality test on the number
  * http://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
  */
-int rabin_miller(int* r, const BIGNUM* n, const uint32_t certainty) {
+int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 	if(n == NULL) {
 		return 1;
 	}
@@ -85,11 +85,11 @@ int rabin_miller(int* r, const BIGNUM* n, const uint32_t certainty) {
 
 /* sets r to 1 if probably prime, 0 if definitely composite
  * the odds that this method returns a false positive is at most 2^(-certainty) */
-int bnu_probably_prime(int* r, BIGNUM* a, const uint32_t certainty) {
+int bnu_probably_prime(int *r, BIGNUM *a, const uint32_t certainty) {
 	return 1;
 }
 
-int bnu_gen_prime(BIGNUM* r, const int bitlen) {
+int bnu_gen_prime(BIGNUM *r, const int bitlen) {
 	return bnu_trim(r);
 }
 

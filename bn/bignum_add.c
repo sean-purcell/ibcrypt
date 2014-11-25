@@ -7,7 +7,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 /* returns 1 if there was a carry, 0 if not */
-int add_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const uint32_t blen) {
+int add_words(uint64_t *r, uint64_t *a, const uint32_t alen, uint64_t *b, const uint32_t blen) {
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
@@ -37,7 +37,7 @@ int add_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 }
 
 /* returns 1 if there was a carry, 0 if not */
-int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const uint32_t blen) {
+int sub_words(uint64_t *r, uint64_t *a, const uint32_t alen, uint64_t *b, const uint32_t blen) {
 	uint64_t t0, t1;
 	uint32_t i;
 	int carry = 0;
@@ -60,7 +60,7 @@ int sub_words(uint64_t* r, uint64_t* a, const uint32_t alen, uint64_t* b, const 
 	return carry;
 }
 
-int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
+int bno_add(BIGNUM *r, const BIGNUM *a, const BIGNUM *b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -76,7 +76,7 @@ int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
 	return bnu_trim(r);
 }
 
-int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
+int bno_add_mod(BIGNUM *r, const BIGNUM *a, const BIGNUM *b, const BIGNUM *n) {
 	if(bno_add(r, a, b) != 0) {
 		return 1;
 	}
@@ -84,7 +84,7 @@ int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n) {
 	return bno_rmod(r, r, n);
 }
 
-int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b) {
+int bno_sub(BIGNUM *r, const BIGNUM *a, const BIGNUM *b) {
 	if(r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}

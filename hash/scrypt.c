@@ -16,9 +16,9 @@
 #define MAP_ANONYMOUS MAP_ANON
 #endif
 
-static uint64_t integerify(uint32_t* B, uint32_t r) {
+static uint64_t integerify(uint32_t *B, uint32_t r) {
 	uint64_t val = 0;
-	uint32_t* x = B + (2 * r - 1) * 16;
+	uint32_t *x = B + (2 * r - 1) * 16;
 	val |= (uint64_t)(x[0]) <<  0;
 	val |= (uint64_t)(x[1]) << 32;
 	return val;
@@ -59,11 +59,11 @@ static void salsa20_8(uint32_t B[16]) {
 	}
 }
 
-static void blockmix(uint32_t* B, uint32_t r, uint32_t* Bout) {
+static void blockmix(uint32_t *B, uint32_t r, uint32_t *Bout) {
 	uint64_t i = 0;
 	
-	uint32_t* X;
-	uint32_t* Y;
+	uint32_t *X;
+	uint32_t *Y;
 	
 	/* 1: X <- B_{2r-1} */
 	X = B + (2 * r-1) * 16;
@@ -87,7 +87,7 @@ static void blockmix(uint32_t* B, uint32_t r, uint32_t* Bout) {
 }
 	
 /* smix = ROMix_BlockMix_salsa20/8, r(B, N) */
-static void smix(uint8_t* B, uint64_t N, uint32_t r, uint32_t* V, uint32_t* X, uint32_t* Y) {
+static void smix(uint8_t *B, uint64_t N, uint32_t r, uint32_t *V, uint32_t *X, uint32_t *Y) {
 	uint64_t i, j;
 	
 	/* 1: X <- B */
@@ -144,14 +144,14 @@ static void smix(uint8_t* B, uint64_t N, uint32_t r, uint32_t* V, uint32_t* X, u
 	}
 }
 
-int scrypt(void* _pass, uint32_t plen, uint8_t* salt, uint32_t slen,
-	uint64_t N, uint32_t r, uint32_t p, size_t dkLen, uint8_t* out) {
+int scrypt(void *_pass, uint32_t plen, uint8_t *salt, uint32_t slen,
+	uint64_t N, uint32_t r, uint32_t p, size_t dkLen, uint8_t *out) {
 	
-	uint8_t* pass = _pass;
-	uint8_t* B;
-	uint32_t* V;
-	uint32_t* X;
-	uint32_t* Y;
+	uint8_t *pass = _pass;
+	uint8_t *B;
+	uint32_t *V;
+	uint32_t *X;
+	uint32_t *Y;
 	
 	const size_t pMFlen = 128 * p * r;
 	

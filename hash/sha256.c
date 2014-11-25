@@ -37,7 +37,7 @@ static const uint32_t K[64] = {
 /**
  *  Schedule needs to be a buffer of size at least sizeof(uint32_t) * 64
  */
-static void create_message_schedule_sha256(const uint32_t* const message, uint32_t* const schedule) {
+static void create_message_schedule_sha256(const uint32_t *const message, uint32_t *const schedule) {
 	for(int j = 0; j < 64; j++) {
 		if(j < 16) {
 			schedule[j] = message[j];
@@ -47,7 +47,7 @@ static void create_message_schedule_sha256(const uint32_t* const message, uint32
 	}
 }
 
-static void process_block_sha256(SHA256_CTX* ctx) {
+static void process_block_sha256(SHA256_CTX *ctx) {
 	/* copy the message into the block */
 	uint32_t block[16];
 	memset(block, 0, 16 * sizeof(uint32_t));
@@ -107,13 +107,13 @@ static const uint32_t H0[8] = {
 	0x5be0cd19
 };
 
-void sha256_init(SHA256_CTX* ctx) {
+void sha256_init(SHA256_CTX *ctx) {
 	/* initialize sha256 state */
 	memcpy(&(ctx->state), H0, sizeof(uint32_t) * 8);
 	ctx->count = 0;
 }
 
-void sha256_update(SHA256_CTX* ctx, const uint8_t* message, size_t msize) {
+void sha256_update(SHA256_CTX *ctx, const uint8_t *message, size_t msize) {
 	while(msize > 0) {
 		const int bufoff = ctx->count % 64;
 		if(bufoff + msize <= 64) {
@@ -140,7 +140,7 @@ void sha256_update(SHA256_CTX* ctx, const uint8_t* message, size_t msize) {
 	}
 }
 
-void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
+void sha256_final(SHA256_CTX *ctx, uint8_t sum[32]) {
 	int bufoff = ctx->count % 64;
 	ctx->buf[bufoff] = 0x80;
 	if(bufoff >= 56) { /* not enough space to write pad and length */
@@ -174,7 +174,7 @@ void sha256_final(SHA256_CTX* ctx, uint8_t sum[32]) {
 	memset(ctx, 0, sizeof(SHA256_CTX));
 }
 
-void sha256(const uint8_t* message, size_t osize, uint8_t* out) {
+void sha256(const uint8_t *message, size_t osize, uint8_t *out) {
 	SHA256_CTX ctx;
 	sha256_init(&ctx);
 	sha256_update(&ctx, message, osize);
@@ -183,8 +183,8 @@ void sha256(const uint8_t* message, size_t osize, uint8_t* out) {
 	/* no need to zero ctx as final does it */
 }
 
-void hmac_sha256_init(HMAC_SHA256_CTX* ctx, const uint8_t* _key, size_t keylen) {
-	const uint8_t* key = _key;
+void hmac_sha256_init(HMAC_SHA256_CTX *ctx, const uint8_t *_key, size_t keylen) {
+	const uint8_t *key = _key;
 	uint8_t khash[32];
 	uint8_t pad[64];
 	
@@ -214,12 +214,12 @@ void hmac_sha256_init(HMAC_SHA256_CTX* ctx, const uint8_t* _key, size_t keylen) 
 	memset(pad, 0, 64);
 }
 
-void hmac_sha256_update(HMAC_SHA256_CTX* ctx, uint8_t* message, size_t mlen) {
+void hmac_sha256_update(HMAC_SHA256_CTX *ctx, uint8_t *message, size_t mlen) {
 	/* feed the data into the inner context */
 	sha256_update(&(ctx->ictx), message, mlen);
 }
 
-void hmac_sha256_final(HMAC_SHA256_CTX* ctx, uint8_t mac[32]) {
+void hmac_sha256_final(HMAC_SHA256_CTX *ctx, uint8_t mac[32]) {
 	/* compute the inner hash */
 	uint8_t ihash[32];
 	sha256_final(&(ctx->ictx), ihash);
@@ -233,7 +233,7 @@ void hmac_sha256_final(HMAC_SHA256_CTX* ctx, uint8_t mac[32]) {
 	/* clean context unecessary as final was called on ictx and octx */
 }
 
-void hmac_sha256(uint8_t* key, size_t keylen, uint8_t* message, size_t len, uint8_t* out) {
+void hmac_sha256(uint8_t *key, size_t keylen, uint8_t *message, size_t len, uint8_t *out) {
 	HMAC_SHA256_CTX ctx;
 	hmac_sha256_init(&ctx, key, keylen);
 	hmac_sha256_update(&ctx, message, len);
@@ -243,7 +243,7 @@ void hmac_sha256(uint8_t* key, size_t keylen, uint8_t* message, size_t len, uint
 // PBKDF2_HMAC_SHA256
 
 // dkLen and hlen are in bytes
-void pbkdf2_hmac_sha256(uint8_t* pass, size_t plen, uint8_t* salt, size_t saltLen, uint32_t c, size_t dkLen, uint8_t* out) {
+void pbkdf2_hmac_sha256(uint8_t *pass, size_t plen, uint8_t *salt, size_t saltLen, uint32_t c, size_t dkLen, uint8_t *out) {
 	/* in case dkLen is not a multiple of 32 */
 	const uint32_t sections = (dkLen + 31)/32;
 	/* 32 bit buffer to store integer counter */

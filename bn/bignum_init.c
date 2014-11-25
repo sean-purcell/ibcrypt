@@ -10,7 +10,7 @@
 BIGNUM BN_ZERO = {0, 0};
 
 /* create an empty bignum */
-int bni_zero(BIGNUM* a) {
+int bni_zero(BIGNUM *a) {
 	if(a == NULL) {
 		return -1;
 	}
@@ -21,7 +21,7 @@ int bni_zero(BIGNUM* a) {
 }
 
 /* create a bignum from the given source */
-int bni_int(BIGNUM* a, uint64_t source) {
+int bni_int(BIGNUM *a, uint64_t source) {
 	if(bni_zero(a) != 0) {
 		return -1;
 	}
@@ -43,7 +43,7 @@ static inline uint8_t fhex(const char c) {
 }
 
 /* currently only works with radix 16 */
-int bni_fstr(BIGNUM* a, const char* source) {
+int bni_fstr(BIGNUM *a, const char *source) {
 	if(source == 0) {
 		return -1;
 	}
@@ -67,14 +67,14 @@ int bni_fstr(BIGNUM* a, const char* source) {
 	/* TODO: technically defined but I should rework to not use integer under/overflow later */
 	for(i = size-1; (i + 16) >= 16; i -= 16) {
 		for(int j = 0; j < 16 && j <= i; j++) {
-			a->d[(size-1-i)/16] |= ((uint64_t) fhex(source[i - j])) << (j * 4);
+			a->d[(size-1-i)/16] |= ((uint64_t) fhex(source[i - j])) << (j  *4);
 		}
 	}
 
 	return 0;
 }
 
-int bni_cpy(BIGNUM* r, const BIGNUM* a) {
+int bni_cpy(BIGNUM *r, const BIGNUM *a) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}
@@ -87,13 +87,13 @@ int bni_cpy(BIGNUM* r, const BIGNUM* a) {
 		return 1;
 	}
 
-	memcpy(r->d, a->d, sizeof(uint64_t) * r->size);
+	memcpy(r->d, a->d, sizeof(uint64_t)  *r->size);
 
 	return 0;
 }
 
 /* get 2 to the power of k */
-int bni_2power(BIGNUM* _r, const uint64_t k) {
+int bni_2power(BIGNUM *_r, const uint64_t k) {
 	if(_r == NULL) {
 		return -1;
 	}

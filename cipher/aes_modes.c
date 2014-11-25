@@ -5,7 +5,7 @@
 
 #include <aes.h>
 
-int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
+int encrypt_cbc_AES(const uint8_t *const message, const uint32_t length, const uint8_t *const iv, const AES_KEY *const key, uint8_t *const out) {
 	if(length % 16 != 0) {
 		return -1; // must be of proper size
 	}
@@ -16,14 +16,14 @@ int encrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const u
 	uint8_t encbuf[16];
 	
 	for(uint32_t i = 0; i < length / 16; i++) {
-		xor_bytes(message + i * 16, prev, 16, encbuf); // xor in iv
+		xor_bytes(message + i  *16, prev, 16, encbuf); // xor in iv
 		encrypt_block_AES(encbuf, prev, key); // encrypt block
-		memcpy(out + i * 16, prev, 16); // copy to output
+		memcpy(out + i  *16, prev, 16); // copy to output
 	}
 	return 0;
 }
 
-int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const uint8_t* const iv, const AES_KEY* const key, uint8_t* const out) {
+int decrypt_cbc_AES(const uint8_t *const message, const uint32_t length, const uint8_t *const iv, const AES_KEY *const key, uint8_t *const out) {
 	if(length % 16 != 0) {
 		return -1; // must be of proper size
 	}
@@ -34,16 +34,16 @@ int decrypt_cbc_AES(const uint8_t* const message, const uint32_t length, const u
 	uint8_t decbuf[16];
 	
 	for(uint32_t i = 0; i < length / 16; i++) {
-		decrypt_block_AES(message + i * 16, decbuf, key); // decrypt block
-		xor_bytes(decbuf, prev, 16, out + i * 16); // write to output
-		memcpy(prev, message + i * 16, 16); // copy ciphertext for next prev
+		decrypt_block_AES(message + i  *16, decbuf, key); // decrypt block
+		xor_bytes(decbuf, prev, 16, out + i  *16); // write to output
+		memcpy(prev, message + i  *16, 16); // copy ciphertext for next prev
 	}
 	
 	return 0;
 }
 
 // adds 1, iterating through to carry if necessary
-static void add_one(uint8_t* const nonce) {
+static void add_one(uint8_t *const nonce) {
 	for(int i = 15; i >= 0; i--) {
 		nonce[i]++;
 		if(nonce[i] != 0) {
@@ -53,13 +53,13 @@ static void add_one(uint8_t* const nonce) {
 }
 
 /* initialize an aes ctr context.  recommended for large messages instead of putting it all in one buffer */
-AES_CTR_CTX* init_ctr_AES(const AES_KEY* const key, const uint8_t* const nonce, const uint32_t noncelen) {
+AES_CTR_CTX *init_ctr_AES(const AES_KEY *const key, const uint8_t *const nonce, const uint32_t noncelen) {
 	if(noncelen == 0 || noncelen > 16) {
 		/* not ok */
 		goto err0;
 	}
 	
-	AES_CTR_CTX* ctx;
+	AES_CTR_CTX *ctx;
 	
 	if((ctx = malloc(sizeof(AES_CTR_CTX))) == NULL) {
 		errno = ENOMEM;
@@ -81,7 +81,7 @@ err0:
 }
 
 /* encrypt/decrypt a block of ctr */
-void stream_ctr_AES(AES_CTR_CTX* const ctx, const uint8_t* const in, const size_t len, uint8_t* const out) {
+void stream_ctr_AES(AES_CTR_CTX *const ctx, const uint8_t *const in, const size_t len, uint8_t *const out) {
 	size_t i;
 	
 	for(i = 0; i < len; i++) {
@@ -95,13 +95,13 @@ void stream_ctr_AES(AES_CTR_CTX* const ctx, const uint8_t* const in, const size_
 }
 
 /* free the context and zero the memory */
-void free_ctr_AES(AES_CTR_CTX* ctx) {
+void free_ctr_AES(AES_CTR_CTX *ctx) {
 	memset(ctx, 0, sizeof(AES_CTR_CTX));
 	free(ctx);
 }
 
-int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {
-	AES_CTR_CTX* ctx = init_ctr_AES(key, nonce, 16);
+int encrypt_ctr_AES(const uint8_t *const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY *const key, uint8_t *const out) {
+	AES_CTR_CTX *ctx = init_ctr_AES(key, nonce, 16);
 	if(ctx == NULL) {
 		/* failure */
 		return -1;
@@ -112,6 +112,6 @@ int encrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const u
 	return 0;
 }
 
-int decrypt_ctr_AES(const uint8_t* const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY* const key, uint8_t* const out) {
+int decrypt_ctr_AES(const uint8_t *const message, const uint32_t length, const uint8_t nonce[16], const AES_KEY *const key, uint8_t *const out) {
 	return encrypt_ctr_AES(message, length, nonce, key, out);
 }

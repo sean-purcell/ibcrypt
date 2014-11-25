@@ -7,7 +7,7 @@
 #include "bignum_util.h"
 
 /* assumes that n is "trimmed" */
-int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
+int bnu_barrett_mfactor(BIGNUM *r, const BIGNUM *n) {
 	if(r == NULL || n == NULL) {
 		return -1;
 	}
@@ -27,7 +27,7 @@ int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n) {
 }
 
 /* use the m factor to effect a modular reduction */
-int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNUM* n) {
+int bno_barrett_reduce(BIGNUM *_r, const BIGNUM *a, const BIGNUM *m, const BIGNUM *n) {
 	if(_r == NULL || a == NULL || m == NULL || n == NULL) {
 		return -1;
 	}
@@ -55,7 +55,7 @@ int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNU
 	return bnu_free(&q) || bnu_free(&qn);
 }
 
-int bno_barrett_rmod(BIGNUM* _r, const BIGNUM* a, const BIGNUM* n) {
+int bno_barrett_rmod(BIGNUM *_r, const BIGNUM *a, const BIGNUM *n) {
 	if(_r == NULL || a == NULL || n == NULL) {
 		return -1;
 	}

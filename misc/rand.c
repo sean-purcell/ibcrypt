@@ -58,12 +58,12 @@ err0: /* error occurred while closing/opening fd */
 }
 
 /* returns RANDOM_FAIL if unsuccessful, 0 if successful */
-int cs_rand(void* _buf, size_t buflen) {
+int cs_rand(void *_buf, size_t buflen) {
 	if(random_init) {
 		reset_buf();
 		random_init = 0;
 	}
-	uint8_t* buf = (uint8_t*) _buf;
+	uint8_t *buf = (uint8_t*) _buf;
 	size_t space = RANDOM_BUFLEN - buf_index;
 	while(buflen >= space) {
 		memcpy(buf, &random_buf[buf_index], space * sizeof(uint8_t));
@@ -82,11 +82,11 @@ int cs_rand(void* _buf, size_t buflen) {
 	return 0;
 }
 
-int cs_rand_uint64(uint64_t* r) {
+int cs_rand_uint64(uint64_t *r) {
 	return cs_rand(r, sizeof(uint64_t));
 }
 
-int cs_rand_uint64_range(uint64_t* r, uint64_t top) {
+int cs_rand_uint64_range(uint64_t *r, uint64_t top) {
 	if(top == 0) {
 		*r = 0;
 		return 0;
@@ -113,11 +113,11 @@ int cs_rand_uint64_range(uint64_t* r, uint64_t top) {
 	}
 }
 
-int cs_rand_uint32(uint32_t* r) {
+int cs_rand_uint32(uint32_t *r) {
 	return cs_rand(r, sizeof(uint32_t));
 }
 
-int cs_rand_uint32_range(uint32_t* r, uint32_t top) {
+int cs_rand_uint32_range(uint32_t *r, uint32_t top) {
 	uint64_t res;
 	if(cs_rand_uint64_range(&res, (uint64_t) top) != 0) {
 		return RANDOM_FAIL;

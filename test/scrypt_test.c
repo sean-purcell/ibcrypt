@@ -5,7 +5,7 @@
 
 #include <scrypt.h>
 
-const static char* pass[] = {
+const static char *pass[] = {
 	"",
 	"password",
 	"pleaseletmein",
@@ -19,7 +19,7 @@ const static size_t plen[] = {
 	13
 };
 
-const static char* salt[] = {
+const static char *salt[] = {
 	"",
 	"NaCl",
 	"SodiumChloride",
@@ -54,7 +54,7 @@ const static uint32_t p[] = {
 	1
 };
 
-const static char* out[] = {
+const static char *out[] = {
 	"77 d6 57 62 38 65 7b 20 3b 19 ca 42 c1 8a 04 97\
 	 f1 6b 48 44 e3 07 4a e8 df df fa 3f ed e2 14 42\
 	 fc d0 06 9d ed 09 48 f8 32 6a 75 3a 0f c8 1f 17\
@@ -82,8 +82,8 @@ const static size_t dkLen[] = {
 
 void scrypt_tests() {
 	for(int i = 0; i < sizeof(dkLen)/sizeof(*dkLen); i++) {
-		uint8_t* eout = malloc(dkLen[i]);
-		uint8_t* aout = malloc(dkLen[i]);
+		uint8_t *eout = malloc(dkLen[i]);
+		uint8_t *aout = malloc(dkLen[i]);
 		
 		from_hex(out[i], eout);
 		

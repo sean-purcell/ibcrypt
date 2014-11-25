@@ -22,11 +22,8 @@ static void uppercase(char* str) {
 	}
 }
 
-static void bn_mul_test() {
-	const uint32_t sizes[] = {  32,  64 , 511, 256, 2048, 4096 };
-	const uint32_t tests[] = { 100, 100 ,  10,  50,   4,    2 };
-
-	/* create bc process to check our answers */
+/* initialize a bc subprocess for calculation */
+static void init_bc(pid_t* pid, FILE** bcin, FILE** bcout) {
 	int w_pipe[2];
 	int r_pipe[2];
 
@@ -54,10 +51,21 @@ static void bn_mul_test() {
 	close(w_pipe[0]);
 	close(r_pipe[1]);
 
-	FILE* bcin = fdopen(w_pipe[1], "w");
-	FILE* bcout = fdopen(r_pipe[0], "r");
+	*bcin = fdopen(w_pipe[1], "w");
+	*bcout = fdopen(r_pipe[0], "r");
 
-	fprintf(bcin, "ibase=16;obase=10;\n");
+	fprintf(*bcin, "ibase=16;obase=10;\n");
+}
+
+static void bn_mul_test() {
+	const uint32_t sizes[] = {  32,  64 , 511, 256, 2048, 4096 };
+	const uint32_t tests[] = { 100, 100 ,  10,  50,   4,    2 };
+
+	/* create bc process to check our answers */
+	pid_t bc;
+	FILE* bcin;
+	FILE* bcout;
+	init_bc(&bc, &bcin, &bcout);
 
 	/* run tests */
 
@@ -115,11 +123,13 @@ static void bn_mul_test() {
 
 	fclose(bcin);
 	fclose(bcout);
-	close(w_pipe[1]);
-	close(r_pipe[0]);
 
 	int status;
 	waitpid(bc, &status, 0);
+}
+
+static void bn_div_test() {
+	
 }
 
 void bignum_tests() {

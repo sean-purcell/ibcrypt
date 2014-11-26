@@ -58,8 +58,8 @@ static void init_bc(pid_t *pid, FILE **bcin, FILE **bcout) {
 }
 
 static void bn_mul_test() {
-	const uint32_t sizes[] = {  32,  64 , 511, 256, 2048, 4096 };
-	const uint32_t tests[] = { 100, 100 ,  10,  50,   4,    2 };
+	const uint64_t sizes[] = {  32,  64 , 511, 256, 2048, 4096 };
+	const uint64_t tests[] = { 100, 100 ,  10,  50,   4,    2 };
 
 	/* create bc process to check our answers */
 	pid_t bc;
@@ -115,6 +115,7 @@ static void bn_mul_test() {
 		free(astr);
 		free(bstr);
 		free(res);
+		free(bcres);
 	}
 
 	bnu_free(&a);
@@ -128,11 +129,95 @@ static void bn_mul_test() {
 	waitpid(bc, &status, 0);
 }
 
-static void bn_div_test() {
-	
+static void bn_div_mod_test() {
+	const uint64_t sizea[] = {  64, 256, 512, 2048, 2048, 4096 };
+	const uint64_t sizeb[] = {  32, 128, 128, 1024, 1536, 2048 };
+	const uint64_t tests[] = { 100, 100,  50,   10,   10,   10 };
+
+	pid_t bc;
+	FILE *bcin;
+	FILE *bcout;
+	init_bc(&bc, &bcin, &bcout);
+
+	BIGNUM a = BN_ZERO;
+	BIGNUM b = BN_ZERO;
+	BIGNUM q = BN_ZERO;
+	BIGNUM r = BN_ZERO;
+	int i;
+	for(i = 0; i < sizeof(sizea)/sizeof(sizea[0]); i++) {
+		int j;
+		const size_t asize = (sizea[i] + 63) / 64 * 16;
+		const size_t bsize = (sizeb[i] + 63) / 64 * 16;
+		char *astr = malloc(asize + 1);
+		char *bstr = malloc(bsize + 1);
+		char *qstr = malloc(asize + 1);
+		char *rstr = malloc(bsize + 1);
+		char *bcq = malloc(asize + 1);
+		char *bcr = malloc(bsize + 1);
+
+		for(j = 0; j < tests[i]; j++) {
+			if(bni_rand_bits(&a, sizea[i]) != 0 ||
+			   bni_rand_bits(&b, sizeb[i]) != 0) {
+				bn_err("rand");
+			}
+
+			if(bno_div_mod(&q, &r, &a, &b) != 0) {
+				bn_err("div");
+			}
+
+			bnu_tstr(astr, &a);
+			bnu_tstr(bstr, &b);
+			bnu_tstr(qstr, &q);
+			bnu_tstr(rstr, &r);
+
+			/* compare answers with bc */
+			uppercase(astr);
+			uppercase(bstr);
+			uppercase(qstr);
+			uppercase(rstr);
+
+			fprintf(bcin, "%s/%s\n%s%%%s\n", astr, bstr, astr, bstr);
+			fflush(bcin);
+			fgets(bcq, 1000000, bcout);
+			fgets(bcr, 1000000, bcout);
+
+			bcq[strlen(bcq)-1] = '\0';
+			bcr[strlen(bcr)-1] = '\0';
+
+			if(qstr[0] == '\0' ? !(bcq[0] == '0' && bcq[1] == '\0') /* result was 0 */
+				: strcmp(&qstr[strlen(qstr)-strlen(bcq)], bcq) != 0) {
+				printf("DIV FAILED:\n%s/%s=\n%s\n%s\n\n",
+					astr, bstr, qstr, bcq);
+			}
+			if(rstr[0] == '\0' ? !(bcr[0] == '0' && bcr[1] == '\0') /* result was 0 */
+				: strcmp(&rstr[strlen(rstr)-strlen(bcr)], bcr) != 0) {
+				printf("DIV FAILED:\n%s/%s=\n%s\n%s\n\n",
+					astr, bstr, rstr, bcr);
+			}
+		}
+
+		free(astr);
+		free(bstr);
+		free(qstr);
+		free(rstr);
+		free(bcq);
+		free(bcr);
+	}
+
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&q);
+	bnu_free(&r);
+
+	fclose(bcin);
+	fclose(bcout);
+
+	int status;
+	waitpid(bc, &status, 0);
 }
 
 void bignum_tests() {
 	bn_mul_test();
+	bn_div_mod_test();
 }
 

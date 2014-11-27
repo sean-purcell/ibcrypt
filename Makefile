@@ -1,7 +1,11 @@
 CC=gcc
 BUILDDIR=bin
 OBJECTDIR=objects
-CFLAGS=-Wall -std=gnu99 -O3 -g
+CFLAGS=-Wall -std=gnu99 -g
+ifeq ($(NO-OPTIMIZE),1)
+else
+	CFLAGS+=-O3
+endif
 LINKFLAGS=-flto
 
 LIBINC=-I/usr/local/include

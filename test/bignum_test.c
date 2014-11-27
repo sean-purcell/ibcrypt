@@ -63,8 +63,7 @@ static void bn_mul_test() {
 
 	/* create bc process to check our answers */
 	pid_t bc;
-	FILE *bcin;
-	FILE *bcout;
+	FILE *bcin, *bcout;
 	init_bc(&bc, &bcin, &bcout);
 
 	/* run tests */
@@ -135,8 +134,7 @@ static void bn_div_mod_test() {
 	const uint64_t tests[] = { 100, 100,  50,   10,   10,   10 };
 
 	pid_t bc;
-	FILE *bcin;
-	FILE *bcout;
+	FILE *bcin, *bcout;
 	init_bc(&bc, &bcin, &bcout);
 
 	BIGNUM a = BN_ZERO;
@@ -191,7 +189,7 @@ static void bn_div_mod_test() {
 			}
 			if(rstr[0] == '\0' ? !(bcr[0] == '0' && bcr[1] == '\0') /* result was 0 */
 				: strcmp(&rstr[strlen(rstr)-strlen(bcr)], bcr) != 0) {
-				printf("DIV FAILED:\n%s/%s=\n%s\n%s\n\n",
+				printf("MOD FAILED:\n%s/%s=\n%s\n%s\n\n",
 					astr, bstr, rstr, bcr);
 			}
 		}
@@ -216,8 +214,83 @@ static void bn_div_mod_test() {
 	waitpid(bc, &status, 0);
 }
 
+int bno_barrett_rmod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n);
+
+static void bn_barrett_mod_test() {
+	const uint64_t sizea[] = {  64, 256, 512, 2048, 2048, 4096 };
+	const uint64_t sizeb[] = {  32, 192, 257, 1025, 1536, 3072 };
+	const uint64_t tests[] = { 100, 100,  50,   10,   10,   10 };
+
+	pid_t bc;
+	FILE *bcin, *bcout;
+	init_bc(&bc, &bcin, &bcout);
+
+	/* run tests */
+
+	BIGNUM a = BN_ZERO;
+	BIGNUM b = BN_ZERO;
+	BIGNUM r = BN_ZERO;
+	int i, j;
+	for(i = 0; i < sizeof(sizea)/sizeof(sizea[0]); i++) {
+		const size_t asize = (sizea[i] + 63) / 64 * 16;
+		const size_t bsize = (sizeb[i] + 63) / 64 * 16;
+		char *astr = malloc(asize + 1);
+		char *bstr = malloc(bsize + 1);
+		char *rstr = malloc(bsize + 1);
+		char *bcr = malloc(bsize + 1);
+
+		for(j = 0; j < tests[i]; j++) {
+			if(bni_rand_bits(&a, sizea[i]) != 0 ||
+			   bni_rand_bits(&b, sizeb[i]) != 0) {
+				bn_err("rand");
+			}
+
+			if(bno_barrett_rmod(&r, &a, &b) != 0) {
+				bn_err("barrett rmod");
+			}
+
+			bnu_tstr(astr, &a);
+			bnu_tstr(bstr, &b);
+			bnu_tstr(rstr, &r);
+
+			/* check answer against bc */
+			uppercase(astr);
+			uppercase(bstr);
+			uppercase(rstr);
+
+			fprintf(bcin, "%s%%%s\n", astr, bstr);
+			fflush(bcin);
+			fgets(bcr, 1000000, bcout);
+
+			bcr[strlen(bcr)-1] = '\0';
+
+			if(rstr[0] == '\0' ? !(bcr[0] == '0' && bcr[1] == '\0') /* result was 0 */
+				: strcmp(&rstr[strlen(rstr)-strlen(bcr)], bcr) != 0) {
+				printf("BARRETT RMOD FAILED:\n%s%%\n%s=\n%s\n%s\n\n",
+					astr, bstr, rstr, bcr);
+			}
+		}
+
+		free(astr);
+		free(bstr);
+		free(rstr);
+		free(bcr);
+	}
+
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&r);
+
+	fclose(bcin);
+	fclose(bcout);
+
+	int status;
+	waitpid(bc, &status, 0);
+}
+
 void bignum_tests() {
 	bn_mul_test();
 	bn_div_mod_test();
+	bn_barrett_mod_test();
 }
 

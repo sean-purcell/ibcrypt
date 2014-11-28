@@ -52,6 +52,12 @@ int bno_barrett_reduce(BIGNUM *_r, const BIGNUM *a, const BIGNUM *m, const BIGNU
 		return 1;
 	}
 
+	if(bno_cmp(_r, n) >= 0) {
+		if(bno_sub(_r, _r, n) != 0) {
+			return 1;
+		}
+	}
+
 	return bnu_free(&q) || bnu_free(&qn);
 }
 

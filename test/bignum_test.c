@@ -57,6 +57,39 @@ static void init_bc(pid_t *pid, FILE **bcin, FILE **bcout) {
 	fprintf(*bcin, "ibase=16;obase=10;\n");
 }
 
+/* initialize a py subprocess for calculation */
+static void init_py(pid_t *pid, FILE **bcin, FILE **bcout) {
+	int w_pipe[2];
+	int r_pipe[2];
+
+	if(pipe(w_pipe) != 0 || pipe(r_pipe) != 0) {
+		fprintf(stderr, "pipe failed to happen");
+		exit(1);
+	}
+
+	pid_t bc = fork();
+	if(bc == 0) { /* we are the child */
+		/* set up the pipes */
+		dup2(w_pipe[0], STDIN_FILENO);
+		dup2(r_pipe[1], STDOUT_FILENO);
+		/* close unneeded pipe ends */
+		close(w_pipe[1]);
+		close(r_pipe[0]);
+		close(STDERR_FILENO);
+		/* become bc */
+		execlp("python", "python", "-i", NULL);
+		/* if we get here, we failed */
+		_exit(1);
+	}
+
+	/* we're the parent, close unneeded pipe ends and setup bc for base 16 */
+	close(w_pipe[0]);
+	close(r_pipe[1]);
+
+	*bcin = fdopen(w_pipe[1], "w");
+	*bcout = fdopen(r_pipe[0], "r");
+}
+
 static void bn_mul_test() {
 	const uint64_t sizes[] = {  32,  64 , 511, 256, 2048, 4096 };
 	const uint64_t tests[] = { 100, 100 ,  10,  50,   4,    2 };
@@ -150,8 +183,8 @@ static void bn_div_mod_test() {
 		char *bstr = malloc(bsize + 1);
 		char *qstr = malloc(asize + 1);
 		char *rstr = malloc(bsize + 1);
-		char *bcq = malloc(asize + 1);
-		char *bcr = malloc(bsize + 1);
+		char *bcq = malloc(asize + 2);
+		char *bcr = malloc(bsize + 2);
 
 		for(j = 0; j < tests[i]; j++) {
 			if(bni_rand_bits(&a, sizea[i]) != 0 ||
@@ -288,9 +321,87 @@ static void bn_barrett_mod_test() {
 	waitpid(bc, &status, 0);
 }
 
+void bn_exp_test() {
+	const uint64_t sizes[] = {  32,  64 , 256, 2048, 4096 };
+	const uint64_t tests[] = { 100, 100 ,  10,    2,    1 };
+
+	/* create bc process to check our answers */
+	pid_t py;
+	FILE *pyin, *pyout;
+	init_py(&py, &pyin, &pyout);
+
+	/* run tests */
+
+	BIGNUM a = BN_ZERO;
+	BIGNUM b = BN_ZERO;
+	BIGNUM c = BN_ZERO;
+	BIGNUM r = BN_ZERO;
+	int i;
+	for(i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
+		int j;
+		const size_t numsize = (sizes[i] + 63) / 64 * 16;
+		char *astr = malloc(numsize + 1);
+		char *bstr = malloc(numsize + 1);
+		char *cstr = malloc(numsize + 1);
+		char *rstr = malloc(numsize + 1);
+		char *pyr = malloc(numsize + 4);
+		for(j = 0; j < tests[i]; j++) {
+			if(bni_rand_bits(&a, sizes[i]) != 0 ||
+			   bni_rand_bits(&b, sizes[i]) != 0 ||
+			   bni_rand_bits(&c, sizes[i]) != 0) {
+				bn_err("rand");
+			}
+
+			if(bno_exp_mod(&r, &a, &b, &c) != 0) {
+				bn_err("exp");
+			}
+
+			bnu_tstr(astr, &a);
+			bnu_tstr(bstr, &b);
+			bnu_tstr(cstr, &c);
+			bnu_tstr(rstr, &r);
+
+			/* get bc to calculate the answer */
+			fprintf(pyin, "print(hex(pow(0x%s,0x%s,0x%s)))\n", astr, bstr, cstr);
+			fflush(pyin);
+			fgets(pyr, 1000000, pyout);
+			size_t len = strlen(pyr);
+			pyr[len-1] = '\0';
+			if(pyr[len-2] == 'L') {
+				pyr[len-2] = '\0';
+			}
+
+			/* compare */
+			if(rstr[0] == '\0' ? !(pyr[2] == '0' && pyr[3] == '\0') /* result was 0 */
+				: strcmp(&rstr[strlen(rstr)-strlen(&pyr[2])], &pyr[2]) != 0) {
+				printf("EXP FAILED:\n%s^%s%%\n%s=\n%s\n%s\n\n",
+					astr, bstr, cstr, rstr, pyr);
+			}
+		}
+
+		free(astr);
+		free(bstr);
+		free(cstr);
+		free(rstr);
+		free(pyr);
+	}
+
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&c);
+	bnu_free(&r);
+
+	fclose(pyin);
+	fclose(pyout);
+
+	int status;
+	waitpid(py, &status, 0);
+}
+
 void bignum_tests() {
 	bn_mul_test();
 	bn_div_mod_test();
 	bn_barrett_mod_test();
+	bn_exp_test();
 }
 

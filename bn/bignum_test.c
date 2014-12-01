@@ -45,6 +45,10 @@ void speed_test() {
 	bnu_tstr(out, &r);
 	printf("e^n%%m:%s\n", out);
 
+	exp_mod_odd(&r, &e, &n, &m);
+	bnu_tstr(out, &r);
+	printf("e^n%%m:%s\n", out);
+
 	int prime = 5;
 	printf("%d\n", rabin_miller(&prime, &m, 128));
 	printf("mprime:%d\n", prime);
@@ -260,6 +264,14 @@ int main() {
 	bnu_tstr(out, &r);
 	printf("xiv%%n:%s\n", out);
 
+	bno_inv_mod(&r, &five, &x);
+	bnu_tstr(out, &r);
+	printf("5iv%%x:%s\n", out);
+
+	exp_mod_odd(&r, &five, &y, &x);
+	bnu_tstr(out, &r);
+	printf("5^y%%x:%s\n", out);
+
 	bni_rand_range(&r, &x, &y);
 	bnu_tstr(out, &r);
 	printf("randxy:%s\n", out);
@@ -274,6 +286,6 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	//speed_test();
-	rand_exp_test();
+	speed_test();
+	//rand_exp_test();
 }

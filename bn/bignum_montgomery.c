@@ -30,10 +30,6 @@ int montgomery_mul(BIGNUM *res, const BIGNUM *a, const BIGNUM *b, const BIGNUM *
 	return bno_mul(res, a, b) != 0 || montgomery_reduce(res, N, Nres, R_size) != 0;
 }
 
-int montgomery_step(BIGNUM *res, const BIGNUM *a, const BIGNUM *b, const uint64_t R_bits) {
-	return bno_mul(res, a, b) != 0 || bno_rshift(res, res, R_bits) != 0;
-}
-
 // montgomery multiplication, uses next largest power of 2 as R, therefore only works with odd numbers
 
 int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *n) {
@@ -47,10 +43,9 @@ int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 	BIGNUM R = BN_ZERO, Nres = BN_ZERO;
 
 	/* create R */
-	if(bnu_resize(&R, R_exp_words+1) != 0) {
+	if(bni_2power(&R, R_bits) != 0) {
 		return 1;
 	}
-	R.d[R_exp_words] = 1;
 
 	/* pre calculate -N^-1 mod R */
 	if(bno_inv_mod(&Nres, n, &R) != 0 || bno_neg_mod(&Nres, &Nres, &R)) {
@@ -59,7 +54,7 @@ int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 
 	BIGNUM A[2] = { BN_ZERO, BN_ZERO };
 
-	if(bni_fstr(&A[0], "1") != 0) {
+	if(bno_rmod(&A[0], &R, n) != 0) {
 		return 1;
 	}
 
@@ -76,10 +71,10 @@ int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 		int j;
 		for(j = 63; j >= 0; j--) {
 			uint8_t bit = ((exp->d[i] & ((uint64_t)1 << j)) >> j);
-			if(montgomery_step(&A[!bit], &A[0], &A[1], R_bits) != 0) {
+			if(montgomery_mul(&A[!bit], &A[0], &A[1], n, &Nres, R_exp_words) != 0) {
 				return 1;
 			}
-			if(montgomery_step(&A[bit], &A[bit], &A[bit], R_bits) != 0) {
+			if(montgomery_mul(&A[bit], &A[bit], &A[bit], n, &Nres, R_exp_words) != 0) {
 				return 1;
 			}
 		}
@@ -90,6 +85,8 @@ int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 	}
 	montgomery_reduce(r, n, &Nres, R_exp_words);
 
+	bnu_free(&R);
+	bnu_free(&Nres);
 	bnu_free(&A[0]);
 	bnu_free(&A[1]);
 

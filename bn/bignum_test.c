@@ -37,10 +37,6 @@ void speed_test() {
 	bnu_tstr(out, &r);
 	printf("m-1%%n:%s\n", out);
 
-	bno_exp_mod(&r, &m, &e, &n);
-	bnu_tstr(out, &r);
-	printf("m^e%%n:%s\n", out);
-
 	bno_exp_mod(&r, &e, &n, &m);
 	bnu_tstr(out, &r);
 	printf("e^n%%m:%s\n", out);
@@ -50,7 +46,7 @@ void speed_test() {
 	printf("e^n%%m:%s\n", out);
 
 	int prime = 5;
-	printf("%d\n", rabin_miller(&prime, &m, 128));
+	//printf("%d\n", rabin_miller(&prime, &m, 128));
 	printf("mprime:%d\n", prime);
 
 	bnu_free(&m);

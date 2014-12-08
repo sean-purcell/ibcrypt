@@ -78,7 +78,7 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 		return 0;
 
 		testloopend:;
-		printf("test %llu\n", i);
+		//printf("test %llu\n", i);
 	}
 
 	bnu_free(&one);

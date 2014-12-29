@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <bignum.h>
+#include <sha256.h> 
+
+#include <libibur/util.h>
 
 int bno_barrett_rmod(BIGNUM *_r, const BIGNUM *a, const BIGNUM *n);
 int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty);
 int karatsuba_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b);
+int cross_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b);
+int exp_mod_odd(BIGNUM *_r, const BIGNUM *m, const BIGNUM *e, const BIGNUM *n);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;
@@ -61,7 +67,7 @@ void speed_test() {
 }
 
 void karatsuba_test() {
-	char out[1025];
+	char *out = malloc(2049);
 	puts("karatsuba test");
 	BIGNUM a = BN_ZERO;
 	BIGNUM b = BN_ZERO;
@@ -72,7 +78,7 @@ void karatsuba_test() {
 	BIGNUM xr = BN_ZERO,
 	       kr = BN_ZERO;
 
-	bni_2power(&max, 512);
+	bni_2power(&max, 4096);
 	bni_int(&min, 0);
 
 	bni_rand_range(&a, &min, &max);
@@ -94,6 +100,67 @@ void karatsuba_test() {
 
 	int cmp = bno_cmp(&xr, &kr);
 	printf("cmp  :%d\n", cmp);
+
+	free(out);
+}
+
+void karatsuba_speed_test() {
+	const size_t N = 4096;
+	const uint32_t B = 2048;
+	BIGNUM a[N];
+	BIGNUM b[N];
+	BIGNUM x[N];
+	BIGNUM k[N];
+
+	BIGNUM max = BN_ZERO;
+	BIGNUM min = BN_ZERO;
+
+	clock_t start, end;
+
+	bni_2power(&max, B);
+	bni_int(&min, 0);
+
+	for(int i = 0; i < N; i++) {
+		a[i] = BN_ZERO;
+		b[i] = BN_ZERO;
+
+		bni_rand_range(&a[i], &min, &max);
+		bni_rand_range(&b[i], &min, &max);
+	}
+
+	start = clock();
+	for(int i = 0; i < N; i++) {
+		cross_mul(&x[i], &a[i], &b[i]);
+	}
+	end = clock();
+	printf("%zu %u-bit xmuls done in %fs\n", N, B, (float)(end-start)/CLOCKS_PER_SEC);
+
+	start = clock();
+	for(int i = 0; i < N; i++) {
+		karatsuba_mul(&k[i], &a[i], &b[i]);
+	}
+	end = clock();
+	printf("%zu %u-bit kmuls done in %fs\n", N, B, (float)(end-start)/CLOCKS_PER_SEC);
+
+	SHA256_CTX xsha, ksha;
+	sha256_init(&xsha);
+	sha256_init(&ksha);
+
+	for(int i = 0; i < 1024; i++) {
+		sha256_update(&xsha, (uint8_t*) x[i].d, x[i].size * sizeof(uint64_t));
+		sha256_update(&ksha, (uint8_t*) k[i].d, k[i].size * sizeof(uint64_t));
+	}
+
+	uint8_t xdig[32];
+	uint8_t kdig[32];
+
+	sha256_final(&xsha, xdig);
+	sha256_final(&ksha, kdig);
+
+	printf("xdig:");
+	printbuf(&xdig, 32);
+	printf("kdig:");
+	printbuf(&kdig, 32);
 }
 
 void rand_exp_test() {
@@ -323,7 +390,8 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	karatsuba_test();
+	//karatsuba_test();
+	karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
 }

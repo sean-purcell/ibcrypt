@@ -6,7 +6,7 @@
 #include "bignum_util.h"
 
 /* words must be at least this size to do karatsuba multiplication */
-#define KARATSUBA_THRESHOLD 2
+#define KARATSUBA_THRESHOLD 8
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -78,6 +78,13 @@ int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
 	return 0;
 }
 
+/*
+ * a   = (ah*B + al)
+ * b   = (bh*B + bl)
+ * a*b = (ah*B + al)(bh*B + bl)
+ * a*b = ah*bh*B^2 + (ah*bl + bh*al)*B + al*bl
+ * a*b = ah*bh*B^2 + ((ah+al)(bh+bl)-al*bl-ah*bh)*B + al*bl
+ */
 int karatsuba_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b) {
 	/* make a the larger one */
 	const BIGNUM *a, *b;
@@ -125,30 +132,29 @@ int karatsuba_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b) {
 		return 1;
 	}
 
-	/* compute al*bl and ah*bh */
-	if(cross_mul(&t1, &al, &bl) != 0 || cross_mul(&t2, &ah, &bh) != 0) {
-		return 1;
-	}
-
-	/* copy in al*bl and ah*bh */
-	memcpy(&r.d[0], t1.d, t1.size * sizeof(uint64_t));
-	memcpy(&r.d[2 * wordsize], t2.d, t2.size * sizeof(uint64_t));
-
-	/* subtract al*bl and ah*bh from the middle */
-	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t1.d, t1.size);
-	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t2.d, t2.size);
-
 	/* calculate al+ah and bl+bh */
 	if(bno_add(&t1, &al, &ah) != 0 || bno_add(&t2, &bl, &bh) != 0) {
 		return 1;
 	}
 
 	/* calculate (al+ah)(bl+bh) */
-	if(cross_mul(&t3, &t1, &t2) != 0) {
+	if(karatsuba_mul(&t3, &t1, &t2) != 0) {
 		return 1;
 	}
 
 	add_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t3.d, t3.size);
+
+	/* compute al*bl and ah*bh */
+	if(karatsuba_mul(&t1, &al, &bl) != 0 || karatsuba_mul(&t2, &ah, &bh) != 0) {
+		return 1;
+	}
+
+	/* add/subtract in al*bl and ah*bh */
+	add_words(&r.d[0], &r.d[0], r.size, t1.d, t1.size);
+	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t1.d, t1.size);
+
+	add_words(&r.d[wordsize * 2], &r.d[wordsize * 2], r.size - 2*wordsize, t2.d, t2.size);
+	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t2.d, t2.size);
 
 	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
 		return 1;

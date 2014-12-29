@@ -78,8 +78,7 @@ void karatsuba_test() {
 	BIGNUM xr = BN_ZERO,
 	       kr = BN_ZERO;
 
-	bni_2power(&max, 4096);
-	bni_int(&min, 0);
+	bni_2power(&max, 128);
 
 	bni_rand_range(&a, &min, &max);
 	bni_rand_range(&b, &min, &max);
@@ -102,11 +101,17 @@ void karatsuba_test() {
 	printf("cmp  :%d\n", cmp);
 
 	free(out);
+	bnu_free(&a);
+	bnu_free(&b);
+	bnu_free(&max);
+	bnu_free(&min);
+	bnu_free(&xr);
+	bnu_free(&kr);
 }
 
 void karatsuba_speed_test() {
 	const size_t N = 4096;
-	const uint32_t B = 2048;
+	const uint32_t B = 8192;
 	BIGNUM a[N];
 	BIGNUM b[N];
 	BIGNUM x[N];
@@ -118,7 +123,6 @@ void karatsuba_speed_test() {
 	clock_t start, end;
 
 	bni_2power(&max, B);
-	bni_int(&min, 0);
 
 	for(int i = 0; i < N; i++) {
 		a[i] = BN_ZERO;
@@ -176,7 +180,6 @@ void rand_exp_test() {
 	BIGNUM r = BN_ZERO;
 
 	bni_2power(&max, 2048);
-	bni_int(&min, 0);
 
 	bni_rand_range(&a, &min, &max);
 	bni_rand_range(&b, &min, &max);
@@ -390,8 +393,8 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	//karatsuba_test();
-	karatsuba_speed_test();
+	karatsuba_test();
+	//karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
 }

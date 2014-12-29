@@ -2,15 +2,18 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <libibur/util.h>
+
 #include <bignum.h>
 #include "bignum_util.h"
 
 /* words must be at least this size to do karatsuba multiplication */
-#define KARATSUBA_THRESHOLD 8
+#define KARATSUBA_THRESHOLD 1
 
+#undef max
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
-void mul_words(uint64_t *const r, uint64_t *const a, uint32_t alen, uint64_t *b, uint32_t blen) {
+void x_mul_words(uint64_t *const r, uint64_t *const a, uint32_t alen, uint64_t *b, uint32_t blen) {
 	/* generic empty vars */
 	uint64_t t0, t1;
 
@@ -57,6 +60,87 @@ void mul_words(uint64_t *const r, uint64_t *const a, uint32_t alen, uint64_t *b,
 	}
 }
 
+void k_mul_words(uint64_t *const r, uint64_t *const _a, uint32_t _alen, uint64_t *const _b, uint32_t _blen, uint64_t *const scratch) {
+	uint64_t *a, *b;
+	uint32_t alen, blen;
+	if(_alen >= _blen) {
+		a = _a;
+		b = _b;
+		alen = _alen;
+		blen = _blen;
+	} else {
+		a = _b;
+		b = _a;
+		alen = _blen;
+		blen = _alen;
+	}
+
+	if(blen <= KARATSUBA_THRESHOLD) {
+		x_mul_words(r, a, alen, b, blen);
+		return;
+	}
+
+	const uint32_t rsize = alen + blen;
+	const uint32_t wsize = (alen + 1)/2;
+	if(blen <= wsize) {
+		/* optimize this later */
+		x_mul_words(r, a, alen, b, blen);
+		return;
+	}
+
+	uint64_t *al, *ah, *bl, *bh;
+	al = &a[0];
+	ah = &a[wsize];
+	bl = &b[0];
+	bh = &b[wsize];
+
+	/* zero out scratch space and result space */
+	memset(scratch, 0x00, (2 * wsize + 2) * sizeof(uint64_t));
+	memset(      r, 0x00,           rsize * sizeof(uint64_t));
+
+	uint64_t *t1, *t2, *t3;
+	t1 = &scratch[0]; /* wsize + 1 wide */
+	t2 = &scratch[wsize + 1]; /* wsize + 1 wide */
+	t3 = &scratch[2 * wsize + 2]; /* rest of the scratch space */
+
+	/* calculate ah+al and bh+bl */
+	int carry;
+	carry = add_words(t1, ah, alen - wsize, al, wsize);
+	t1[wsize] = carry;
+	carry = add_words(t2, bh, blen - wsize, bl, wsize);
+	t2[wsize] = carry;
+
+	/* calculate (ah+al)(bh+bl) into the result space */
+	x_mul_words(&r[wsize], t1, wsize + 1, t2, wsize + 1);
+
+	/* calculate al * bl */
+	x_mul_words(t1, al, wsize, bl, wsize);
+	add_words(&r[    0], &r[    0],         rsize, t1, 2 * wsize);
+	sub_words(&r[wsize], &r[wsize], rsize - wsize, t1, 2 * wsize);
+
+	/* calculate ah * bh */
+	x_mul_words(t1, ah, alen - wsize, bh, blen - wsize);
+	add_words(&r[2 * wsize], &r[2 * wsize], rsize - 2 * wsize, t1, rsize - 2 * wsize);
+	sub_words(&r[    wsize], &r[    wsize], rsize -     wsize, t1, rsize - 2 * wsize);
+
+	/* done */
+}
+
+uint32_t k_scratch_req(const uint32_t size) {
+	const uint32_t RECURSION_CUTOFF = 1024;
+	if(size <= RECURSION_CUTOFF) {
+		if(size <= 3) {
+			return 0;
+		} else {
+			return 2 * ((size+1)/2) + 2
+			                     /* wsize + 1 */
+				+ k_scratch_req((size+1)/2 + 1);
+		}
+	} else {
+		return 2 * size + 8 * lg(size - 4) - 10;
+	}
+}
+
 int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
 	uint64_t size = (uint64_t) a->size + b->size;
 	if(size > 0xffffffffULL) {
@@ -68,7 +152,7 @@ int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
 		return 1;
 	}
 
-	mul_words(r.d, a->d, a->size, b->d, b->size);
+	x_mul_words(r.d, a->d, a->size, b->d, b->size);
 
 	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
 		return 1;
@@ -85,85 +169,34 @@ int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
  * a*b = ah*bh*B^2 + (ah*bl + bh*al)*B + al*bl
  * a*b = ah*bh*B^2 + ((ah+al)(bh+bl)-al*bl-ah*bh)*B + al*bl
  */
-int karatsuba_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b) {
-	/* make a the larger one */
-	const BIGNUM *a, *b;
-	if(_a->size >= _b->size) {
-		a = _a;
-		b = _b;
-	} else {
-		a = _b;
-		b = _a;
+int karatsuba_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
+	if(_r == NULL || a == NULL || b == NULL) {
+		return -1;
 	}
 
-	if(b->size < KARATSUBA_THRESHOLD) {
-		return cross_mul(_r, a, b);
+	uint64_t size = (uint64_t) a->size + b->size;
+	if(size > 0xffffffffULL) {
+		return 2; /* too big */
 	}
 
-	                          /* round up */
-	const uint32_t wordsize = (a->size + 1) / 2;
-	if(b->size <= wordsize) {
-		/* optimize this later */
-		return cross_mul(_r, a, b);
-	}
-
-	BIGNUM ah = BN_ZERO,
-	       al = BN_ZERO,
-	       bh = BN_ZERO,
-	       bl = BN_ZERO;
-	if(bnu_resize(&al, wordsize) != 0 ||
-	   bnu_resize(&bl, wordsize) != 0 ||
-	   bnu_resize(&ah, a->size - wordsize) != 0 ||
-	   bnu_resize(&bh, b->size - wordsize) != 0) {
+	BIGNUM r = BN_ZERO;
+	if(bnu_resize(&r, size) != 0) {
 		return 1;
 	}
 
-	/* copy words into the sections */
-	memcpy(al.d, &a->d[0], al.size * sizeof(uint64_t));
-	memcpy(bl.d, &b->d[0], bl.size * sizeof(uint64_t));
-	memcpy(ah.d, &a->d[wordsize], ah.size * sizeof(uint64_t));
-	memcpy(bh.d, &b->d[wordsize], bh.size * sizeof(uint64_t));
+	uint32_t scratch_size = k_scratch_req(max(a->size, b->size));
+	uint64_t *scratch = malloc(scratch_size * sizeof(uint64_t));
 
-	BIGNUM t1 = BN_ZERO,
-	       t2 = BN_ZERO,
-	       t3 = BN_ZERO,
-	       r  = BN_ZERO;
-	if(bnu_resize(&r, a->size + b->size) != 0) {
-		return 1;
-	}
+	k_mul_words(r.d, a->d, a->size, b->d, b->size, scratch);
 
-	/* calculate al+ah and bl+bh */
-	if(bno_add(&t1, &al, &ah) != 0 || bno_add(&t2, &bl, &bh) != 0) {
-		return 1;
-	}
-
-	/* calculate (al+ah)(bl+bh) */
-	if(karatsuba_mul(&t3, &t1, &t2) != 0) {
-		return 1;
-	}
-
-	add_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t3.d, t3.size);
-
-	/* compute al*bl and ah*bh */
-	if(karatsuba_mul(&t1, &al, &bl) != 0 || karatsuba_mul(&t2, &ah, &bh) != 0) {
-		return 1;
-	}
-
-	/* add/subtract in al*bl and ah*bh */
-	add_words(&r.d[0], &r.d[0], r.size, t1.d, t1.size);
-	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t1.d, t1.size);
-
-	add_words(&r.d[wordsize * 2], &r.d[wordsize * 2], r.size - 2*wordsize, t2.d, t2.size);
-	sub_words(&r.d[wordsize], &r.d[wordsize], r.size - wordsize, t2.d, t2.size);
+	free(scratch);
 
 	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
 		return 1;
 	}
 
 	*_r = r;
-
-	return bnu_free(&ah) || bnu_free(&al) || bnu_free(&bh) || bnu_free(&bl) ||
-	       bnu_free(&t1) || bnu_free(&t2) || bnu_free(&t3);
+	return 0;
 }
 
 int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
@@ -181,7 +214,7 @@ int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 		return 1;
 	}
 
-	mul_words(r.d, a->d, a->size, b->d, b->size);
+	x_mul_words(r.d, a->d, a->size, b->d, b->size);
 
 	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
 		return 1;

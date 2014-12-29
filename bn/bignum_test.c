@@ -5,6 +5,7 @@
 
 int bno_barrett_rmod(BIGNUM *_r, const BIGNUM *a, const BIGNUM *n);
 int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty);
+int karatsuba_mul(BIGNUM *_r, const BIGNUM *_a, const BIGNUM *_b);
 
 void speed_test() {
 	BIGNUM m, e, n, r = BN_ZERO;
@@ -29,6 +30,10 @@ void speed_test() {
 	bnu_tstr(out, &r);
 	printf("m*n  :%s\n", out);
 
+	karatsuba_mul(&r, &m, &n);
+	bnu_tstr(out, &r);
+	printf("m*n  :%s\n", out);
+
 	bno_neg_mod(&r, &m, &n);
 	bnu_tstr(out, &r);
 	printf("-m%%n :%s\n", out);
@@ -46,13 +51,49 @@ void speed_test() {
 	printf("e^n%%m:%s\n", out);
 
 	int prime = 5;
-	//printf("%d\n", rabin_miller(&prime, &m, 128));
+	printf("%d\n", rabin_miller(&prime, &m, 128));
 	printf("mprime:%d\n", prime);
 
 	bnu_free(&m);
 	bnu_free(&e);
 	bnu_free(&n);
 	bnu_free(&r);
+}
+
+void karatsuba_test() {
+	char out[1025];
+	puts("karatsuba test");
+	BIGNUM a = BN_ZERO;
+	BIGNUM b = BN_ZERO;
+
+	BIGNUM max = BN_ZERO;
+	BIGNUM min = BN_ZERO;
+
+	BIGNUM xr = BN_ZERO,
+	       kr = BN_ZERO;
+
+	bni_2power(&max, 512);
+	bni_int(&min, 0);
+
+	bni_rand_range(&a, &min, &max);
+	bni_rand_range(&b, &min, &max);
+
+	bnu_tstr(out, &a);
+	printf("a    :%s\n", out);
+	bnu_tstr(out, &b);
+	printf("b    :%s\n", out);
+
+	bno_mul(&xr, &a, &b);
+	karatsuba_mul(&kr, &a, &b);
+
+	bnu_tstr(out, &xr);
+	printf("a*b r:%s\n", out);
+
+	bnu_tstr(out, &kr);
+	printf("a*b k:%s\n", out);
+
+	int cmp = bno_cmp(&xr, &kr);
+	printf("cmp  :%d\n", cmp);
 }
 
 void rand_exp_test() {
@@ -282,6 +323,7 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	speed_test();
+	karatsuba_test();
+	//speed_test();
 	//rand_exp_test();
 }

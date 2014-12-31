@@ -8,7 +8,7 @@
 #include "bignum_util.h"
 
 /* words must be at least this size to do karatsuba multiplication */
-#define KARATSUBA_THRESHOLD 4
+#define KARATSUBA_THRESHOLD 16
 
 #undef max
 #define max(a, b) ((a) > (b) ? (a) : (b))

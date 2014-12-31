@@ -110,12 +110,12 @@ void karatsuba_test() {
 }
 
 void karatsuba_speed_test() {
-	const size_t N = 2048;
-	const uint32_t B = 16384;
-	BIGNUM a[N];
-	BIGNUM b[N];
-	BIGNUM x[N];
-	BIGNUM k[N];
+	const size_t N = 16384;
+	const uint32_t B = 2048;
+	BIGNUM *a = malloc(N * sizeof(BIGNUM));
+	BIGNUM *b = malloc(N * sizeof(BIGNUM));
+	BIGNUM *x = malloc(N * sizeof(BIGNUM));
+	BIGNUM *k = malloc(N * sizeof(BIGNUM));
 
 	BIGNUM max = BN_ZERO;
 	BIGNUM min = BN_ZERO;
@@ -165,6 +165,11 @@ void karatsuba_speed_test() {
 	printbuf(&xdig, 32);
 	printf("kdig:");
 	printbuf(&kdig, 32);
+
+	free(a);
+	free(b);
+	free(x);
+	free(k);
 }
 
 void rand_exp_test() {
@@ -393,8 +398,8 @@ int main() {
 	bnu_free(&y);
 	bnu_free(&x);
 
-	karatsuba_test();
-	//karatsuba_speed_test();
+	//karatsuba_test();
+	karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
 }

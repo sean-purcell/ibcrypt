@@ -78,7 +78,7 @@ void karatsuba_test() {
 	BIGNUM xr = BN_ZERO,
 	       kr = BN_ZERO;
 
-	bni_2power(&max, 128);
+	bni_2power(&max, 2048);
 
 	bni_rand_range(&a, &min, &max);
 	bni_rand_range(&b, &min, &max);
@@ -110,8 +110,8 @@ void karatsuba_test() {
 }
 
 void karatsuba_speed_test() {
-	const size_t N = 4096;
-	const uint32_t B = 8192;
+	const size_t N = 2048;
+	const uint32_t B = 16384;
 	BIGNUM a[N];
 	BIGNUM b[N];
 	BIGNUM x[N];

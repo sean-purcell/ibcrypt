@@ -8,7 +8,7 @@
 #include "bignum_util.h"
 
 /* words must be at least this size to do karatsuba multiplication */
-#define KARATSUBA_THRESHOLD 1
+#define KARATSUBA_THRESHOLD 4
 
 #undef max
 #define max(a, b) ((a) > (b) ? (a) : (b))
@@ -111,15 +111,17 @@ void k_mul_words(uint64_t *const r, uint64_t *const _a, uint32_t _alen, uint64_t
 	t2[wsize] = carry;
 
 	/* calculate (ah+al)(bh+bl) into the result space */
-	x_mul_words(&r[wsize], t1, wsize + 1, t2, wsize + 1);
+	k_mul_words(&r[wsize], t1, wsize + 1, t2, wsize + 1, t3);
 
 	/* calculate al * bl */
-	x_mul_words(t1, al, wsize, bl, wsize);
+	memset(t1, 0x00, 2 * wsize * sizeof(uint64_t));
+	k_mul_words(t1, al, wsize, bl, wsize, t3);
 	add_words(&r[    0], &r[    0],         rsize, t1, 2 * wsize);
 	sub_words(&r[wsize], &r[wsize], rsize - wsize, t1, 2 * wsize);
 
 	/* calculate ah * bh */
-	x_mul_words(t1, ah, alen - wsize, bh, blen - wsize);
+	memset(t1, 0x00, 2 * wsize * sizeof(uint64_t));
+	k_mul_words(t1, ah, alen - wsize, bh, blen - wsize, t3);
 	add_words(&r[2 * wsize], &r[2 * wsize], rsize - 2 * wsize, t1, rsize - 2 * wsize);
 	sub_words(&r[    wsize], &r[    wsize], rsize -     wsize, t1, rsize - 2 * wsize);
 

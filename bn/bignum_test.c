@@ -399,7 +399,7 @@ int main() {
 	bnu_free(&x);
 
 	//karatsuba_test();
-	karatsuba_speed_test();
+	//karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
 }

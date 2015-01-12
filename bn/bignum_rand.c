@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <libibur/util.h>
+
 #include "bignum_util.h"
 #include <bignum.h>
 #include <rand.h>
@@ -41,20 +43,20 @@ int bni_rand_range(BIGNUM *r, const BIGNUM *bot, const BIGNUM *top) {
 		return 1;
 	}
 
-	if(bnu_free(r) != 0 || bnu_resize(r, top->size)) {
+	if(bnu_free(r) != 0 || bnu_resize(r, range.size)) {
 		return 1;
 	}
 
-	uint32_t topword = range.size - 1;
-	if(cs_rand_uint64_range(&r->d[topword], range.d[topword]) != 0) {
+	uint64_t mask = (2 << lg(range.d[range.size - 1])) - 1;
+
+	do {
+		cs_rand(r->d, r->size * sizeof(uint64_t));
+		r->d[r->size - 1] &= mask;
+	} while(bno_cmp(r, &range) >= 0);
+
+	if(bno_add(r, r, bot) != 0) {
 		return 1;
 	}
-
-	if(cs_rand(&r->d[0], sizeof(uint64_t) * topword) != 0) {
-		return 1;
-	}
-
-	add_words(r->d, r->d, top->size, bot->d, bot->size);
 
 	return bnu_free(&range) != 0 || bnu_trim(r);
 }

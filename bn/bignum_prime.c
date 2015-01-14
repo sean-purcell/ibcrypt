@@ -11,11 +11,8 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 	}
 
 	/* get 1 and n - 1 in bignum form for comparison */
-	BIGNUM one = BN_ZERO, n_minus_one = BN_ZERO;
-	if(bni_int(&one, 1) != 0) {
-		return 1;
-	}
-	if(bno_sub(&n_minus_one, n, &one) != 0) {
+	BIGNUM n_minus_one = BN_ZERO;
+	if(bno_sub(&n_minus_one, n, &ONE) != 0) {
 		return 1;
 	}
 
@@ -37,13 +34,6 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 		return 1;
 	}
 
-	/* two, for bounds on random numbers */
-	BIGNUM two = BN_ZERO;
-	if(bni_int(&two, 2) != 0) {
-		return 1;
-	}
-
-
 	BIGNUM a = BN_ZERO;
 	BIGNUM x = BN_ZERO;
 
@@ -51,7 +41,7 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 	/* run ceil(certainty/2) times to obtain the certainty value*/
 	const uint64_t iters = (certainty + 1) / 2;
 	for(i = 0; i < iters; i++) {
-		if(bni_rand_range(&a, &two, &n_minus_one) != 0) {
+		if(bni_rand_range(&a, &TWO, &n_minus_one) != 0) {
 			return 1;
 		}
 		if(bno_exp_mod(&x, &a, &d, n) != 0) {

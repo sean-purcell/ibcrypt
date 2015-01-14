@@ -87,7 +87,7 @@ int bno_inv_mod(BIGNUM *inv, const BIGNUM *_a, const BIGNUM *_n) {
 
 	BIGNUM tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO, remain = BN_ZERO;
 
-	if(bni_fstr(&newt, "1") != 0 || bni_cpy(&r, _n) != 0 || bni_cpy(&newr, _a) != 0) {
+	if(bni_int(&newt, 1) != 0 || bni_cpy(&r, _n) != 0 || bni_cpy(&newr, _a) != 0) {
 		return 1;
 	}
 

@@ -10,7 +10,7 @@ int bno_exp(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp) {
 
 	BIGNUM R[2] = { BN_ZERO, BN_ZERO };
 
-	if(bni_fstr(&R[0], "1") != 0 || bni_cpy(&R[1], base)) {
+	if(bni_int(&R[0], 1) != 0 || bni_cpy(&R[1], base)) {
 		return 1;
 	}
 
@@ -47,7 +47,7 @@ int bno_exp_mod(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 	/* barrett reduction factor */
 	BIGNUM m = BN_ZERO;
 
-	if(bni_fstr(&R[0], "1") != 0) {
+	if(bni_int(&R[0], 1) != 0) {
 		return 1;
 	}
 

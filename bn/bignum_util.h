@@ -8,6 +8,12 @@
 
 #include <stdint.h>
 
+/* some useful constant */
+static uint64_t d1 = 1, d2 = 2;
+
+static const BIGNUM ONE  = {&d1, 1};
+static const BIGNUM TWO  = {&d2, 1};
+
 int bnu_resize(BIGNUM* r, uint32_t size);
 
 int bnu_trim(BIGNUM* r);

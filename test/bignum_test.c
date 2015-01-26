@@ -101,9 +101,9 @@ static void bn_mul_test() {
 
 	/* run tests */
 
-	BIGNUM a = BN_ZERO;
-	BIGNUM b = BN_ZERO;
-	BIGNUM r = BN_ZERO;
+	bignum a = BN_ZERO;
+	bignum b = BN_ZERO;
+	bignum r = BN_ZERO;
 	int i;
 	for(i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
 		int j;
@@ -170,10 +170,10 @@ static void bn_div_mod_test() {
 	FILE *bcin, *bcout;
 	init_bc(&bc, &bcin, &bcout);
 
-	BIGNUM a = BN_ZERO;
-	BIGNUM b = BN_ZERO;
-	BIGNUM q = BN_ZERO;
-	BIGNUM r = BN_ZERO;
+	bignum a = BN_ZERO;
+	bignum b = BN_ZERO;
+	bignum q = BN_ZERO;
+	bignum r = BN_ZERO;
 	int i;
 	for(i = 0; i < sizeof(sizea)/sizeof(sizea[0]); i++) {
 		int j;
@@ -247,7 +247,7 @@ static void bn_div_mod_test() {
 	waitpid(bc, &status, 0);
 }
 
-int bno_barrett_rmod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n);
+int bno_barrett_rmod(bignum *r, const bignum *a, const bignum *n);
 
 static void bn_barrett_mod_test() {
 	const uint64_t sizea[] = {  64, 256, 512, 2048, 2048, 4096 };
@@ -260,9 +260,9 @@ static void bn_barrett_mod_test() {
 
 	/* run tests */
 
-	BIGNUM a = BN_ZERO;
-	BIGNUM b = BN_ZERO;
-	BIGNUM r = BN_ZERO;
+	bignum a = BN_ZERO;
+	bignum b = BN_ZERO;
+	bignum r = BN_ZERO;
 	int i, j;
 	for(i = 0; i < sizeof(sizea)/sizeof(sizea[0]); i++) {
 		const size_t asize = (sizea[i] + 63) / 64 * 16;
@@ -332,10 +332,10 @@ void bn_exp_test() {
 
 	/* run tests */
 
-	BIGNUM a = BN_ZERO;
-	BIGNUM b = BN_ZERO;
-	BIGNUM c = BN_ZERO;
-	BIGNUM r = BN_ZERO;
+	bignum a = BN_ZERO;
+	bignum b = BN_ZERO;
+	bignum c = BN_ZERO;
+	bignum r = BN_ZERO;
 	int i;
 	for(i = 0; i < sizeof(sizes)/sizeof(sizes[0]); i++) {
 		int j;

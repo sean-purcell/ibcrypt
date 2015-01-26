@@ -4,8 +4,8 @@
 #include "bignum_util.h"
 
 // don't resize, do inplace
-int rmod_words(uint64_t *r, const uint32_t rlen, const BIGNUM *n) {
-	BIGNUM nt = BN_ZERO;
+int rmod_words(uint64_t *r, const uint32_t rlen, const bignum *n) {
+	bignum nt = BN_ZERO;
 
 	if(bni_cpy(&nt, n) != 0 || bnu_resize(&nt, rlen+1)) {
 		return 1;
@@ -30,7 +30,7 @@ int rmod_words(uint64_t *r, const uint32_t rlen, const BIGNUM *n) {
 	return 0;
 }
 
-int bno_rmod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n) {
+int bno_rmod(bignum *r, const bignum *a, const bignum *n) {
 	if(r == NULL || a == NULL || n == NULL) {
 		return -1;
 	}
@@ -39,8 +39,8 @@ int bno_rmod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n) {
 		return bni_cpy(r, a);
 	}
 
-	BIGNUM nt = BN_ZERO;
-	BIGNUM at = BN_ZERO;
+	bignum nt = BN_ZERO;
+	bignum at = BN_ZERO;
 	if(bni_cpy(&nt, n) != 0 || bni_cpy(&at, a) != 0) {
 		return 1;
 	}
@@ -72,7 +72,7 @@ int bno_rmod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n) {
 }
 
 /* return n - a */
-int bno_neg_mod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n) {
+int bno_neg_mod(bignum *r, const bignum *a, const bignum *n) {
 	if(bno_rmod(r, a, n) != 0) {
 		return 1;
 	}
@@ -80,12 +80,12 @@ int bno_neg_mod(BIGNUM *r, const BIGNUM *a, const BIGNUM *n) {
 }
 
 // note: if the GCD of a and n isn't 1, the execution is undefined
-int bno_inv_mod(BIGNUM *inv, const BIGNUM *_a, const BIGNUM *_n) {
+int bno_inv_mod(bignum *inv, const bignum *_a, const bignum *_n) {
 	/* compute the inverse using the extended euclidean algorithm */
-	BIGNUM t = BN_ZERO, newt = BN_ZERO;
-	BIGNUM r = BN_ZERO, newr = BN_ZERO;
+	bignum t = BN_ZERO, newt = BN_ZERO;
+	bignum r = BN_ZERO, newr = BN_ZERO;
 
-	BIGNUM tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO, remain = BN_ZERO;
+	bignum tmp = BN_ZERO, tmp2 = BN_ZERO, quot = BN_ZERO, remain = BN_ZERO;
 
 	if(bni_int(&newt, 1) != 0 || bni_cpy(&r, _n) != 0 || bni_cpy(&newr, _a) != 0) {
 		return 1;

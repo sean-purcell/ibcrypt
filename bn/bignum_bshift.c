@@ -68,7 +68,7 @@ void rshift_words(uint64_t *r, const uint64_t *a, uint32_t a_size, const uint64_
 /* bit shifts a given bignum, effectively << and >> operators */
 
 /* a and r may be the same bignum */
-int bno_lshift(BIGNUM *r, const BIGNUM *a, const uint64_t shift) {
+int bno_lshift(bignum *r, const bignum *a, const uint64_t shift) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}
@@ -93,7 +93,7 @@ int bno_lshift(BIGNUM *r, const BIGNUM *a, const uint64_t shift) {
 	return bnu_trim(r);
 }
 
-int bno_rshift(BIGNUM *r, const BIGNUM *a, const uint64_t shift) {
+int bno_rshift(bignum *r, const bignum *a, const uint64_t shift) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}

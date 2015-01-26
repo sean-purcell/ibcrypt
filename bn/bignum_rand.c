@@ -6,7 +6,7 @@
 #include <bignum.h>
 #include <rand.h>
 
-int bni_rand_bits(BIGNUM *r, const uint64_t bits) {
+int bni_rand_bits(bignum *r, const uint64_t bits) {
 	if(r == NULL) {
 		return 1;
 	}
@@ -32,12 +32,12 @@ int bni_rand_bits(BIGNUM *r, const uint64_t bits) {
 	return 0;
 }
 
-int bni_rand_range(BIGNUM *r, const BIGNUM *bot, const BIGNUM *top) {
+int bni_rand_range(bignum *r, const bignum *bot, const bignum *top) {
 	if(r == NULL || bot == NULL || top == NULL) {
 		return 1;
 	}
 
-	BIGNUM range = BN_ZERO;
+	bignum range = BN_ZERO;
 
 	if(bno_sub(&range, top, bot) != 0) {
 		return 1;

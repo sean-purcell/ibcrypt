@@ -1,14 +1,16 @@
+#include <stdlib.h>
+
 #include <bignum.h>
 #include "bignum_util.h"
 
 /* exponentiation using the montgomery powering ladder
  * http://cr.yp.to/bib/2003/joye-ladder.pdf */
-int bno_exp(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp) {
-	if(r == 0 || base == 0 || exp == 0) {
+int bno_exp(bignum *r, const bignum *base, const bignum *exp) {
+	if(r == NULL || base == NULL || exp == NULL) {
 		return -1;
 	}
 
-	BIGNUM R[2] = { BN_ZERO, BN_ZERO };
+	bignum R[2] = { BN_ZERO, BN_ZERO };
 
 	if(bni_int(&R[0], 1) != 0 || bni_cpy(&R[1], base)) {
 		return 1;
@@ -38,14 +40,14 @@ int bno_exp(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp) {
 	return bnu_trim(r);
 }
 
-int bno_exp_mod(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *n) {
-	if(r == 0 || base == 0 || exp == 0 || n == 0) {
+int bno_exp_mod(bignum *r, const bignum *base, const bignum *exp, const bignum *n) {
+	if(r == NULL || base == NULL || exp == NULL || n == NULL) {
 		return -1;
 	}
 
-	BIGNUM R[2] = { BN_ZERO, BN_ZERO };
+	bignum R[2] = { BN_ZERO, BN_ZERO };
 	/* barrett reduction factor */
-	BIGNUM m = BN_ZERO;
+	bignum m = BN_ZERO;
 
 	if(bni_int(&R[0], 1) != 0) {
 		return 1;
@@ -90,15 +92,15 @@ int bno_exp_mod(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *
 	return bnu_trim(r);
 }
 
-int exp_mod_odd(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *n);
+int exp_mod_odd(bignum *r, const bignum *base, const bignum *exp, const bignum *n);
 
 /* copied from java's BigInteger implementation */
-int bno_exp_mod_crt(BIGNUM *r, const BIGNUM *base, const BIGNUM *exp, const BIGNUM *n) {
-	if(r == 0 || base == 0 || exp == 0 || n == 0) {
+int bno_exp_mod_crt(bignum *r, const bignum *base, const bignum *exp, const bignum *n) {
+	if(r == NULL || base == NULL || exp == NULL || n == NULL) {
 		return -1;
 	}
 
-	BIGNUM _n = *n;
+	bignum _n = *n;
 
 	if(_n.size == 0) {
 		return 1;

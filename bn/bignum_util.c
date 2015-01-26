@@ -9,7 +9,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 /* size is in 64 bit blocks */
-int bnu_resize(BIGNUM *r, uint32_t size) {
+int bnu_resize(bignum *r, uint32_t size) {
 	if(r->size == size) {
 		return 0;
 	}
@@ -41,7 +41,7 @@ int bnu_resize(BIGNUM *r, uint32_t size) {
 	return 0;
 }
 
-int bnu_trim(BIGNUM *r) {
+int bnu_trim(bignum *r) {
 	if(r == NULL) {
 		return -1;
 	}
@@ -58,7 +58,7 @@ int bnu_trim(BIGNUM *r) {
 	return bnu_resize(r, (uint32_t) (i + 1));
 }
 
-int bnu_free(BIGNUM *r) {
+int bnu_free(bignum *r) {
 	if(r == NULL) {
 		return -1;
 	}
@@ -74,7 +74,7 @@ static inline char fhex(const uint8_t v) {
 	}
 }
 
-int bnu_tstr(char *out, const BIGNUM *a) {
+int bnu_tstr(char *out, const bignum *a) {
 	uint32_t i = a->size;
 	size_t pos = 0;
 
@@ -91,7 +91,7 @@ int bnu_tstr(char *out, const BIGNUM *a) {
 	return 0;
 }
 
-int bnu_print(const BIGNUM *a) {
+int bnu_print(const bignum *a) {
 	char* str = malloc(16 * a->size + 1);
 	bnu_tstr(str, a);
 	printf("%s", str);

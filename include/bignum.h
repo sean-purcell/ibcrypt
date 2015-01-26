@@ -8,79 +8,79 @@
 typedef struct bignum_struct {
 	uint64_t* d; /* array of 64 bit digits */
 	uint32_t size; /* size of d array */
-} BIGNUM;
+} bignum;
 
-extern BIGNUM BN_ZERO;
+extern bignum BN_ZERO;
 
 /* create an empty bignum */
-int bni_zero(BIGNUM* a);
+int bni_zero(bignum* a);
 
 /* create a bignum from the given source */
-int bni_int(BIGNUM* a, uint64_t source);
+int bni_int(bignum* a, uint64_t source);
 
 /* currently only works with radix 16 */
-int bni_fstr(BIGNUM* a, const char* source);
+int bni_fstr(bignum* a, const char* source);
 
-int bni_cpy(BIGNUM* r, const BIGNUM* a);
+int bni_cpy(bignum* r, const bignum* a);
 
-int bni_2power(BIGNUM* r, const uint64_t k);
+int bni_2power(bignum* r, const uint64_t k);
 
 /* returns a random bignum within the range [bot, top) */
-int bni_rand_range(BIGNUM* r, const BIGNUM* bot, const BIGNUM* top);
+int bni_rand_range(bignum* r, const bignum* bot, const bignum* top);
 
 /* returns a random bignum with `bits' bits */
-int bni_rand_bits(BIGNUM* r, const uint64_t bits);
+int bni_rand_bits(bignum* r, const uint64_t bits);
 
 /* out must be big enough to hold a */
-int bnu_tstr(char* out, const BIGNUM* a);
+int bnu_tstr(char* out, const bignum* a);
 
 /* prints a to stdout */
-int bnu_print(const BIGNUM* a);
+int bnu_print(const bignum* a);
 
 /* frees a bignum, should be used before it goes out of scope */
-int bnu_free(BIGNUM* r);
+int bnu_free(bignum* r);
 
 /* + operator */
-int bno_add(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_add(bignum* r, const bignum* a, const bignum* b);
 
 /* - operator */
-int bno_sub(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_sub(bignum* r, const bignum* a, const bignum* b);
 
 /* * operator */
-int bno_mul(BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_mul(bignum* r, const bignum* a, const bignum* b);
 
 /* integer / operator */
-int bno_div(BIGNUM* q, const BIGNUM* a, const BIGNUM* b);
+int bno_div(bignum* q, const bignum* a, const bignum* b);
 /* returns the remainder as well as the quotient */
-int bno_div_mod(BIGNUM* q, BIGNUM* r, const BIGNUM* a, const BIGNUM* b);
+int bno_div_mod(bignum* q, bignum* r, const bignum* a, const bignum* b);
 
 /* ^ operator */
-int bno_exp(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp);
+int bno_exp(bignum* r, const bignum* base, const bignum* exp);
 
 /* % operator */
-int bno_rmod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
+int bno_rmod(bignum* r, const bignum* a, const bignum* n);
 
 /* return r such that (r + a) == 0 mod n */
-int bno_neg_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* n);
+int bno_neg_mod(bignum* r, const bignum* a, const bignum* n);
 
 /* return r such that (r*a) == 1 mod n */
-int bno_inv_mod(BIGNUM* inv, const BIGNUM* _a, const BIGNUM* _n);
+int bno_inv_mod(bignum* inv, const bignum* _a, const bignum* _n);
 
 /* barrett reduction functions */
-int bnu_barrett_mfactor(BIGNUM* r, const BIGNUM* n);
-int bno_barrett_reduce(BIGNUM* _r, const BIGNUM* a, const BIGNUM* m, const BIGNUM* n);
+int bnu_barrett_mfactor(bignum* r, const bignum* n);
+int bno_barrett_reduce(bignum* _r, const bignum* a, const bignum* m, const bignum* n);
 
-int bno_add_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* n);
-int bno_mul_mod(BIGNUM* r, const BIGNUM* a, const BIGNUM* b, const BIGNUM* const n);
-int bno_exp_mod(BIGNUM* r, const BIGNUM* base, const BIGNUM* exp, const BIGNUM* n);
+int bno_add_mod(bignum* r, const bignum* a, const bignum* b, const bignum* n);
+int bno_mul_mod(bignum* r, const bignum* a, const bignum* b, const bignum* const n);
+int bno_exp_mod(bignum* r, const bignum* base, const bignum* exp, const bignum* n);
 
 /* a and r may be the same bignum
  * << operator */
-int bno_lshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
+int bno_lshift(bignum* r, const bignum* a, const uint64_t shift);
 /* >> operator */
-int bno_rshift(BIGNUM* r, const BIGNUM* a, const uint64_t shift);
+int bno_rshift(bignum* r, const bignum* a, const uint64_t shift);
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
-int bno_cmp(const BIGNUM* a, const BIGNUM* b);
+int bno_cmp(const bignum* a, const bignum* b);
 
 #endif

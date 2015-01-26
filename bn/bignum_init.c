@@ -7,10 +7,10 @@
 #include "bignum_util.h"
 
 /* equivalent to bni_zero(&bn); */
-BIGNUM BN_ZERO = {0, 0};
+bignum BN_ZERO = {0, 0};
 
 /* create an empty bignum */
-int bni_zero(BIGNUM *a) {
+int bni_zero(bignum *a) {
 	if(a == NULL) {
 		return -1;
 	}
@@ -21,7 +21,7 @@ int bni_zero(BIGNUM *a) {
 }
 
 /* create a bignum from the given source */
-int bni_int(BIGNUM *a, uint64_t source) {
+int bni_int(bignum *a, uint64_t source) {
 	if(bni_zero(a) != 0) {
 		return -1;
 	}
@@ -43,8 +43,8 @@ static inline uint8_t fhex(const char c) {
 }
 
 /* currently only works with radix 16 */
-int bni_fstr(BIGNUM *a, const char *source) {
-	if(source == 0) {
+int bni_fstr(bignum *a, const char *source) {
+	if(source == NULL) {
 		return -1;
 	}
 
@@ -74,7 +74,7 @@ int bni_fstr(BIGNUM *a, const char *source) {
 	return 0;
 }
 
-int bni_cpy(BIGNUM *r, const BIGNUM *a) {
+int bni_cpy(bignum *r, const bignum *a) {
 	if(a == NULL || r == NULL) {
 		return -1;
 	}
@@ -93,7 +93,7 @@ int bni_cpy(BIGNUM *r, const BIGNUM *a) {
 }
 
 /* get 2 to the power of k */
-int bni_2power(BIGNUM *_r, const uint64_t k) {
+int bni_2power(bignum *_r, const uint64_t k) {
 	if(_r == NULL) {
 		return -1;
 	}
@@ -105,7 +105,7 @@ int bni_2power(BIGNUM *_r, const uint64_t k) {
 		return 2; /* too big */
 	}
 
-	BIGNUM r = BN_ZERO;
+	bignum r = BN_ZERO;
 	if(bnu_resize(&r, size) != 0) {
 		return 1; /* failed to resize */
 	}

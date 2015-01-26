@@ -143,13 +143,13 @@ uint32_t k_scratch_req(const uint32_t size) {
 	}
 }
 
-int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
+int cross_mul(bignum* _r, const bignum *a, const bignum *b) {
 	uint64_t size = (uint64_t) a->size + b->size;
 	if(size > 0xffffffffULL) {
 		return 2; /* too big */
 	}
 
-	BIGNUM r = BN_ZERO;
+	bignum r = BN_ZERO;
 	if(bnu_resize(&r, size) != 0) {
 		return 1;
 	}
@@ -171,7 +171,7 @@ int cross_mul(BIGNUM* _r, const BIGNUM *a, const BIGNUM *b) {
  * a*b = ah*bh*B^2 + (ah*bl + bh*al)*B + al*bl
  * a*b = ah*bh*B^2 + ((ah+al)(bh+bl)-al*bl-ah*bh)*B + al*bl
  */
-int karatsuba_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
+int karatsuba_mul(bignum *_r, const bignum *a, const bignum *b) {
 	if(_r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -181,7 +181,7 @@ int karatsuba_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 		return 2; /* too big */
 	}
 
-	BIGNUM r = BN_ZERO;
+	bignum r = BN_ZERO;
 	if(bnu_resize(&r, size) != 0) {
 		return 1;
 	}
@@ -201,7 +201,7 @@ int karatsuba_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 	return 0;
 }
 
-int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
+int bno_mul(bignum *_r, const bignum *a, const bignum *b) {
 	if(_r == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -211,7 +211,7 @@ int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 		return 2; /* too big */
 	}
 
-	BIGNUM r = BN_ZERO;
+	bignum r = BN_ZERO;
 	if(bnu_resize(&r, size) != 0) {
 		return 1;
 	}
@@ -226,7 +226,7 @@ int bno_mul(BIGNUM *_r, const BIGNUM *a, const BIGNUM *b) {
 	return 0;
 }
 
-int bno_mul_mod(BIGNUM *r, const BIGNUM *_a, const BIGNUM *_b, const BIGNUM *const n) {
+int bno_mul_mod(bignum *r, const bignum *_a, const bignum *_b, const bignum *const n) {
 	if(bno_mul(r, _a, _b) != 0) {
 		return 1;
 	}

@@ -4,11 +4,11 @@
 #include "bignum_util.h"
 
 // returns floor(a / b)
-int bno_div(BIGNUM *q, const BIGNUM *a, const BIGNUM *b) {
+int bno_div(bignum *q, const bignum *a, const bignum *b) {
 	return bno_div_mod(q, NULL, a, b);
 }
 
-int bno_div_mod(BIGNUM *q, BIGNUM *r, const BIGNUM *a, const BIGNUM *b) {
+int bno_div_mod(bignum *q, bignum *r, const bignum *a, const bignum *b) {
 	if(q == NULL || a == NULL || b == NULL) {
 		return -1;
 	}
@@ -17,8 +17,8 @@ int bno_div_mod(BIGNUM *q, BIGNUM *r, const BIGNUM *a, const BIGNUM *b) {
 		return bnu_resize(q, 0);
 	}
 
-	BIGNUM nt = BN_ZERO;
-	BIGNUM at = BN_ZERO;
+	bignum nt = BN_ZERO;
+	bignum at = BN_ZERO;
 	if(bni_cpy(&nt, b) != 0 || bni_cpy(&at, a) != 0) {
 		return 1;
 	}

@@ -28,7 +28,7 @@ int cmp_words(const uint64_t *a, const uint32_t alen, const uint64_t *b, const u
 
 /* returns 1 if a > b, -1 if a < b, 0 if a == b
  * ignores sign */
-int bno_cmp(const BIGNUM *a, const BIGNUM *b) {
+int bno_cmp(const bignum *a, const bignum *b) {
 	if(a == NULL || b == NULL) {
 		if(a == NULL) {
 			return -1;

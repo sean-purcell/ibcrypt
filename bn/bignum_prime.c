@@ -5,13 +5,13 @@
 /* runs rabin-miller primality test on the number
  * http://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
  */
-int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
+int rabin_miller(int *r, const bignum *n, const uint32_t certainty) {
 	if(n == NULL) {
 		return 1;
 	}
 
 	/* get 1 and n - 1 in bignum form for comparison */
-	BIGNUM n_minus_one = BN_ZERO;
+	bignum n_minus_one = BN_ZERO;
 	if(bno_sub(&n_minus_one, n, &ONE) != 0) {
 		return 1;
 	}
@@ -28,14 +28,14 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 	}
 	dloopend:;
 	const uint64_t s = i * 64 + j;
-	BIGNUM d = BN_ZERO;
+	bignum d = BN_ZERO;
 
 	if(bno_rshift(&d, &n_minus_one, s) != 0) {
 		return 1;
 	}
 
-	BIGNUM a = BN_ZERO;
-	BIGNUM x = BN_ZERO;
+	bignum a = BN_ZERO;
+	bignum x = BN_ZERO;
 
 	/* each iteration has a 1/4 chance of false positive */
 	/* run ceil(certainty/2) times to obtain the certainty value*/
@@ -48,7 +48,7 @@ int rabin_miller(int *r, const BIGNUM *n, const uint32_t certainty) {
 			return 1;
 		}
 
-		if(bno_cmp(&x, &one) == 0 || bno_cmp(&x, &n_minus_one) == 0) {
+		if(bno_cmp(&x, &ONE) == 0 || bno_cmp(&x, &n_minus_one) == 0) {
 			goto testloopend;
 		}
 

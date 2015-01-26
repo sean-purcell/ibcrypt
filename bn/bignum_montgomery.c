@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <bignum.h>
 #include "bignum_util.h"
 

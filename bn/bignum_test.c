@@ -66,6 +66,16 @@ void speed_test() {
 	bnu_free(&r);
 }
 
+int prime_test(int *r, const bignum *n, const uint32_t certainty);
+void prime_test_test() {
+	bignum m;
+	bni_fstr(&m, "ced9c95986f5bf1805110bb5fb436fb5bd300ede4e5ad19d53c30f473b323f1f12b55ded63cdc6840612196870bdffffeee41157c1eed71dd3e4c60239f2a4401c87e33a328bf09b685f81fb50c7b5c81995c6af280ceceb8422e92bae75d19a5dff48e5c836d14045ea568074d49ca9647d665b37dc15b29604ae85ffa847d4d6315efb3adf6d3e3700f14d08f68ff448d78f650a95c123daa4f308f79fe23333c818fa85d457b32a75b51f9a1f69a386da6a35cbf75ad893a3bfa59633e48cf985b525ef63d7698a4faa75cf07c9303491ab61fc36549fc2c7eae38e2764aa9a0034a9f2f0c19ffe2589d26070ffa923302dedfe240c8e082403d3bad8fead");
+
+	int prime;
+	prime_test(&prime, &m, 128);
+	printf("mprime:%d\n", prime);
+}
+
 void karatsuba_test() {
 	char *out = malloc(2049);
 	puts("karatsuba test");
@@ -222,7 +232,7 @@ void rand_exp_test() {
 	bnu_free(&r);
 }
 
-int main() {
+void assorted() {
 	bignum a, b, c;
 	bni_fstr(&a, "ec154596e28d60228c0b3ec154596e28d60228c0b3ec154596e28d60228c0b3ec154596e28d60228c0b3");
 	bni_fstr(&b, "baa5bffffff00efffff0f1f29285726fb9a9d05a97baa5bffffff00efffff0f1f29285726fb9a9d05a97");
@@ -397,9 +407,13 @@ int main() {
 	bnu_free(&four);
 	bnu_free(&y);
 	bnu_free(&x);
+}
 
+
+int main() {
 	//karatsuba_test();
 	//karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
+	prime_test_test();
 }

@@ -33,7 +33,7 @@ int montgomery_mul(bignum *res, const bignum *a, const bignum *b, const bignum *
 // montgomery multiplication, uses next largest power of 2 as R, therefore only works with odd numbers
 
 int exp_mod_odd(bignum *r, const bignum *base, const bignum *exp, const bignum *n) {
-	if(r == 0 || base == 0 || exp == 0 || n == 0) {
+	if(r == NULL || base == NULL|| exp == NULL|| n == NULL) {
 		return -1;
 	}
 

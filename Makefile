@@ -38,6 +38,7 @@ test: libibur $(BUILDDIR) $(BUILDHEADERS) $(TESTOBJECTS)
 	gcc $(LINKFLAGS) $(TESTOBJECTS) -o $(BUILDDIR)/test
 
 libibur:
+	git submodule update
 	$(MAKE) -C libibur
 
 $(BUILDDIR)/$(OBJECTDIR)/%.o: %.c

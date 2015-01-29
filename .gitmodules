@@ -1,0 +1,3 @@
+[submodule "libibur"]
+	path = libibur
+	url = https://github.com/iburinoc/libibur.git

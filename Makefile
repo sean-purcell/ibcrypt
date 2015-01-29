@@ -8,7 +8,7 @@ else
 endif
 LINKFLAGS=-flto
 
-LIBINC=-I/usr/local/include
+LIBINC=-I/usr/local/include -Ilibibur/bin
 
 DIRS=test cipher hash bn misc include
 BUILDDIRS=$(patsubst %,$(BUILDDIR)/$(OBJECTDIR)/%,$(DIRS))
@@ -29,13 +29,16 @@ TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/$(OBJECTDIR)/%.o,$(TESTSOURCES))
 
 BUILDHEADERS:=$(patsubst include/%.h,$(HEADERDIR)/%.h,$(HEADERS))
 
-.PHONY: libheaders lib clean install
+.PHONY: libibur libheaders lib clean install
 
-lib: $(BUILDDIR) $(BUILDHEADERS) $(OBJECTS)
+lib: libibur $(BUILDDIR) $(BUILDHEADERS) $(OBJECTS)
 	ar -rs bin/libibcrypt.a $(OBJECTS)
 
-test: $(BUILDDIR) $(BUILDHEADERS) $(TESTOBJECTS)
+test: libibur $(BUILDDIR) $(BUILDHEADERS) $(TESTOBJECTS)
 	gcc $(LINKFLAGS) $(TESTOBJECTS) -o $(BUILDDIR)/test
+
+libibur:
+	$(MAKE) -C libibur
 
 $(BUILDDIR)/$(OBJECTDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@

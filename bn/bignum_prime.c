@@ -78,12 +78,12 @@ int fermat_test(int *r, const bignum *n) {
 	}
 
 	bignum a = BN_ZERO;
-	//if(bni_rand_range(&a, &TWO, n) != 0) {
-	//	return 1;
-	//}
+	if(bni_rand_range(&a, &TWO, n) != 0) {
+		return 1;
+	}
 
 	bignum res = BN_ZERO;
-	if(bno_exp_mod(&res, &TWO, &n_minus_one, n) != 0) {
+	if(bno_exp_mod(&res, &a, &n_minus_one, n) != 0) {
 		return 1;
 	}
 	if(res.size == 1 && res.d[0] == 1) {

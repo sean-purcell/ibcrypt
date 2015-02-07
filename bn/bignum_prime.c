@@ -7,10 +7,13 @@ static const uint64_t *const small_primes;
 static int divisible_single_digit(const bignum *n, const uint64_t q);
 
 int rabin_miller(int *r, const bignum *n, const uint32_t certainty);
+int fermat_test(int *r, const bignum *n);
 
+/* sets r to 1 if probably prime, 0 if definitely composite
+ * the odds that this method returns a false positive is at most 2^(-certainty) */
 int prime_test(int *r, const bignum *n, const uint32_t certainty) {
 	if(n == NULL || r == NULL) {
-		return 1;
+		return -1;
 	}
 
 	/* check small numbers */
@@ -50,8 +53,50 @@ int prime_test(int *r, const bignum *n, const uint32_t certainty) {
 		}
 	}
 
+	/* run fermat test */
+	if(fermat_test(r, n) != 0) {
+		return 1;
+	}
+	if(r == 0) {
+		return 0;
+	}
+
 	/* fall back to rabin miller */
 	return rabin_miller(r, n, certainty);
+}
+
+int fermat_test(int *r, const bignum *n) {
+	if(n == NULL) {
+		return -1;
+	}
+
+	puts("reached fermat");
+
+	bignum n_minus_one = BN_ZERO;
+	if(bno_sub(&n_minus_one, n, &ONE) != 0) {
+		return 1;
+	}
+
+	bignum a = BN_ZERO;
+	//if(bni_rand_range(&a, &TWO, n) != 0) {
+	//	return 1;
+	//}
+
+	bignum res = BN_ZERO;
+	if(bno_exp_mod(&res, &TWO, &n_minus_one, n) != 0) {
+		return 1;
+	}
+	if(res.size == 1 && res.d[0] == 1) {
+		*r = 1;
+	} else {
+		*r = 0;
+	}
+
+	bnu_free(&n_minus_one);
+	bnu_free(&a);
+	bnu_free(&res);
+
+	return 0;
 }
 
 /* runs rabin-miller primality test on the number
@@ -59,8 +104,10 @@ int prime_test(int *r, const bignum *n, const uint32_t certainty) {
  */
 int rabin_miller(int *r, const bignum *n, const uint32_t certainty) {
 	if(n == NULL) {
-		return 1;
+		return -1;
 	}
+
+	puts("reached rabin miller");
 
 	/* get 1 and n - 1 in bignum form for comparison */
 	bignum n_minus_one = BN_ZERO;
@@ -125,23 +172,13 @@ int rabin_miller(int *r, const bignum *n, const uint32_t certainty) {
 	*r = 1;
 
 end:
-
+	printf("%d\n", i);
 	bnu_free(&n_minus_one);
 	bnu_free(&d);
 	bnu_free(&a);
 	bnu_free(&x);
 
 	return 0;
-}
-
-/* sets r to 1 if probably prime, 0 if definitely composite
- * the odds that this method returns a false positive is at most 2^(-certainty) */
-int bnu_probably_prime(int *r, const bignum *a, const uint32_t certainty) {
-	return 1;
-}
-
-int bnu_gen_prime(bignum *r, const int bitlen) {
-	return bnu_trim(r);
 }
 
 /* test if a bignum is divisible by a given single digit number using long

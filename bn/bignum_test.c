@@ -12,6 +12,7 @@ int rabin_miller(int *r, const bignum *n, const uint32_t certainty);
 int karatsuba_mul(bignum *_r, const bignum *_a, const bignum *_b);
 int cross_mul(bignum *_r, const bignum *_a, const bignum *_b);
 int exp_mod_odd(bignum *_r, const bignum *m, const bignum *e, const bignum *n);
+int fermat_test(int *r, const bignum *n);
 
 void speed_test() {
 	bignum m, e, n, r = BN_ZERO;
@@ -74,6 +75,16 @@ void prime_test_test() {
 	int prime;
 	prime_test(&prime, &m, 128);
 	printf("mprime:%d\n", prime);
+}
+
+void prime_gen_test() {
+	bignum p;
+	bni_rand_prime(&p, 2048, 128);
+	char *out = malloc(513);
+	bnu_tstr(out, &p);
+	printf("p:%s\n", out);
+	bnu_free(&p);
+	free(out);
 }
 
 void karatsuba_test() {
@@ -398,6 +409,13 @@ void assorted() {
 	bnu_tstr(out, &r);
 	printf("randxy:%s\n", out);
 
+	bni_fstr(&x, "22");
+	bni_fstr(&y, "26");
+
+	int prime = 0;
+	fermat_test(&prime, &x);
+	printf("%d\n", prime);
+
 	bnu_free(&a);
 	bnu_free(&b);
 	bnu_free(&r);
@@ -415,5 +433,7 @@ int main() {
 	//karatsuba_speed_test();
 	//speed_test();
 	//rand_exp_test();
-	prime_test_test();
+	//prime_test_test();
+	prime_gen_test();
+	//assorted();
 }

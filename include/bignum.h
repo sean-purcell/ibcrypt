@@ -83,4 +83,11 @@ int bno_rshift(bignum* r, const bignum* a, const uint64_t shift);
 /* returns 1 if a > b, -1 if a < b, 0 if a == b */
 int bno_cmp(const bignum* a, const bignum* b);
 
+/* sets r to 1 if the number is prime with a certainty of at least
+ * 1-(2^-certainty), 0 otherwise */
+int prime_test(int *r, const bignum *n, const uint32_t certainty);
+/* generates a random prime with `bits` bits with certainty `certainty`
+ * (see prime_test) */
+int bni_rand_prime(bignum *r, const uint64_t bits, const uint32_t certainty);
+
 #endif

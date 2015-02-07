@@ -206,24 +206,7 @@ int bno_mul(bignum *_r, const bignum *a, const bignum *b) {
 		return -1;
 	}
 
-	uint64_t size = (uint64_t) a->size + b->size;
-	if(size > 0xffffffffULL) {
-		return 2; /* too big */
-	}
-
-	bignum r = BN_ZERO;
-	if(bnu_resize(&r, size) != 0) {
-		return 1;
-	}
-
-	x_mul_words(r.d, a->d, a->size, b->d, b->size);
-
-	if(bnu_trim(&r) != 0 || bnu_free(_r) != 0) {
-		return 1;
-	}
-
-	*_r = r;
-	return 0;
+	return cross_mul(_r, a, b);
 }
 
 int bno_mul_mod(bignum *r, const bignum *_a, const bignum *_b, const bignum *const n) {

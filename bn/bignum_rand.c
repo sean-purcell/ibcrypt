@@ -78,10 +78,12 @@ int bni_rand_prime(bignum *r, const uint64_t bits, const uint32_t certainty) {
 	}
 
 	int prime = 0;
+	int num = 0;
 	do{
 		if(cs_rand(&r->d[0], sizeof(uint64_t) * size) != 0) {
 			return 1;
 		}
+		num++;
 
 		if(bits % 64 != 0) {
 			r->d[size - 1] &= mask;
@@ -96,6 +98,7 @@ int bni_rand_prime(bignum *r, const uint64_t bits, const uint32_t certainty) {
 			return 1;
 		}
 	} while(prime == 0);
+	printf("%d tested\n", num);
 
 	return 0;
 }

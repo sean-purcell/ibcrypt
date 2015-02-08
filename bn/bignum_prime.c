@@ -54,12 +54,12 @@ int prime_test(int *r, const bignum *n, const uint32_t certainty) {
 	}
 
 	/* run fermat test */
-	if(fermat_test(r, n) != 0) {
+	/*if(fermat_test(r, n) != 0) {
 		return 1;
 	}
 	if(r == 0) {
 		return 0;
-	}
+	}*/
 
 	/* fall back to rabin miller */
 	return rabin_miller(r, n, certainty);
@@ -214,4 +214,46 @@ static const uint64_t small_primes_array[] = {
 };
 
 static const uint64_t *const small_primes = (const uint64_t *const) small_primes_array;
+
+int bni_rand_prime(bignum *r, const uint64_t bits, const uint32_t certainty) {
+	if(r == NULL) {
+		return 1;
+	}
+
+	if(bits / 64 > 0xffffffffULL) {
+		return 2; /* too big */
+	}
+
+	const uint32_t size = (bits + 63) / 64;
+	const uint64_t mask = (1ULL << (bits % 64)) - 1;
+	const uint64_t top_bit = (1ULL << ((bits + 63) % 64));
+	if(bnu_resize(r, size) != 0) {
+		return 1;
+	}
+
+	int prime = 0;
+	int num = 0;
+	do{
+		if(cs_rand(&r->d[0], sizeof(uint64_t) * size) != 0) {
+			return 1;
+		}
+		num++;
+
+		if(bits % 64 != 0) {
+			r->d[size - 1] &= mask;
+		}
+		/* set top and bottom bits
+		 * top bit ensures it is in the range
+		 * bottom bit ensures it's odd */
+		r->d[size - 1] |= top_bit;
+		r->d[0] |= 1;
+
+		if(prime_test(&prime, r, certainty) != 0) {
+			return 1;
+		}
+	} while(prime == 0);
+	printf("%d tested\n", num);
+
+	return 0;
+}
 

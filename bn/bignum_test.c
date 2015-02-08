@@ -79,7 +79,7 @@ void prime_test_test() {
 
 void prime_gen_test() {
 	bignum p;
-	bni_rand_prime(&p, 2048, 128);
+	bni_rand_prime(&p, 1024, 128);
 	char *out = malloc(513);
 	bnu_tstr(out, &p);
 	printf("p:%s\n", out);

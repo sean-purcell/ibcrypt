@@ -16,7 +16,15 @@ typedef struct {
 	uint64_t e;
 } RSA_KEY;
 
+typedef struct {
+	bignum n;
+	uint64_t e;
+} RSA_PUBLIC_KEY;
+
 int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e);
+
+int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result);
+int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result);
 
 #endif
 

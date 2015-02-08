@@ -70,8 +70,6 @@ int fermat_test(int *r, const bignum *n) {
 		return -1;
 	}
 
-	puts("reached fermat");
-
 	bignum n_minus_one = BN_ZERO;
 	if(bno_sub(&n_minus_one, n, &ONE) != 0) {
 		return 1;
@@ -106,8 +104,6 @@ int rabin_miller(int *r, const bignum *n, const uint32_t certainty) {
 	if(n == NULL) {
 		return -1;
 	}
-
-	puts("reached rabin miller");
 
 	/* get 1 and n - 1 in bignum form for comparison */
 	bignum n_minus_one = BN_ZERO;
@@ -167,12 +163,10 @@ int rabin_miller(int *r, const bignum *n, const uint32_t certainty) {
 		goto end;
 
 		testloopend:;
-		printf("test %llu\n", i);
 	}
 	*r = 1;
 
 end:
-	printf("%d\n", i);
 	bnu_free(&n_minus_one);
 	bnu_free(&d);
 	bnu_free(&a);
@@ -252,8 +246,20 @@ int bni_rand_prime(bignum *r, const uint64_t bits, const uint32_t certainty) {
 			return 1;
 		}
 	} while(prime == 0);
-	printf("%d tested\n", num);
 
 	return 0;
+}
+
+int bni_rand_prime_rsa(bignum *r, const uint64_t bits, const uint64_t e, const uint32_t certainty) {
+	uint64_t e_mut = e;
+	bignum e_bn = { &e_mut, 1 };
+	bignum remainder = BN_ZERO;
+	do {
+		if(bni_rand_prime(r, bits, certainty) != 0) {
+			return 1;
+		}
+		bno_rmod(&remainder, r, &e_bn);
+	} while(bno_cmp(&remainder, &ONE) == 0);
+	return bnu_free(&remainder);
 }
 

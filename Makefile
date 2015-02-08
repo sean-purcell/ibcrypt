@@ -10,7 +10,7 @@ LINKFLAGS=-flto
 
 LIBINC=-I/usr/local/include -Ilibibur/bin
 
-DIRS=test cipher hash bn misc
+DIRS=test cipher hash bn misc pk
 BUILDDIRS=$(patsubst %,$(BUILDDIR)/$(OBJECTDIR)/%,$(DIRS))
 
 SOURCES:= 

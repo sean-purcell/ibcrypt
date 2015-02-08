@@ -137,3 +137,47 @@ int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 	return bno_exp_mod(result, message, &key->d, &key->n);
 }
 
+int os2ip(bignum *out, const uint8_t *const in, const size_t inLen) {
+	if(out == NULL || in == NULL) {
+		return 1;
+	}
+	if(inLen > 0xffffffffULL * 8) {
+		return 1; /* too big */
+	}
+
+	/* zero the output */
+	if(bnu_resize(out, 0) != 0) {
+		return 1;
+	}
+
+	const uint32_t size = (inLen + 7) / 8;
+	if(bnu_resize(out, size) != 0) {
+		return 1;
+	}
+
+	size_t i;
+	for(i = 0; i < inLen; i++) {
+		size_t block = (inLen - i - 1) / 8;
+		size_t offset = ((inLen - i - 1) % 8) * 8;
+		out->d[block] |= ((uint64_t) in[i]) << offset;
+	}
+
+	return 0;
+}
+
+int i2osp(uint8_t *out, bignum *in) {
+	if(out == NULL || in == NULL) {
+		return 1;
+	}
+
+	size_t outLen = ((size_t) in->size) * 8;
+	size_t i;
+	for(i = 0; i < inLen; i++) {
+		size_t block = (outLen - i - 1) / 8;
+		size_t offset = ((outLen - i - 1) % 8) * 8;
+		out[i] = (in->d[block] & (0xff << offset)) >> offset;
+	}
+
+	return 0;
+}
+

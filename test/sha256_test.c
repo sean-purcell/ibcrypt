@@ -4,7 +4,7 @@
 #include <libibur/test.h>
 #include <libibur/util.h>
 
-#include <sha256.h>
+#include "../hash/sha256.h"
 
 void sha256Test() {
 	const char *in[] = {

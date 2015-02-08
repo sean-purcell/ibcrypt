@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
 
 /* equivalent to bni_zero(&bn); */

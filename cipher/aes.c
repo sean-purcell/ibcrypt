@@ -4,7 +4,7 @@
 
 #include <libibur/util.h>
 
-#include <aes.h>
+#include "aes.h"
 
 /* Rijndael key schedule rcon */
 uint8_t rcon[256] = {

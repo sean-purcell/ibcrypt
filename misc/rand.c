@@ -7,7 +7,7 @@
 
 #include <libibur/util.h>
 
-#include <rand.h>
+#include "rand.h"
 
 static uint8_t random_buf[1024];
 static const size_t RANDOM_BUFLEN = 1024;

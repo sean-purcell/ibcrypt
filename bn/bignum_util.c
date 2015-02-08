@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))

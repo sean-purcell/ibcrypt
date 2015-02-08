@@ -10,16 +10,16 @@ LINKFLAGS=-flto
 
 LIBINC=-I/usr/local/include -Ilibibur/bin
 
-DIRS=test cipher hash bn misc include
+DIRS=test cipher hash bn misc
 BUILDDIRS=$(patsubst %,$(BUILDDIR)/$(OBJECTDIR)/%,$(DIRS))
 
 SOURCES:= 
 TESTSOURCES:= 
+HEADERS:=
 
-INCLUDEDIR=include
 HEADERDIR=$(BUILDDIR)/include/ibcrypt
 
-LIBINC+=-I$(HEADERDIR)
+#LIBINC+=-I$(HEADERDIR)
 
 include $(patsubst %,%/inc.mk,$(DIRS))
 
@@ -27,7 +27,7 @@ OBJECTS:=$(patsubst %.c,$(BUILDDIR)/$(OBJECTDIR)/%.o,$(SOURCES))
 TESTSOURCES+=$(SOURCES)
 TESTOBJECTS:=$(patsubst %.c,$(BUILDDIR)/$(OBJECTDIR)/%.o,$(TESTSOURCES))
 
-BUILDHEADERS:=$(patsubst include/%.h,$(HEADERDIR)/%.h,$(HEADERS))
+BUILDHEADERS:=$(patsubst %.h,$(HEADERDIR)/%.h,$(notdir $(HEADERS)))
 
 .PHONY: libibur libheaders lib clean install
 
@@ -44,7 +44,9 @@ libibur:
 $(BUILDDIR)/$(OBJECTDIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $(LIBINC) $< -o $@
 
-$(HEADERDIR)/%.h: include/%.h
+# find a better way to do this later
+.SECONDEXPANSION:
+$(HEADERDIR)/%.h: $$(wildcard */%.h)
 	cp $< $@
 
 $(BUILDDIR):

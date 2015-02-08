@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include <bignum.h>
+#include "../bn/bignum.h"
 
 static void bn_err(const char *err) {
 	fprintf(stderr, "bignum lib error: %s\n", err);

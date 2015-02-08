@@ -5,7 +5,7 @@
 
 #include <libibur/util.h>
 
-#include <sha256.h>
+#include "sha256.h"
 
 /**
  * sha256 constants

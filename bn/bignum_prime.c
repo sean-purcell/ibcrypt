@@ -1,6 +1,6 @@
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
-#include <rand.h>
+#include "../misc/rand.h"
 
 static const size_t num_small_primes = 167;
 static const uint64_t *const small_primes;

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
 
 /* exponentiation using the montgomery powering ladder

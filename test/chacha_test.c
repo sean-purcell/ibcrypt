@@ -1,7 +1,7 @@
 #include <libibur/test.h>
 #include <libibur/endian.h>
 
-#include <chacha.h>
+#include "../cipher/chacha.h"
 
 void chacha_full_tests() {
 	{

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
 
 /* assumes that n is "trimmed" */

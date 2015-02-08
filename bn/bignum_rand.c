@@ -3,8 +3,8 @@
 #include <libibur/util.h>
 
 #include "bignum_util.h"
-#include <bignum.h>
-#include <rand.h>
+#include "bignum.h"
+#include "../misc/rand.h"
 
 int bni_rand_bits(bignum *r, const uint64_t bits) {
 	if(r == NULL) {

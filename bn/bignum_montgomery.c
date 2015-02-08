@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <bignum.h>
+#include "bignum.h"
 #include "bignum_util.h"
 
 int montgomery_reduce(bignum *T, const bignum *N, const bignum *Nres, const uint32_t R_size) {

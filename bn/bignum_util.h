@@ -4,7 +4,7 @@
 #ifndef IBCRYPT_BN_BIGNUM_UTIL_H
 #define IBCRYPT_BN_BIGNUM_UTIL_H
 
-#include <bignum.h>
+#include "bignum.h"
 
 #include <stdint.h>
 

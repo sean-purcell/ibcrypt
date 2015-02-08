@@ -1,6 +1,6 @@
 #include <libibur/test.h>
 
-#include <salsa20.h>
+#include "../cipher/salsa20.h"
 
 void salsa20_core_tests() {
 	{

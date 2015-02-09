@@ -83,7 +83,7 @@ int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
 		/* invalid message */
 		return 1;
 	}
-	if(bno_cmp(&message, &ONE) == 0) {
+	if(bno_cmp(message, &ONE) == 0) {
 		/* invalid message */
 		return 1;
 	}
@@ -101,7 +101,7 @@ int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
 	}
 
 	/* now do the actual encrypting */
-	uint64_t e_mut = e;
+	uint64_t e_mut = key->e;
 	bignum e_bn = { &e_mut, 1 };
 
 	return bno_exp_mod(result, message, &e_bn, &key->n);
@@ -116,7 +116,7 @@ int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 		/* invalid message */
 		return 1;
 	}
-	if(bno_cmp(&ctext, &ONE) == 0) {
+	if(bno_cmp(ctext, &ONE) == 0) {
 		/* invalid message */
 		return 1;
 	}
@@ -134,7 +134,7 @@ int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 	}
 
 	/* now do the actual decrypting */
-	return bno_exp_mod(result, message, &key->d, &key->n);
+	return bno_exp_mod(result, ctext, &key->d, &key->n);
 }
 
 int os2ip(bignum *out, const uint8_t *const in, const size_t inLen) {
@@ -172,7 +172,7 @@ int i2osp(uint8_t *out, bignum *in) {
 
 	size_t outLen = ((size_t) in->size) * 8;
 	size_t i;
-	for(i = 0; i < inLen; i++) {
+	for(i = 0; i < outLen; i++) {
 		size_t block = (outLen - i - 1) / 8;
 		size_t offset = ((outLen - i - 1) % 8) * 8;
 		out[i] = (in->d[block] & (0xff << offset)) >> offset;

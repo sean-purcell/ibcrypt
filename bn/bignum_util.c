@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "../misc/zfree.h"
 #include "bignum.h"
 #include "bignum_util.h"
 
@@ -27,8 +28,7 @@ int bnu_resize(bignum *r, uint32_t size) {
 
 	if(r->d != 0) {
 		memcpy(ptr, r->d, sizeof(uint64_t) * (uint64_t) min(r->size, size));
-		memset(r->d, 0x00, sizeof(uint64_t) * (uint64_t) r->size);
-		free(r->d);
+		zfree(r->d, sizeof(uint64_t) * (uint64_t) r->size);
 	}
 
 	r->d = ptr;

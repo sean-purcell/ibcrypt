@@ -2,9 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <libibur/endian.h>
+#include <libibur/util.h>
+
 #define IBCRYPT_BUILD
 #include "rsa.h"
 #undef IBCRYPT_BUILD
+#include "../misc/zfree.h"
+#include "../misc/rand.h"
+#include "../hash/sha256.h"
 #include "../bn/bignum.h"
 #include "../bn/bignum_util.h"
 
@@ -16,7 +22,7 @@ int bni_rand_prime_rsa(bignum *r, const uint64_t bits, const uint64_t e, const u
  */
 int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 	if(key == NULL) {
-		return 1;
+		return -1;
 	}
 
 	/* zero all values */
@@ -76,7 +82,7 @@ int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
 	if(key == NULL || message == NULL || result == NULL) {
-		return 1;
+		return -1;
 	}
 
 	if(message->size == 0) {
@@ -109,7 +115,7 @@ int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
 
 int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 	if(key == NULL || ctext == NULL || result == NULL) {
-		return 1;
+		return -1;
 	}
 
 	if(ctext->size == 0) {
@@ -139,20 +145,20 @@ int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 
 int os2ip(bignum *out, const uint8_t *const in, const size_t inLen) {
 	if(out == NULL || in == NULL) {
-		return 1;
+		return -1;
 	}
 	if(inLen > 0xffffffffULL * 8) {
-		return 1; /* too big */
+		return TOO_LONG; /* too big */
 	}
 
 	/* zero the output */
 	if(bnu_resize(out, 0) != 0) {
-		return 1;
+		return CRYPTOGRAPHY_ERROR;
 	}
 
 	const uint32_t size = (inLen + 7) / 8;
 	if(bnu_resize(out, size) != 0) {
-		return 1;
+		return CRYPTOGRAPHY_ERROR;
 	}
 
 	size_t i;
@@ -167,7 +173,7 @@ int os2ip(bignum *out, const uint8_t *const in, const size_t inLen) {
 
 int i2osp(uint8_t *out, bignum *in) {
 	if(out == NULL || in == NULL) {
-		return 1;
+		return -1;
 	}
 
 	size_t outLen = ((size_t) in->size) * 8;
@@ -179,5 +185,128 @@ int i2osp(uint8_t *out, bignum *in) {
 	}
 
 	return 0;
+}
+
+void mgf1_sha256(uint8_t *seed, size_t seedLen, size_t maskLen, uint8_t *out) {
+	SHA256_CTX base, ctrhash;
+
+	sha256_init(&base);
+	sha256_update(&base, seed, seedLen);
+
+	uint8_t ctrbuf[4];
+	uint8_t hashbuf[32];
+
+	uint64_t ctr;
+	for(ctr = 0; ctr < maskLen; ctr+=32) {
+		memcpy(&ctrhash, &base, sizeof(SHA256_CTX));
+		encbe32(ctr / 32, ctrbuf);
+		sha256_update(&ctrhash, ctrbuf, 4);
+		sha256_final(&ctrhash, hashbuf);
+		if(maskLen - ctr < 32) {
+			memcpy(&out[ctr], hashbuf, maskLen - ctr);
+		} else {
+			memcpy(&out[ctr], hashbuf, 32);
+		}
+	}
+
+	memsets(&base, 0, sizeof(SHA256_CTX));
+	memsets(&ctrhash, 0, sizeof(SHA256_CTX));
+	memsets(ctrbuf, 0, 4);
+	memsets(hashbuf, 0, 32);
+}
+
+/* when l is the empty string, this is the value of lHash */
+const uint8_t lhash[] = {0xe3,0xb0,0xc4,0x42,0x98,0xfc,0x1c,0x14,0x9a,0xfb,0xf4,0xc8,0x99,0x6f,0xb9,0x24,0x27,0xae,0x41,0xe4,0x64,0x9b,0x93,0x4c,0xa4,0x95,0x99,0x1b,0x78,0x52,0xb8,0x55};
+
+int rsa_oaep_encrypt(RSA_PUBLIC_KEY *key, uint8_t *message, size_t mlen, uint8_t *out) {
+	if(key == NULL || message == NULL || out == NULL) {
+		return -1;
+	}
+
+	const size_t k = (size_t)key->n.size * 8;
+	const size_t hlen = 32;
+	uint8_t seed[hlen];
+	uint8_t *mask;
+	uint8_t *em;
+	uint8_t *db;
+	bignum m_bn;
+	bignum c_bn;
+
+	int ret;
+
+	if(k - 2 * hlen - 2 < mlen) {
+		return TOO_LONG;
+	}
+
+	/* do stuff involving the masks first, as in case of error it does not
+	 * need to be kept secure */
+	if(cs_rand(seed, hlen) != 0) {
+		return CRYPTOGRAPHY_ERROR;
+	}
+
+	if((mask = malloc(k - hlen - 1)) == NULL) {
+		return MALLOC_FAIL;
+	}
+
+	/* calculate dbMask = MGF(seed, k - hLen - 1) */
+	mgf1_sha256(seed, hlen, k - hlen - 1, mask);
+
+	/* now initialize the string to be encrypted */
+	if((em = malloc(k - 1)) == NULL) {
+		return MALLOC_FAIL;
+	}
+
+	/* from now on we have to clean up memory after any failures */
+	/* em[hlen:] is all DB = lhash || PS || 0x01 || M */
+	db = em + hlen;
+	memcpy(db, lhash, hlen);
+	/* PS is a padding string of zeroes */
+	memset(db + hlen, 0x00, k - 2 * hlen - mlen - 2);
+	/* there is then one byte of value 0x01 */
+	db[k - 2 - hlen - mlen] = 0x01;
+	/* then message */
+	memcpy(&db[k - hlen - mlen - 1], message, mlen);
+
+	/* now apply the mask to it */
+	xor_bytes(db, mask, k - hlen - 1, db);
+
+	/* now we can repurpose mask to encode the seed mask */
+	mgf1_sha256(db, k - hlen - 1, hlen, mask);
+	/* xor it into em */
+	xor_bytes(seed, mask, hlen, em);
+
+	m_bn = BN_ZERO;
+	c_bn = BN_ZERO;
+	/* now convert to a big integer */
+	if((ret = os2ip(&m_bn, em, k - 1)) != 0) {
+		goto err;
+	}
+
+	/* encrypt */
+	if((ret = rsa_encrypt(key, &m_bn, &c_bn)) != 0) {
+		goto err;
+	}
+
+	/* convert back */
+	if((ret = i2osp(out, &c_bn)) != 0) {
+		goto err;
+	}
+
+	/* encryption is officially done, clean up */
+	ret = 0;
+
+err:
+	/* free mask and em, zero seed */
+	zfree(mask, k - hlen - 1);
+	zfree(em, k - 1);
+	memsets(seed, 0x00, hlen);
+
+	/* free the bignums */
+	/* an error here is still an error as it is a possible leak of
+	 * sensitive data */
+	ret = ret == 0 ? bnu_free(&m_bn) : ret;
+	ret = ret == 0 ? bnu_free(&c_bn) : ret;
+
+	return ret;
 }
 

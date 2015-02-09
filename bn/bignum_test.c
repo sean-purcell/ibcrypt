@@ -3,7 +3,7 @@
 #include <time.h>
 
 #include "bignum.h"
-#include "../hash/sha256.h>"
+#include "../hash/sha256.h"
 
 #include <libibur/util.h>
 

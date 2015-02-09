@@ -6,7 +6,7 @@
 /* replica of memset
  * casts p to a volatile pointer and then manually memsets, hopefully avoiding
  * being optimized out */
-void *memset_s(void *p, int v, size_t n);
+void *memsets(void *p, int v, size_t n);
 /* frees p after setting it to 0 using memset_s */
 void zfree(void *p, size_t n);
 

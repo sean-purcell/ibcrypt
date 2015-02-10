@@ -38,9 +38,12 @@ void rsa_test() {
 	int ret = rsa_oaep_encrypt(&pkey, (uint8_t*) message, strlen(message) + 1, ctext);
 	printf("%d\n", ret);
 	printbuf(ctext, key.n.size * 8);
+
+	ret = rsa_oaep_decrypt(&key, ctext, key.n.size * 8, (uint8_t*)mtext);
+	printf("%s\n", mtext);
 }
 
 int main() {
-	i2os_os2i_test();
+	rsa_test();
 }
 

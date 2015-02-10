@@ -23,9 +23,9 @@ typedef struct {
 	uint64_t e;
 } RSA_PUBLIC_KEY;
 
-int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e);
+int rsa_gen_key(RSA_KEY *key, const uint32_t k, const uint64_t e);
 /* creates a public key from a private one */
-RSA_PUBLIC_KEY pub_key(RSA_KEY *key);
+int rsa_pub_key(RSA_KEY *key, RSA_PUBLIC_KEY *pkey);
 
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result);
 int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result);

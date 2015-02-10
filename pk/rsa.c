@@ -20,7 +20,7 @@ int bni_rand_prime_rsa(bignum *r, const uint64_t bits, const uint64_t e, const u
 /* generates an rsa key with `k` bits and a public exponent of `e`
  * returns 1 on failure, 0 on success
  */
-int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
+int rsa_gen_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 	if(key == NULL) {
 		return -1;
 	}
@@ -36,7 +36,7 @@ int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 		return 1;
 	}
 
-	if(bni_rand_prime_rsa(&key->p, prime_bits, e, 128) != 0) {
+	if(bni_rand_prime_rsa(&key->q, prime_bits, e, 128) != 0) {
 		return 1;
 	}
 
@@ -80,11 +80,18 @@ int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 	return 0;
 }
 
-RSA_PUBLIC_KEY pub_key(RSA_KEY *key) {
-	RSA_PUBLIC_KEY pkey;
-	pkey.n = key->n;
-	pkey.e = key->e;
-	return pkey;
+int rsa_pub_key(RSA_KEY *key, RSA_PUBLIC_KEY *pkey) {
+	if(pkey == NULL || key == NULL) {
+		return -1;
+	}
+
+	pkey->n = BN_ZERO;
+	if(bni_cpy(&pkey->n, &key->n) != 0) {
+		return CRYPTOGRAPHY_ERROR;
+	}
+
+	pkey->e = key->e;
+	return 0;
 }
 
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
@@ -188,7 +195,7 @@ int i2osp(uint8_t *out, bignum *in) {
 	for(i = 0; i < outLen; i++) {
 		size_t block = (outLen - i - 1) / 8;
 		size_t offset = ((outLen - i - 1) % 8) * 8;
-		out[i] = (in->d[block] & (0xff << offset)) >> offset;
+		out[i] = (in->d[block] & ((uint64_t)0xff << offset)) >> offset;
 	}
 
 	return 0;

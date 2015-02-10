@@ -11,7 +11,7 @@ void i2os_os2i_test() {
 	uint8_t o[8];
 	bignum m;
 	os2ip(&m, i, 8);
-	i2osp(o, &m);
+	i2osp(o, 8, &m);
 
 	printbuf(i, 8);
 	bnu_print(&m);puts("");
@@ -33,17 +33,24 @@ void rsa_test() {
 	/* test encryption and decryption of message */
 	char *message = "this is my secret.  there are many like it, but this one is mine.";
 	uint8_t *ctext = malloc(key.n.size * 8);
+	uint8_t *sig = malloc(key.n.size * 8);
 	char *mtext = malloc(strlen(message) + 1);
 
-	int ret = rsa_oaep_encrypt(&pkey, (uint8_t*) message, strlen(message) + 1, ctext);
+	int ret = rsa_oaep_encrypt(&pkey, (uint8_t*) message, strlen(message) + 1, ctext, key.n.size * 8);
 	printf("%d\n", ret);
 	printbuf(ctext, key.n.size * 8);
 
-	ret = rsa_oaep_decrypt(&key, ctext, key.n.size * 8, (uint8_t*)mtext);
+	ret = rsa_oaep_decrypt(&key, ctext, key.n.size * 8, (uint8_t*)mtext, strlen(message) + 1);
+	printf("%d\n", ret);
 	printf("%s\n", mtext);
+
+	ctext[128] ^= 1;
+	ret = rsa_oaep_decrypt(&key, ctext, key.n.size * 8, (uint8_t*)mtext, strlen(message) + 1);
+	printf("%d\n", ret);
 }
 
 int main() {
-	rsa_test();
+	i2os_os2i_test();
+	//rsa_test();
 }
 

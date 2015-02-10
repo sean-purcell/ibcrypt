@@ -6,6 +6,7 @@
 #define TOO_LONG 2
 #define INVALID_ARGUMENTS 3
 #define MALLOC_FAIL 4
+#define TOO_SHORT 5
 
 #endif
 

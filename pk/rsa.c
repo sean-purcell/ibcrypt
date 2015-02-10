@@ -199,7 +199,7 @@ int i2osp(uint8_t *out, size_t outlen, bignum *in) {
 	size_t i = 0;
 	if(outlen > in->size * 8) {
 		memset(out, 0x00, outlen - in->size * 8);
-		i = in->size * 8;
+		i = outlen - in->size * 8;
 	}
 	for(; i < outlen; i++) {
 		size_t block = (outlen - i - 1) / 8;

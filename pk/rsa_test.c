@@ -8,14 +8,16 @@
 
 void i2os_os2i_test() {
 	uint8_t i[8] = { 0x10, 0x53, 0xef, 0x42, 0xb3, 0x9e, 0x1c, 0xf4 };
-	uint8_t o[8];
-	bignum m;
+	uint8_t o[9];
+	bignum m = BN_ZERO;
 	os2ip(&m, i, 8);
-	i2osp(o, 8, &m);
+	i2osp(o, 9, &m);
 
 	printbuf(i, 8);
 	bnu_print(&m);puts("");
-	printbuf(o, 8);
+	printbuf(o, 9);
+
+	bnu_free(&m);
 }
 
 void rsa_test() {

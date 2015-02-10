@@ -80,6 +80,13 @@ int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e) {
 	return 0;
 }
 
+RSA_PUBLIC_KEY pub_key(RSA_KEY *key) {
+	RSA_PUBLIC_KEY pkey;
+	pkey.n = key->n;
+	pkey.e = key->e;
+	return pkey;
+}
+
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result) {
 	if(key == NULL || message == NULL || result == NULL) {
 		return -1;
@@ -306,6 +313,89 @@ err:
 	 * sensitive data */
 	ret = ret == 0 ? bnu_free(&m_bn) : ret;
 	ret = ret == 0 ? bnu_free(&c_bn) : ret;
+
+	return ret;
+}
+
+int rsa_oaep_decrypt(RSA_KEY *key, uint8_t *ctext, size_t clen, uint8_t *out) {
+	if(key == NULL || ctext == NULL || out == NULL) {
+		return -1;
+	}
+
+	const size_t k = (size_t)key->n.size * 8;
+	const size_t hlen = 32;
+	bignum c_bn = BN_ZERO;
+	bignum m_bn = BN_ZERO;
+	uint8_t *em = NULL;
+	uint8_t *db = NULL;
+	uint8_t *mask = NULL;
+	uint8_t seed[32];
+	size_t message_start;
+
+	int ret;
+
+	/* nothing critical yet */
+	if((ret = os2ip(&c_bn, ctext, clen)) != 0) {
+		return ret;
+	}
+
+	/* now sensitive information is contained in our buffers, so we have
+	 * to clean up */
+	if((ret = rsa_decrypt(key, &c_bn, &m_bn)) != 0) {
+		goto err;
+	}
+
+	if((em = malloc(k)) == NULL) {
+		ret = MALLOC_FAIL;
+		goto err;
+	}
+
+	if((ret = i2osp(em, &m_bn)) != 0) {
+		goto err;
+	}
+	db = em + hlen + 1;
+
+	if((mask = malloc(k - hlen - 1)) == NULL) {
+		ret = MALLOC_FAIL;
+		goto err;
+	}
+
+	/* calculate seed mask = MGF1(maskedDB, k - hlen - 1) */
+	mgf1_sha256(db, k - hlen - 1, hlen, mask);
+
+	/* calculate seed */
+	xor_bytes(em + 1, mask, hlen, seed);
+
+	/* calculate dbMask */
+	mgf1_sha256(seed, hlen, k - hlen - 1, mask);
+
+	/* unmask db */
+	xor_bytes(db, mask, k - hlen - 1, db);
+
+	/* find the start of the message */
+	for(message_start = hlen; message_start < k - hlen - 1 &&
+		db[message_start] == 0x00; message_start++) {}
+
+	uint8_t valid = 0;
+	valid |= memcmp_ct(db, lhash, 32);
+	valid |= em[0];
+	valid |= !(message_start != k - hlen - 1 && db[message_start] == 1);
+
+	/* if valid is non-zero this is not a valid message */
+	if(valid != 0) {
+		ret = CRYPTOGRAPHY_ERROR;
+		goto err;
+	}
+
+	memcpy(out, &db[message_start], k - hlen - 1 - message_start);
+
+	ret = 0;
+err:
+	ret = ret == 0 ? bnu_free(&c_bn) : ret;
+	ret = ret == 0 ? bnu_free(&m_bn) : ret;
+	if(em) zfree(em, k);
+	if(mask) zfree(mask, k - hlen - 1);
+	memsets(seed, 0x00, hlen);
 
 	return ret;
 }

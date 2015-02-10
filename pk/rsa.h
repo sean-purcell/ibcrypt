@@ -24,6 +24,8 @@ typedef struct {
 } RSA_PUBLIC_KEY;
 
 int gen_rsa_key(RSA_KEY *key, const uint32_t k, const uint64_t e);
+/* creates a public key from a private one */
+RSA_PUBLIC_KEY pub_key(RSA_KEY *key);
 
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result);
 int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result);
@@ -40,6 +42,7 @@ void mgf1_sha256(uint8_t *seed, size_t seedLen, size_t maskLen, uint8_t *out);
 
 /* RSAES-OAEP encryption using MGF1 and SHA256 */
 int rsa_oaep_encrypt(RSA_PUBLIC_KEY *key, uint8_t *message, size_t mlen, uint8_t *out);
+int rsa_oaep_decrypt(RSA_KEY *key, uint8_t *ctext, size_t clen, uint8_t *out);
 
 #endif
 

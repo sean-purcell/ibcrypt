@@ -474,7 +474,7 @@ int rsa_pss_sign(RSA_KEY *key, uint8_t *message, size_t mlen, uint8_t *out, size
 	sha256_update(&ctx, message, mlen);
 	sha256_final(&ctx, mhash);
 
-	/* calculate H = sha256(0x00 00 00 00 00 00 00 00 || mhash || salt */
+	/* calculate H = sha256(0x00 00 00 00 00 00 00 00 || mhash || salt) */
 	memset(zeroes, 0x00, 8);
 
 	sha256_init(&ctx);
@@ -515,4 +515,95 @@ err:
 
 	return ret;
 }
+
+int rsa_pss_verify(RSA_PUBLIC_KEY *key, uint8_t *sig, size_t siglen, uint8_t *message, size_t mlen, int *valid) {
+	if(key == NULL || sig == NULL || message == NULL || valid == NULL) {
+		return -1;
+	}
+
+	const size_t k = (key->bits - 1) / 8 + 1;
+	const size_t emlen = (key->bits - 2) / 8 + 1;
+	const size_t hlen = 32;
+	const size_t slen = hlen;
+	SHA256_CTX ctx;
+	uint8_t hash[hlen];
+	uint8_t zeroes[8];
+	uint8_t *em = NULL;
+	uint8_t *mask = NULL;
+	bignum em_bn = BN_ZERO;
+	bignum s_bn = BN_ZERO;
+
+	int ret;
+
+	*valid = 0;
+
+	if((em = malloc(emlen)) == NULL) {
+		return MALLOC_FAIL;
+	}
+
+	if((mask = malloc(emlen - hlen - 1)) == NULL) {
+		ret = MALLOC_FAIL;
+		goto err;
+	}
+
+	if((ret = os2ip(&s_bn, sig, siglen)) != 0) {
+		/* cleanup is non-necessary here, but no harm */
+		goto err;
+	}
+
+	if((ret = rsa_encrypt(key, &s_bn, &em_bn)) != 0) {
+		goto err;
+	}
+
+	if((ret = i2osp(em, emlen, &em_bn)) != 0) {
+		goto err;
+	}
+
+	mgf1_sha256(&em[emlen - hlen - 1], hlen, emlen - hlen - 1, mask);
+
+	xor_bytes(em, mask, emlen - hlen - 1, em);
+
+	sha256_init(&ctx);
+	sha256_update(&ctx, message, mlen);
+	sha256_final(&ctx, hash);
+
+	memset(zeroes, 0x00, 8);
+
+	sha256_init(&ctx);
+	sha256_update(&ctx, zeroes, 8);
+	sha256_update(&ctx, hash, hlen);
+	sha256_update(&ctx, &em[emlen - hlen - slen - 1], slen);
+	sha256_final(&ctx, hash);
+
+	xor_bytes(&em[emlen - hlen - 1], hash, hlen, &em[emlen - hlen - 1]);
+	em[emlen - hlen - slen - 2] ^= 0x01;
+	em[emlen - 1] ^= 0xbc;
+	em[0] &= ((uint8_t) 0xff) >> (emlen * 8 - (key->bits - 1));
+	memset(&em[emlen - hlen - slen - 1], 0x00, slen);
+
+	size_t i;
+	uint8_t val = 0;
+	for(i = 0; i < emlen; i++) {
+		val |= (em[i]);
+	}
+
+	if(val) {
+		*valid = 0;
+	} else {
+		*valid = 1;
+	}
+
+	ret = 0;
+
+err:
+	memsets(&ctx, 0x00, sizeof(SHA256_CTX));
+	memsets(hash, 0x00, hlen);
+	if(em) zfree(em, emlen);
+	if(mask) zfree(mask, emlen - hlen - 1);
+	bnu_free(&em_bn);
+	bnu_free(&s_bn);
+
+	return ret;
+}
+
 

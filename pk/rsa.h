@@ -40,7 +40,7 @@ size_t sig_size(bignum *n);
 /* PKCS#1 v2.1 algorithms below */
 
 /* see RFC3447 for a description of the following algorithms */
-int os2ip(bignum *out, uint8_t *in, size_t inLen);
+int os2ip(bignum *out, uint8_t *in, size_t inlen);
 int i2osp(uint8_t *out, size_t outlen, bignum *in);
 
 /* a mask generation function defined by RFC3447, using sha256 as the hash

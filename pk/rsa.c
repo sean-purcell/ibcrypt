@@ -521,7 +521,6 @@ int rsa_pss_verify(RSA_PUBLIC_KEY *key, uint8_t *sig, size_t siglen, uint8_t *me
 		return -1;
 	}
 
-	const size_t k = (key->bits - 1) / 8 + 1;
 	const size_t emlen = (key->bits - 2) / 8 + 1;
 	const size_t hlen = 32;
 	const size_t slen = hlen;

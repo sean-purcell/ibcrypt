@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <libibur/endian.h>
 #include <libibur/util.h>

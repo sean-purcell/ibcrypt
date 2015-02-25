@@ -1,6 +1,8 @@
 #ifndef IBCRYPT_PK_RSA_H
 #define IBCRYPT_PK_RSA_H
 
+#include <string.h>
+
 /* if we're compiling inside ibcrypt, use relative directories */
 #ifdef IBCRYPT_BUILD
 #include "../bn/bignum.h"

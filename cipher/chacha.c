@@ -6,6 +6,7 @@
 #include <libibur/endian.h>
 
 #include "chacha.h"
+#include "../misc/zfree.h"
 
 #ifdef CHACHA_DEBUG
 #include <libibur/util.h>
@@ -117,7 +118,7 @@ void stream_chacha(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out,
 	/* the n value to pass when expanding new stream block */
 	uint8_t n[16];
 	encle64(ctx->nonce, &n[8]);
-	
+
 	for(i = 0; i < len; i++) {
 		if(ctx->count % 64 == 0) {
 			encle64(ctx->count / 64, &n[0]);
@@ -133,8 +134,7 @@ void stream_chacha(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out,
 
 /* frees an initialized chacha context */
 void free_chacha(CHACHA_CTX *ctx) {
-	memset(ctx, 0x00, sizeof(CHACHA_CTX));
-	free(ctx);
+	zfree(ctx, sizeof(CHACHA_CTX));
 }
 
 /* convenience functions */

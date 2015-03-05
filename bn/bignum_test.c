@@ -427,6 +427,14 @@ void assorted() {
 	bnu_free(&x);
 }
 
+int bni_rand_prime_dh(bignum *p, const uint64_t bits, const uint32_t certainty);
+
+void dh_gen_test() {
+	bignum q;
+	bni_rand_prime_dh(&q, 512, 128);
+
+	bnu_print(&q);puts("");
+}
 
 int main() {
 	//karatsuba_test();
@@ -434,6 +442,7 @@ int main() {
 	//speed_test();
 	//rand_exp_test();
 	//prime_test_test();
-	prime_gen_test();
+	//prime_gen_test();
 	//assorted();
+	dh_gen_test();
 }

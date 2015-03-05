@@ -263,3 +263,23 @@ int bni_rand_prime_rsa(bignum *r, const uint64_t bits, const uint64_t e, const u
 	return bnu_free(&remainder);
 }
 
+int bni_rand_prime_dh(bignum *p, const uint64_t bits, const uint32_t certainty) {
+	if(bits <= 3) return 1;
+	bignum q = BN_ZERO;
+	int prime = 0;
+
+	do {
+		if(bni_rand_prime(&q, bits - 1, certainty) != 0) {
+			return 1;
+		}
+		if(bno_lshift(p, &q, 1) != 0 || bno_add(p, p, &ONE) != 0) {
+			return 1;
+		}
+		if(prime_test(&prime, p, certainty) != 0) {
+			return 1;
+		}
+		printf("test\n");
+	} while(prime == 0);
+	return bnu_free(&q);
+}
+

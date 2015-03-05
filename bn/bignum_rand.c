@@ -47,7 +47,7 @@ int bni_rand_range(bignum *r, const bignum *bot, const bignum *top) {
 		return 1;
 	}
 
-	uint64_t mask = (2 << lg(range.d[range.size - 1])) - 1;
+	uint64_t mask = ((uint64_t)2 << lg(range.d[range.size - 1])) - 1;
 
 	do {
 		cs_rand(r->d, r->size * sizeof(uint64_t));

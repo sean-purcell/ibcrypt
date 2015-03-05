@@ -278,7 +278,6 @@ int bni_rand_prime_dh(bignum *p, const uint64_t bits, const uint32_t certainty) 
 		if(prime_test(&prime, p, certainty) != 0) {
 			return 1;
 		}
-		printf("test\n");
 	} while(prime == 0);
 	return bnu_free(&q);
 }

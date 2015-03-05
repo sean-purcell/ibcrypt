@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 const uint64_t RFC3526_BITS[] = {
 	2048,
 	3072,

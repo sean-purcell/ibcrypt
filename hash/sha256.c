@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <libibur/util.h>
+#include <libibur/endian.h>
 
 #include "sha256.h"
 
@@ -266,9 +267,7 @@ void pbkdf2_hmac_sha256(uint8_t *pass, size_t plen, uint8_t *salt, size_t saltLe
 		/* init ctx with password */
 		memcpy(&ctx, &Pctx, sizeof(HMAC_SHA256_CTX));
 		
-		for(int x = 0; x < 4; x++) {
-			count_buf[x] = (i >> (24 - x * 8)) & 0xff;
-		}
+		encbe32(i, count_buf);
 		
 		/* update hmac with salt and count */
 		hmac_sha256_update(&ctx, salt, saltLen);
@@ -300,4 +299,8 @@ void pbkdf2_hmac_sha256(uint8_t *pass, size_t plen, uint8_t *salt, size_t saltLe
 	
 	/* final was never called on Pctx */
 	memset(&Pctx, 0, sizeof(HMAC_SHA256_CTX));
+	memset(prev, 0, 32);
+	memset(pkey, 0, 32);
+	memset(count_buf, 0, 4);
 }
+

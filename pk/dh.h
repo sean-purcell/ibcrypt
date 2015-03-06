@@ -23,6 +23,8 @@ typedef struct {
 typedef DH_VAL DH_PRI;
 typedef DH_VAL DH_PUB;
 
+extern DH_VAL DH_VAL_INIT;
+
 int dh_init_ctx(DH_CTX *ctx, int id);
 int dh_free_ctx(DH_CTX *ctx);
 int dh_gen_exp(DH_CTX *ctx, DH_PRI *e);

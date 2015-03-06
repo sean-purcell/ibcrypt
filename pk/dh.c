@@ -14,6 +14,8 @@ extern char     *RFC3526_GROUPS[];
 static uint64_t bottom_limit_val = 8193;
 static bignum bottom_limit = { &bottom_limit_val, 1 };
 
+DH_VAL DH_VAL_INIT = { { NULL, 0 } };
+
 /* the id refers to the group ids defined in rfc3526
  * only groups 14-18 are included */
 int dh_init_ctx(DH_CTX *ctx, int id) {

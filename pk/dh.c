@@ -69,3 +69,20 @@ int dh_val_free(DH_VAL *v) {
 	return bnu_free(&v->x);
 }
 
+int dh_range_check(DH_CTX *ctx, DH_PUB *v) {
+	bignum p_minus_one = BN_ZERO;
+	if(bno_sub(&p_minus_one, &ctx->p, &ONE) != 0) {
+		return -1;
+	}
+
+	int ret = bno_cmp(&ONE, &v->x) > 0 &&
+	          bno_cmp(&v->x, &p_minus_one) < 0 ?
+	          0 : 1;
+
+	if(bnu_free(&p_minus_one) != 0) {
+		return -1;
+	}
+
+	return ret;
+}
+

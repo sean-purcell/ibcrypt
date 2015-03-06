@@ -32,6 +32,7 @@ int dh_gen_pub(DH_CTX *ctx, DH_PRI *e, DH_PUB *x);
 int dh_compute_secret(DH_CTX *ctx, DH_PRI *e, DH_PUB *x, DH_VAL *s);
 int dh_val_init(DH_VAL *v);
 int dh_val_free(DH_VAL *v);
+int dh_range_check(DH_CTX *ctx, DH_PUB *v);
 
 #endif
 

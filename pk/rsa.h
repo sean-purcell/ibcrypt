@@ -34,6 +34,9 @@ int rsa_pub_key(RSA_KEY *key, RSA_PUBLIC_KEY *pkey);
 int rsa_encrypt(RSA_PUBLIC_KEY *key, bignum *message, bignum *result);
 int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result);
 
+int rsa_free_pubkey(RSA_PUBLIC_KEY *key);
+int rsa_free_prikey(RSA_KEY *key);
+
 /* returns the size in bytes of the cipher text using a given modulus */
 size_t ctext_size(bignum *n);
 /* returns the size in bytes of the signature text using a given modulus */

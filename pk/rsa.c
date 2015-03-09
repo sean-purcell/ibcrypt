@@ -164,6 +164,33 @@ int rsa_decrypt(RSA_KEY *key, bignum *ctext, bignum *result) {
 	return bno_exp_mod(result, ctext, &key->d, &key->n);
 }
 
+int rsa_free_pubkey(RSA_PUBLIC_KEY *key) {
+	if(key == NULL) {
+		return 1;
+	}
+
+	int ret = bnu_free(&key->n);
+	memset(key, 0, sizeof(RSA_PUBLIC_KEY));
+
+	return ret;
+}
+
+int rsa_free_prikey(RSA_KEY *key) {
+	if(key == NULL) {
+		return 1;
+	}
+
+	int ret = 0;
+	ret |= bnu_free(&key->p);
+	ret |= bnu_free(&key->q);
+	ret |= bnu_free(&key->n);
+	ret |= bnu_free(&key->d);
+
+	memset(key, 0, sizeof(RSA_KEY));
+
+	return ret;
+}
+
 int os2ip(bignum *out, uint8_t *in, size_t inlen) {
 	if(out == NULL || in == NULL) {
 		return -1;

@@ -2,6 +2,7 @@
 #define IBCRYPT_SHA256_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef struct sha256_context {
 	uint32_t state[8];

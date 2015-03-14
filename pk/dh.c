@@ -69,6 +69,8 @@ int dh_val_free(DH_VAL *v) {
 	return bnu_free(&v->x);
 }
 
+/* returns 0 if out of range, 1 if in range
+ * -1 if it fails */
 int dh_range_check(DH_CTX *ctx, DH_PUB *v) {
 	bignum p_minus_one = BN_ZERO;
 	if(bno_sub(&p_minus_one, &ctx->p, &ONE) != 0) {

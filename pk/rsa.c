@@ -518,7 +518,7 @@ int rsa_pss_sign(RSA_KEY *key, uint8_t *message, size_t mlen, uint8_t *out, size
 	xor_bytes(&em[emlen - slen - hlen - 1], salt, slen, &em[emlen - slen - hlen - 1]);
 	em[emlen - 1] = 0xbc;
 
-	em[0] &= ((uint8_t) 0xff) >> (8 * emlen - (key->bits - 1));
+	em[0] &= ((uint8_t) 0xff) >> (8 * emlen - (key->bits - 2));
 
 	if((ret = os2ip(&em_bn, em, emlen)) != 0) {
 		goto err;
@@ -605,7 +605,7 @@ int rsa_pss_verify(RSA_PUBLIC_KEY *key, uint8_t *sig, size_t siglen, uint8_t *me
 	xor_bytes(&em[emlen - hlen - 1], hash, hlen, &em[emlen - hlen - 1]);
 	em[emlen - hlen - slen - 2] ^= 0x01;
 	em[emlen - 1] ^= 0xbc;
-	em[0] &= ((uint8_t) 0xff) >> (emlen * 8 - (key->bits - 1));
+	em[0] &= ((uint8_t) 0xff) >> (emlen * 8 - (key->bits - 2));
 	memset(&em[emlen - hlen - slen - 1], 0x00, slen);
 
 	size_t i;

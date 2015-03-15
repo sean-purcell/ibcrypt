@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -12,6 +13,7 @@
 static uint8_t random_buf[1024];
 static const size_t RANDOM_BUFLEN = 1024;
 static size_t buf_index = 0;
+static pthread_mutex_t rand_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* set to 0 after the first use */
 static int random_init = 1;
 
@@ -59,6 +61,7 @@ err0: /* error occurred while closing/opening fd */
 
 /* returns RANDOM_FAIL if unsuccessful, 0 if successful */
 int cs_rand(void *_buf, size_t buflen) {
+	pthread_mutex_lock(&rand_mutex);
 	if(random_init) {
 		reset_buf();
 		random_init = 0;
@@ -79,6 +82,7 @@ int cs_rand(void *_buf, size_t buflen) {
 	memcpy(buf, &random_buf[buf_index], buflen);
 	buf_index += buflen;
 
+	pthread_mutex_unlock(&rand_mutex);
 	return 0;
 }
 

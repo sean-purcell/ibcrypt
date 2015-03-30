@@ -20,21 +20,20 @@ void chacha_core(const uint8_t in[64], uint8_t out[64]);
 /* the chachaexpansion function 
  * ksize must be 16 or 32, otherwise
  * this function will fail silently */
-void chacha_expand(const uint8_t* const k, const int ksize, const uint8_t n[16], uint8_t out[64]);
+void chacha_expand(const uint8_t *const k, const int ksize, const uint8_t n[16], uint8_t out[64]);
 
 /* initialize a chacha context
- * returns NULL on failure 
  * ksize is in bytes */
-CHACHA_CTX* init_chacha(const uint8_t* key, const int ksize, const uint64_t nonce);
+void chacha_init(CHACHA_CTX *ctx, const uint8_t *key, const int ksize, const uint64_t nonce);
 
 /* encrypt/decrypt a section */
-void stream_chacha(CHACHA_CTX* ctx, const uint8_t* const in, uint8_t* const out, const uint64_t len);
+void chacha_stream(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out, const uint64_t len);
 
-/* frees an initialized chacha context */
-void free_chacha(CHACHA_CTX* ctx);
+/* zeroes an initialized chacha context */
+void chacha_final(CHACHA_CTX *ctx);
 
 /* convenience functions */
-int chacha_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
-int chacha_dec(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
+void chacha_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len);
+void chacha_dec(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len);
 
 #endif

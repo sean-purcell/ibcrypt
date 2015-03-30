@@ -82,19 +82,11 @@ void chacha_expand(const uint8_t *const k, const int ksize, const uint8_t n[16],
 	chacha_core(out, out);
 }
 
-/* initialize a chacha context
- * returns NULL on failure */
-CHACHA_CTX *init_chacha(const uint8_t *key, const int ksize, const uint64_t nonce) {
-	CHACHA_CTX *ctx;
-	
+/* initialize a chacha context */
+void chacha_init(CHACHA_CTX *ctx, const uint8_t *key, const int ksize, const uint64_t nonce) {
 	if(ksize != 16 && ksize != 32) {
 		/* unacceptable */
-		goto err0;
-	}
-	
-	if((ctx = malloc(sizeof(CHACHA_CTX))) == NULL) {
-		errno = ENOMEM;
-		goto err0;
+		return;
 	}
 
 	ctx->ksize = ksize;
@@ -104,16 +96,10 @@ CHACHA_CTX *init_chacha(const uint8_t *key, const int ksize, const uint64_t nonc
 	
 	ctx->nonce = nonce;
 	ctx->count = 0;
-
-	return ctx;
-
-err0:
-	/* failure! */
-	return NULL;
 }
 
 /* encrypt/decrypt a section */
-void stream_chacha(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
+void chacha_stream(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
 	uint64_t i;
 	/* the n value to pass when expanding new stream block */
 	uint8_t n[16];
@@ -132,23 +118,20 @@ void stream_chacha(CHACHA_CTX *ctx, const uint8_t *const in, uint8_t *const out,
 	}
 }
 
-/* frees an initialized chacha context */
-void free_chacha(CHACHA_CTX *ctx) {
-	zfree(ctx, sizeof(CHACHA_CTX));
+/* zeroes an initialized chacha context */
+void chacha_final(CHACHA_CTX *ctx) {
+	memsets(ctx, 0, sizeof(CHACHA_CTX));
 }
 
 /* convenience functions */
-int chacha_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
-	CHACHA_CTX *ctx = init_chacha(key, ksize, nonce);
-	if(ctx == NULL) {
-		return 1;
-	}
-	
-	stream_chacha(ctx, in, out, len);
-	free_chacha(ctx);
-	return 0;
+void chacha_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
+	CHACHA_CTX ctx;
+	chacha_init(&ctx, key, ksize, nonce);
+
+	chacha_stream(&ctx, in, out, len);
+	chacha_final(&ctx);
 }
 
-int chacha_dec(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
-	return chacha_enc(key, ksize, nonce, in, out, len);
+void chacha_dec(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
+	chacha_enc(key, ksize, nonce, in, out, len);
 }

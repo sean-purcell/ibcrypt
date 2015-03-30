@@ -21,18 +21,17 @@ void salsa20_core(const uint8_t in[64], uint8_t out[64]);
 void salsa20_expand(const uint8_t* const k, const int ksize, const uint8_t n[16], uint8_t out[64]);
 
 /* initialize a salsa20 context
- * returns NULL on failure 
  * ksize is in bytes */
-SALSA20_CTX* init_salsa20(const uint8_t* key, const int ksize, const uint64_t nonce);
+void salsa20_init(SALSA20_CTX *ctx, const uint8_t* key, const int ksize, const uint64_t nonce);
 
 /* encrypt/decrypt a section */
-void stream_salsa20(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const out, const uint64_t len);
+void salsa20_stream(SALSA20_CTX* ctx, const uint8_t* const in, uint8_t* const out, const uint64_t len);
 
 /* frees an initialized salsa20 context */
-void free_salsa20(SALSA20_CTX* ctx);
+void salsa20_final(SALSA20_CTX* ctx);
 
 /* convenience functions */
-int salsa20_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
-int salsa20_dec(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
+void salsa20_enc(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
+void salsa20_dec(const uint8_t* key, const int ksize, const uint64_t nonce, const uint8_t* const in, uint8_t* const out, const uint64_t len);
 
 #endif

@@ -51,5 +51,15 @@ int main() {
 	printf("q:\n");bnu_print(&key.q);puts("");
 	printf("d:\n");bnu_print(&key.d);puts("");
 	printf("e:\n%llu\n", key.e);
+
+	uint8_t buf2[272];
+	if(rsa_wire_prikey2pubkey(buf, 528, buf2, 272) != 0) {
+		fprintf(stderr, "%d :C\n", __LINE__);
+	}
+	if(rsa_wire2pubkey(buf2, 272, &pkey) != 0) {
+		fprintf(stderr, "%d :C\n", __LINE__);
+	}
+	printf("n:\n");bnu_print(&pkey.n);puts("");
+	printf("e:\n%llu\n", pkey.e);
 }
 

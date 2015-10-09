@@ -112,6 +112,44 @@ error:
 	return 1;
 }
 
+int rsa_wire_prikey2pubkey(uint8_t *in, size_t inlen, uint8_t *out, size_t outlen) {
+	uint64_t bits = decbe64(in);
+	size_t p_len = ((bits / 2) + 7) / 8;
+	int ret = 0;
+
+	if(inlen < rsa_prikey_bufsize(bits) || outlen < rsa_pubkey_bufsize(bits)) {
+		return -1;
+	}
+
+	bignum n = BN_ZERO, p = BN_ZERO, q = BN_ZERO;
+	if(os2ip(&p, &in[8], p_len) != 0) {
+		goto error;
+	}
+	if(os2ip(&q, &in[8+p_len], p_len) != 0) {
+		goto error;
+	}
+
+	if(bno_mul(&n, &p, &q) != 0) {
+		goto error;
+	}
+
+	memcpy(out, in, 8);
+	i2osp(&out[8], (bits + 7) / 8, &n);
+	memcpy(&out[rsa_pubkey_bufsize(bits) - 8],
+		&in[rsa_prikey_bufsize(bits) - 8], 8);
+
+	goto cleanup;
+
+error:
+	ret = 1;
+cleanup:
+	ret |= bnu_free(&n);
+	ret |= bnu_free(&p);
+	ret |= bnu_free(&q);
+
+	return ret;
+}
+
 size_t rsa_pubkey_bufsize(uint64_t bits) {
 	return (bits + 7) / 8 + 16;
 }

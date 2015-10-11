@@ -129,6 +129,7 @@ void salsa20_final(SALSA20_CTX *ctx) {
 /* convenience functions */
 void salsa20_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
 	SALSA20_CTX ctx;
+	memset(&ctx, 0, sizeof(ctx));
 	salsa20_init(&ctx, key, ksize, nonce);
 
 	salsa20_stream(&ctx, in, out, len);

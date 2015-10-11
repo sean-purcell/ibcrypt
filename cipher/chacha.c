@@ -126,6 +126,7 @@ void chacha_final(CHACHA_CTX *ctx) {
 /* convenience functions */
 void chacha_enc(const uint8_t *key, const int ksize, const uint64_t nonce, const uint8_t *const in, uint8_t *const out, const uint64_t len) {
 	CHACHA_CTX ctx;
+	memset(&ctx, 0, sizeof(ctx));
 	chacha_init(&ctx, key, ksize, nonce);
 
 	chacha_stream(&ctx, in, out, len);
